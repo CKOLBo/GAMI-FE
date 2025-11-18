@@ -1,0 +1,89 @@
+@font-face {
+  font-family: 'Pretendard-Regular';
+  src: url('https://fastly.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-Regular.woff')
+    format('woff');
+  font-weight: 400;
+  font-style: normal;
+}
+
+* {
+  box-sizing: border-box;
+  font-family: 'Pretendard-Regular', sans-serif;
+}
+
+body {
+  background-color: #ffffff;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  height: 100vh;
+  justify-content: center;
+}
+
+.회원가입페이지 {
+  text-align: center;
+  max-width: 320px;
+  width: 100%;
+  margin-top: 100px;
+}
+
+.logo {
+  width: 120px;
+}
+
+.로그인 {
+  font-size: 14px;
+  color: #5c5c5c;
+  margin-bottom: 40px;
+}
+
+.로그인 a {
+  color: #91bbff;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.입력 {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.입력 input {
+  padding: 16px;
+  border: 1px solid #ddd;
+  border-radius: 7px;
+  font-size: 14px;
+}
+
+.입력 button {
+  padding: 14px;
+  background-color: #cebeff;
+  color: #fff;
+  font-size: 15px;
+  border: none;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: all 0.3s;
+  margin-top: 10px;
+  font-weight: 600;
+}
+
+.입력 button:hover {
+  background-color: #bbaaf5;
+}
+
+.약관박스 {
+  background-color: #f6f6f8;
+  padding: 16px;
+  border-radius: 7px;
+  font-size: 14px;
+  text-align: left;
+  color: #858486;
+}
+
+.필수항목 {
+  text-align: left;
+  font-size: 14px;
+  color: #858486;
+}
