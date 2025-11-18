@@ -1,4 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom';
+import Logo from '@/assets/Logo/Logo';
 import './EmailPage.css';
 
 export default function EmailPage() {
@@ -12,7 +13,7 @@ export default function EmailPage() {
   return (
     <div className="email-page">
       <div className="email-container">
-        <img src="/logo.svg" alt="GAMI 로고" className="logo" />
+        <Logo />
         <p className="login-link">
           이미 회원이신가요? <Link to="/login">로그인하기</Link>
         </p>
