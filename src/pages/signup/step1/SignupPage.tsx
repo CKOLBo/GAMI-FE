@@ -1,4 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom';
+import Logo from '@/assets/Logo/Logo';
 import './SignupPage.css';
 
 export default function SignupPage() {
@@ -12,7 +13,7 @@ export default function SignupPage() {
   return (
     <div className="signup-page">
       <div className="signup-container">
-        <img src="/logo.svg" alt="GAMI 로고" className="logo" />
+        <Logo />
 
         <p className="login-link">
           이미 회원이신가요? <Link to="/login">로그인하기</Link>
