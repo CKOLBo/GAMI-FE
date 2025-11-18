@@ -1,32 +1,33 @@
 import { Link, useNavigate } from 'react-router-dom';
+import './JoinPage.css';
 
-export default function Join() {
+export default function JoinPage() {
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     navigate('/email');
   };
 
   return (
-    <body>
-      <div className="login">
+    <div className="join-page">
+      <div className="join-container">
         <img src="/logo.svg" alt="GAMI 로고" className="logo" />
-        <p className="join">
+        <p className="login-link">
           이미 회원이신가요? <Link to="/login">로그인</Link>
         </p>
-        <form className="input" onSubmit={handleSubmit}>
+        <form className="join-form" onSubmit={handleSubmit}>
           <input type="text" placeholder="이름" required />
-          <input type="text" placeholder="기수" required />
-          <div className="sex">
-            <button className="male" type="button">
+          <input type="number" placeholder="기수" required min="1" />
+          <div className="gender-buttons">
+            <button className="gender-button male" type="button">
               남자
             </button>
-            <button className="female" type="button">
+            <button className="gender-button female" type="button">
               여자
             </button>
           </div>
-          <select className="major" required defaultValue="">
+          <select className="major-select" required defaultValue="">
             <option value="" disabled>
               전공
             </option>
@@ -34,11 +35,11 @@ export default function Join() {
             <option value="be">BackEnd</option>
             <option value="ios">iOS</option>
           </select>
-          <button className="next" type="submit">
+          <button className="submit-button" type="submit">
             다음으로
           </button>
         </form>
       </div>
-    </body>
+    </div>
   );
 }
