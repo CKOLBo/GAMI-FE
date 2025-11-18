@@ -7,7 +7,7 @@ export default function Password() {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    navigate('/join');
+    navigate('/login');
   };
 
   return (
