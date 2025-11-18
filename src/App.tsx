@@ -10,9 +10,9 @@ function App() {
       <Routes>
         <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="/login" element={<LoginPage />} />
-        <Route path="/signup" element={<Password />} />
-        <Route path="/join" element={<JoinPage />} />
-        <Route path="/email" element={<EmailPage />} />
+        <Route path="/signup/join" element={<JoinPage />} />
+        <Route path="/signup/email" element={<EmailPage />} />
+        <Route path="/signup/password" element={<Password />} />
       </Routes>
     </BrowserRouter>
   );
