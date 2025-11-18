@@ -17,8 +17,8 @@ export default function Join() {
               여자
             </button>
           </div>
-          <select className="major" placeholder="전공" required>
-            <option value="" disabled selected>
+          <select className="major" required defaultValue="">
+            <option value="" disabled>
               전공
             </option>
             <option value="fe">FrontEnd</option>
