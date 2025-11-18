@@ -7,7 +7,7 @@ export default function JoinPage() {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    navigate('/email');
+    navigate('/signup/email');
   };
 
   return (
