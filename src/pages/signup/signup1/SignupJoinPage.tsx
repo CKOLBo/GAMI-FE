@@ -19,7 +19,6 @@ export default function JoinPage() {
         </p>
         <form className="join-form" onSubmit={handleSubmit}>
           <input type="text" placeholder="이름" required />
-          <input type="number" placeholder="기수" required min="1" />
           <div className="gender-buttons">
             <button className="gender-button male" type="button">
               남자
