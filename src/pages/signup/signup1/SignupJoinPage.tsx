@@ -30,11 +30,11 @@ export default function JoinPage() {
           </div>
           <select className="major-select" required defaultValue="">
             <option value="" disabled>
-              전공
+              기수
             </option>
-            <option value="fe">FrontEnd</option>
-            <option value="be">BackEnd</option>
-            <option value="ios">iOS</option>
+            <option value="7기">7기</option>
+            <option value="8기">8기</option>
+            <option value="9기">9기</option>
           </select>
           <button className="submit-button" type="submit">
             다음으로
