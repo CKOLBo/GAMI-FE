@@ -56,7 +56,7 @@ export default function JoinPage() {
           </select>
           <button
             type="submit"
-            className="p-[16px] bg-[#cebeff] text-[white] text-[15px] border-none rounded-[6px] cursor-pointer transition-all duration-[300ms] mt-[10px] font-[600] hover:bg-[#bbaaf5] outline-none"
+            className="p-[16px] bg-[#BFA9FF] text-[white] text-[16px] border-none rounded-[6px] cursor-pointer transition-all duration-[300ms] mt-[10px] font-[700] hover:bg-[#AA8EFF] outline-none"
           >
             다음으로
           </button>
