@@ -39,7 +39,7 @@ export default function Password() {
 
           <button
             type="submit"
-            className="p-[14px] bg-[#cebeff] text-[white] text-[15px] border-none rounded-[7px] cursor-pointer transition-all duration-[300ms] mt-[10px] font-[600] hover:bg-[#bbaaf5] outline-none"
+            className="p-[16px] bg-[#BFA9FF] text-[white] text-[16px] border-none rounded-[7px] cursor-pointer transition-all duration-[300ms] mt-[10px] font-[700] hover:bg-[#bbaaf5] outline-none"
           >
             회원가입
           </button>
