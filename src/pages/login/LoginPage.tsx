@@ -11,7 +11,7 @@ export default function LoginPage() {
         </div>
 
         <p className="signup-link">
-          GAMI가 처음이라면? <Link to="/signup/join">회원가입하기</Link>
+          GAMI가 처음이라면? <Link to="/signup1">회원가입하기</Link>
         </p>
         <form className="login-form">
           <input type="email" placeholder="이메일" required />
