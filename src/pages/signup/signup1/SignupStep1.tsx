@@ -1,12 +1,12 @@
 import { Link, useNavigate } from 'react-router-dom';
 import Logo from '@/assets/Logo/Logo';
 
-export default function JoinPage() {
+export default function Step1() {
   const navigate = useNavigate();
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    navigate('/signup/email');
+    navigate('/signup2');
   };
 
   return (
