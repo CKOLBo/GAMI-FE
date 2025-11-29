@@ -55,12 +55,7 @@ export default function Step2() {
             </button>
           </div>
           <InputPassword />
-          <input
-            type="password"
-            placeholder="비밀번호 확인"
-            required
-            className="p-[16px] border-[1px] border-[solid] border-[#B7BCC8] rounded-[7px] text-[14px] outline-none"
-          />
+          <InputPassword placeholder="비밀번호 확인" />
 
           <button
             type="submit"
