@@ -33,9 +33,9 @@ export default function Step2() {
             />
             <button
               type="button"
-              className="p-[16px] bg-[#91bbff] text-[white] text-[14px] border-none rounded-[6px] cursor-pointer transition-all duration-[300ms] font-[600] whitespace-nowrap min-w-[90px] hover:bg-[#7a9fe6] outline-none"
+              className="p-[16px] bg-[#73A9FF] text-[white] text-[14px] border-none rounded-[6px] cursor-pointer transition-all duration-[300ms] font-[600] whitespace-nowrap min-w-[90px] hover:bg-[#7a9fe6] outline-none"
             >
-              인증하기
+              번호 발송
             </button>
           </div>
 
@@ -48,9 +48,9 @@ export default function Step2() {
             />
             <button
               type="button"
-              className="p-[16px] bg-[#91bbff] text-[white] text-[14px] border-none rounded-[6px] cursor-pointer transition-all duration-[300ms] font-[600] whitespace-nowrap min-w-[90px] hover:bg-[#7a9fe6] outline-none"
+              className="p-[16px] bg-[#73A9FF] text-[white] text-[14px] border-none rounded-[6px] cursor-pointer transition-all duration-[300ms] font-[600] whitespace-nowrap min-w-[90px] hover:bg-[#7a9fe6] outline-none"
             >
-              확인
+              인증하기
             </button>
           </div>
           <input
