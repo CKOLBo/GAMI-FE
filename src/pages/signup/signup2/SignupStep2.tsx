@@ -1,9 +1,17 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Logo from '@/assets/Logo/Logo';
 import CategoryButton from '@/assets/components/CategoryButton';
 import NextButton from '@/assets/components/NextButton';
 
 export default function Step2() {
+  const navigate = useNavigate();
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    navigate('/signup3');
+  };
+
   const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
 
   const interests = [
@@ -38,18 +46,19 @@ export default function Step2() {
         선택해 주세요.
       </p>
 
-      <div className="flex flex-wrap justify-center gap-[10px] max-w-[320px] mb-[32px]">
-        {interests.map((interest) => (
-          <CategoryButton
-            key={interest.id}
-            label={interest.label}
-            isSelected={selectedInterests.includes(interest.id)}
-            onClick={() => toggleInterest(interest.id)}
-          />
-        ))}
-      </div>
-
-      <NextButton />
+      <form onSubmit={handleSubmit} className="flex flex-col items-center">
+        <div className="flex flex-wrap justify-center gap-[10px] max-w-[320px] mb-[32px]">
+          {interests.map((interest) => (
+            <CategoryButton
+              key={interest.id}
+              label={interest.label}
+              isSelected={selectedInterests.includes(interest.id)}
+              onClick={() => toggleInterest(interest.id)}
+            />
+          ))}
+        </div>
+        <NextButton />
+      </form>
     </div>
   );
 }
