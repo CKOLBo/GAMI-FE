@@ -27,18 +27,18 @@ export default function Step1() {
             type="text"
             placeholder="이름"
             required
-            className="p-[16px] border-[1px] border-[solid] border-[#B7BCC8] rounded-[6px] text-[14px] outline-none"
+            className="p-[16px] border border-[1px] border-[solid] border-[#B7BCC8] rounded-[6px] placeholder:text-[#6D6F79] text-[#6D6F79] text-[14px] outline-none focus:outline-none focus:border-[#73A9FF]"
           />
           <div className="flex gap-[2%]">
             <button
               type="button"
-              className="bg-[white] border-[1px] border-[solid] border-[#B7BCC8] rounded-[6px] text-[14px] text-[#858486] font-[500] p-[16px] w-[49%] cursor-pointer transition-all duration-[300ms] hover:border-[#91bbff] hover:text-[#91bbff] outline-none"
+              className="bg-[white] border-[1px] border-[solid] border-[#B7BCC8] rounded-[6px] text-[14px] text-[#6D6F79] font-[500] p-[16px] w-[49%] cursor-pointer transition-all duration-[300ms] hover:border-[#91bbff] hover:text-[#91bbff] outline-none"
             >
               남자
             </button>
             <button
               type="button"
-              className="bg-[white] border-[1px] border-[solid] border-[#B7BCC8] rounded-[6px] text-[14px] text-[#858486] font-[500] p-[16px] w-[49%] cursor-pointer transition-all duration-[300ms] hover:border-[#91bbff] hover:text-[#91bbff] outline-none"
+              className="bg-[white] border-[1px] border-[solid] border-[#B7BCC8] rounded-[6px] text-[14px] text-[#6D6F79] font-[500] p-[16px] w-[49%] cursor-pointer transition-all duration-[300ms] hover:border-[#91bbff] hover:text-[#91bbff] outline-none"
             >
               여자
             </button>
@@ -46,7 +46,7 @@ export default function Step1() {
           <select
             required
             defaultValue=""
-            className="bg-[white] border-[1px] border-[solid] border-[#B7BCC8] rounded-[6px] text-[14px] text-[#858486] font-[500] p-[16px] w-[100%] cursor-pointer appearance-none outline-none"
+            className="bg-[white] border-[1px] border-[solid] border-[#B7BCC8] rounded-[6px] text-[14px] text-[#6D6F79] font-[500] p-[16px] w-[100%] cursor-pointer appearance-none outline-none"
           >
             <option value="" disabled>
               기수
