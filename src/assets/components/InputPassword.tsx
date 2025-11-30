@@ -1,5 +1,5 @@
-import Show from '@/assets/password/show';
-import Hide from '@/assets/password/hide';
+import Show from '@/assets/svg/password/show';
+import Hide from '@/assets/svg/password/hide';
 import { useState } from 'react';
 
 interface InputPasswordProps {
