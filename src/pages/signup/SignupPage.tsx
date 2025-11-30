@@ -200,7 +200,7 @@ export default function Signup() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="flex-[1] p-[16px] border-[1px] border-[solid] border-[#B7BCC8] rounded-[6px] text-[14px] outline-none"
+              className="flex-[1] p-[16px] border-[1px] border-[solid] border-[#B7BCC8] rounded-[6px] text-[14px] outline-none focus:border-[#73A9FF]"
             />
             <button
               type="button"
@@ -217,7 +217,7 @@ export default function Signup() {
               value={verificationCode}
               onChange={(e) => setVerificationCode(e.target.value)}
               required
-              className="flex-[1] p-[16px] border-[1px] border-[solid] border-[#B7BCC8] rounded-[6px] text-[14px] outline-none"
+              className="flex-[1] p-[16px] border-[1px] border-[solid] border-[#B7BCC8] rounded-[6px] text-[14px] outline-none focus:border-[#73A9FF]"
             />
             <button
               type="button"
