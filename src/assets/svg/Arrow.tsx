@@ -14,7 +14,7 @@ export default function Arrow({ className = '' }: ArrowProps) {
     >
       <path
         d="M15 7.5L10 12.5L5 7.5"
-        stroke="#6D6F79"
+        stroke="currentColor"
         strokeWidth="1.66667"
         strokeLinecap="round"
         strokeLinejoin="round"
