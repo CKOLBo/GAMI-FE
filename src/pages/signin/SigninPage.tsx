@@ -4,7 +4,7 @@ import Logo from '@/assets/Logo/Logo';
 import Show from '@/assets/password/show';
 import Hide from '@/assets/password/hide';
 
-export default function LoginPage() {
+export default function SigninPage() {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({ email: '', password: '' });
@@ -49,7 +49,7 @@ export default function LoginPage() {
         <p className="text-[14px] text-[#3D3D48] mb-[40px]">
           <span className="font-[500]">GAMI가 처음이라면?</span>{' '}
           <Link
-            to="/signup1"
+            to="/signup"
             className="text-[#73A9FF] font-[700] no-underline"
           >
             회원가입하기
@@ -95,7 +95,7 @@ export default function LoginPage() {
 
         <div className="mt-[8px] text-right">
           <Link
-            to="/login"
+            to="/signin"
             className="font-[500] text-[14px] text-[#3D3D48] no-underline"
           >
             비밀번호 찾기
