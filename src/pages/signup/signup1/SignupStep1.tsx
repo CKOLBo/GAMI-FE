@@ -32,13 +32,13 @@ export default function Step1() {
           <div className="flex gap-[2%]">
             <button
               type="button"
-              className="bg-[white] border-[1px] border-[solid] border-[#B7BCC8] rounded-[6px] text-[14px] text-[#6D6F79] font-[500] p-[16px] w-[49%] cursor-pointer transition-all duration-[300ms] hover:border-[#73A9FF] hover:text-[#73A9FF] outline-none"
+              className="bg-[white] border-[1px] border-[solid] border-[#B7BCC8] rounded-[6px] text-[14px] text-[#6D6F79] font-[500] p-[16px] w-[49%] cursor-pointer transition-all duration-[300ms] hover:border-[#BFA9FF] hover:text-[#BFA9FF] outline-none"
             >
               남자
             </button>
             <button
               type="button"
-              className="bg-[white] border-[1px] border-[solid] border-[#B7BCC8] rounded-[6px] text-[14px] text-[#6D6F79] font-[500] p-[16px] w-[49%] cursor-pointer transition-all duration-[300ms] hover:border-[#91bbff] hover:text-[#91bbff] outline-none"
+              className="bg-[white] border-[1px] border-[solid] border-[#B7BCC8] rounded-[6px] text-[14px] text-[#6D6F79] font-[500] p-[16px] w-[49%] cursor-pointer transition-all duration-[300ms] hover:border-[#BFA9FF] hover:text-[#BFA9FF] outline-none"
             >
               여자
             </button>
