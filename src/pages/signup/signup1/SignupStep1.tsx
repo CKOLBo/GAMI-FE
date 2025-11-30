@@ -1,9 +1,11 @@
 import { Link, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 import Logo from '@/assets/Logo/Logo';
 import NextButton from '@/assets/components/NextButton';
 
 export default function Step1() {
   const navigate = useNavigate();
+  const [selectedGender, setSelectedGender] = useState<string>('');
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -32,13 +34,23 @@ export default function Step1() {
           <div className="flex gap-[2%]">
             <button
               type="button"
-              className="bg-[white] border-[1px] border-[solid] border-[#B7BCC8] rounded-[6px] text-[14px] text-[#6D6F79] font-[500] p-[16px] w-[49%] cursor-pointer transition-all duration-[300ms] hover:border-[#BFA9FF] hover:text-[#BFA9FF] outline-none"
+              onClick={() => setSelectedGender('male')}
+              className={`border-[1px] border-[solid] rounded-[6px] text-[14px] font-[500] p-[16px] w-[49%] cursor-pointer transition-all duration-[300ms] outline-none ${
+                selectedGender === 'male'
+                  ? 'bg-[#BFA9FF] text-[white] border-[#BFA9FF]'
+                  : 'bg-[white] border-[#B7BCC8] text-[#6D6F79] hover:border-[#BFA9FF] hover:text-[#BFA9FF]'
+              }`}
             >
               남자
             </button>
             <button
               type="button"
-              className="bg-[white] border-[1px] border-[solid] border-[#B7BCC8] rounded-[6px] text-[14px] text-[#6D6F79] font-[500] p-[16px] w-[49%] cursor-pointer transition-all duration-[300ms] hover:border-[#BFA9FF] hover:text-[#BFA9FF] outline-none"
+              onClick={() => setSelectedGender('female')}
+              className={`border-[1px] border-[solid] rounded-[6px] text-[14px] font-[500] p-[16px] w-[49%] cursor-pointer transition-all duration-[300ms] outline-none ${
+                selectedGender === 'female'
+                  ? 'bg-[#BFA9FF] text-[white] border-[#BFA9FF]'
+                  : 'bg-[white] border-[#B7BCC8] text-[#6D6F79] hover:border-[#BFA9FF] hover:text-[#BFA9FF]'
+              }`}
             >
               여자
             </button>
