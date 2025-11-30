@@ -82,7 +82,7 @@ export default function Step1() {
                       setSelectedGeneration(gen);
                       setIsGenerationOpen(false);
                     }}
-                    className="w-[100%] p-[16px] text-left text-[14px] font-[500] text-[#333D48] hover:bg-[#F5F6F8] transition-colors duration-[200ms] border-none cursor-pointer"
+                    className="w-[100%] p-[16px] text-left text-[14px] font-[500] text-[#333D48] bg-[white] hover:bg-[#F5F6F8] transition-colors duration-[200ms] border-none cursor-pointer"
                   >
                     {gen}
                   </button>
