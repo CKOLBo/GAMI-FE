@@ -1,11 +1,26 @@
-export default function Logo() {
+type LogoSize = "sm" | "md";
+
+interface LogoProps {
+  size?: LogoSize;
+  className?: string;
+}
+
+const sizeMap: Record<LogoSize, { width: number; height: number }> = {
+  sm: { width: 95, height: 75 },
+  md: { width: 116, height: 92 },
+};
+
+export default function Logo({ size = "md", className }: LogoProps) {
+  const { width, height } = sizeMap[size];
+
   return (
     <svg
-      width="116"
-      height="92"
+      width={width}
+      height={height}
       viewBox="0 0 116 92"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
+      className={className}
     >
       <path
         d="M34.7872 77.2624C34.9308 77.0656 35.5222 76.3517 37.2958 77.4772C38.715 78.3779 38.9865 81.7242 38.9448 83.2849C38.9143 83.8249 38.8183 84.8635 38.6487 85.7044C39.1808 86.3673 39.4995 87.2059 39.4995 88.119C39.4995 90.2626 37.7474 92 35.5861 92C33.425 91.9998 31.6727 90.2624 31.6726 88.119C31.6726 86.1677 33.125 84.5534 35.0159 84.2794C35.0744 82.795 35.0277 80.9207 34.5901 80.1756C33.8553 78.9245 34.6438 77.459 34.7872 77.2624Z"
