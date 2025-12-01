@@ -1,8 +1,13 @@
 @import 'tailwindcss';
 
+@theme {
+  --font-family-sans: 'Pretendard', sans-serif;
+}
+
 html,
 body {
   overflow-x: hidden;
+  font-family: 'Pretendard', sans-serif;
 }
 
 #root {
