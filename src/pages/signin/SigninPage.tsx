@@ -61,14 +61,14 @@ export default function SigninPage() {
             type="text"
             name="email"
             placeholder="이메일"
-            className="w-full h-13 px-5 border border-[#B7BCC8] rounded-lg text-sm text-[#3D3D48] placeholder:text-[#6D6F79] focus:outline-none focus:border-[#73A9FF] mb-3.5"
+            className="w-full h-13 px-5 border border-[#B7BCC8] rounded-lg text-sm text-[#3D3D48] placeholder:text-[#6D6F79] placeholder:font-medium focus:outline-none focus:border-[#73A9FF] mb-3.5"
           />
           <div className="relative">
             <input
               type={showPassword ? 'text' : 'password'}
               name="password"
               placeholder="비밀번호"
-              className="w-full h-13 px-5 pr-14 border border-[#B7BCC8] rounded-lg text-sm text-[#3D3D48] placeholder:text-[#6D6F79] focus:outline-none focus:border-[#73A9FF]"
+              className="w-full h-13 px-5 pr-14 border border-[#B7BCC8] rounded-lg text-sm text-[#3D3D48] placeholder:text-[#6D6F79] placeholder:font-medium focus:outline-none focus:border-[#73A9FF]"
             />
             <button
               type="button"
