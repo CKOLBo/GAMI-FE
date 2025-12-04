@@ -1,8 +1,8 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
-import Logo from '@/assets/Logo/Logo';
-import Show from '@/assets/password/show';
-import Hide from '@/assets/password/hide';
+import Logo from '@/assets/svg/Logo/Logo';
+import Show from '@/assets/svg/password/show';
+import Hide from '@/assets/svg/password/hide';
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -48,10 +48,7 @@ export default function LoginPage() {
         </div>
         <p className="text-[14px] text-[#3D3D48] mb-[40px]">
           <span className="font-[500]">GAMI가 처음이라면?</span>{' '}
-          <Link
-            to="/signup1"
-            className="text-[#73A9FF] font-[700] no-underline"
-          >
+          <Link to="/signup" className="text-[#73A9FF] font-[700] no-underline">
             회원가입하기
           </Link>
         </p>
