@@ -70,7 +70,7 @@ export default function SignupPage() {
       email,
       password,
     });
-    navigate('/login');
+    navigate('/signin');
   };
 
   const renderStep1 = () => (
@@ -81,7 +81,7 @@ export default function SignupPage() {
         </div>
         <p className="text-sm font-medium text-[#333D48] mb-9">
           이미 회원이신가요?{' '}
-          <Link to="/login" className="text-[#73A9FF] font-bold no-underline">
+          <Link to="/signin" className="text-[#73A9FF] font-bold no-underline">
             로그인
           </Link>
         </p>
@@ -187,7 +187,7 @@ export default function SignupPage() {
 
         <p className="font-medium text-[#333D48] mb-9">
           이미 회원이신가요?{' '}
-          <Link className="text-[#73A9FF] font-bold no-underline" to="/login">
+          <Link className="text-[#73A9FF] font-bold no-underline" to="/signin">
             로그인하기
           </Link>
         </p>
