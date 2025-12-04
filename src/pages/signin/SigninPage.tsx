@@ -41,9 +41,9 @@ export default function SigninPage() {
   };
 
   return (
-    <div className="bg-[#ffffff] h-screen flex justify-center items-center p-[20px] overflow-hidden">
-      <div className="text-center max-w-[320px] w-full">
-        <div className="w-[100px] mb-[30px] mx-auto">
+    <div className="bg-[#ffffff] h-screen flex justify-center items-center p-5 overflow-hidden">
+      <div className="text-center max-w-xs w-full">
+        <div className="w-25 mb-[30px] mx-auto">
           <Logo />
         </div>
         <p className="text-[14px] text-[#3D3D48] mb-[40px]">
@@ -80,23 +80,23 @@ export default function SigninPage() {
           </div>
           <div className="h-[22px] mb-[14px]">
             {(errors.email || errors.password) && (
-              <p className="text-[12px] text-[#FF6B6B] text-left m-0 mt-[4px]">
+              <p className="text-xs text-[#FF6B6B] text-left m-0 mt-1">
                 {errors.email || errors.password}
               </p>
             )}
           </div>
           <button
             type="submit"
-            className="w-full h-[52px] bg-[#BFA9FF] text-[#FFFFFF] text-[16px] rounded-[8px] transition-all duration-300 font-[700] hover:bg-[#AA8EFF] border-0 cursor-pointer"
+            className="w-full h-13 bg-[#BFA9FF] text-[#FFFFFF] text-base rounded-lg transition-all duration-300 font-[700] hover:bg-[#AA8EFF] border-0 cursor-pointer"
           >
             로그인
           </button>
         </form>
 
-        <div className="mt-[8px] text-right">
+        <div className="mt-2 text-right">
           <Link
             to="/signin"
-            className="font-[500] text-[14px] text-[#3D3D48] no-underline"
+            className="font-[500] text-sm text-[#3D3D48] no-underline"
           >
             비밀번호 찾기
           </Link>
