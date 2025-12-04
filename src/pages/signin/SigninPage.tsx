@@ -48,10 +48,7 @@ export default function SigninPage() {
         </div>
         <p className="text-sm text-[#3D3D48] mb-10">
           <span className="font-[500]">GAMI가 처음이라면?</span>{' '}
-          <Link
-            to="/signup"
-            className="text-[#73A9FF] font-[700] no-underline"
-          >
+          <Link to="/signup" className="text-[#73A9FF] font-[700] no-underline">
             회원가입하기
           </Link>
         </p>
