@@ -8,7 +8,7 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Navigate to="/login" replace />} />
+        <Route path="/" element={<Navigate to="/signin" replace />} />
         <Route path="/signin" element={<SigninPage />} />
         <Route path="/signup/join" element={<JoinPage />} />
         <Route path="/signup/email" element={<EmailPage />} />
