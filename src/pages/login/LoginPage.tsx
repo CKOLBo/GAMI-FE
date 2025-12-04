@@ -32,7 +32,10 @@ export default function LoginPage() {
       if (email === 'test@gsm.hs.kr' && password === '1234') {
         navigate('/main');
       } else {
-        setErrors({ email: '', password: '이메일 또는 비밀번호가 일치하지 않습니다.' });
+        setErrors({
+          email: '',
+          password: '이메일 또는 비밀번호가 일치하지 않습니다.',
+        });
       }
     }
   };
@@ -62,7 +65,7 @@ export default function LoginPage() {
           />
           <div className="relative">
             <input
-              type={showPassword ? "text" : "password"}
+              type={showPassword ? 'text' : 'password'}
               name="password"
               placeholder="비밀번호"
               className="w-full h-[52px] px-[20px] pr-14 border border-[#B7BCC8] rounded-[8px] text-[14px] text-[#3D3D48] placeholder:text-[#6D6F79] focus:outline-none focus:border-[#73A9FF]"

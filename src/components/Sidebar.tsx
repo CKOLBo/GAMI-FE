@@ -28,7 +28,7 @@ export default function Sidebar() {
     <div className="w-[180px] h-screen bg-[#FFFFFF] border-r border-[#B7BCC8] flex flex-col">
       <Link to="/main" className="p-[20px] flex justify-center cursor-pointer">
         <div className="w-[116px] justify-center flex">
-          <Logo size='sm' />
+          <Logo size="sm" />
         </div>
       </Link>
 
@@ -50,7 +50,9 @@ export default function Sidebar() {
                 }
               `}
             >
-              <Icon className={isActive ? 'text-[#BFA9FF]' : 'text-[#333D48]'} />
+              <Icon
+                className={isActive ? 'text-[#BFA9FF]' : 'text-[#333D48]'}
+              />
               <span>{item.label}</span>
             </Link>
           );
