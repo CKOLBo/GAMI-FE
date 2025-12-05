@@ -47,8 +47,8 @@ export default function SigninPage() {
           <Logo />
         </div>
         <p className="text-sm text-[#3D3D48] mb-10">
-          <span className="font-[500]">GAMI가 처음이라면?</span>{' '}
-          <Link to="/signup" className="text-[#73A9FF] font-[700] no-underline">
+          <span className="font-medium">GAMI가 처음이라면?</span>{' '}
+          <Link to="/signup" className="text-[#73A9FF] font-bold no-underline">
             회원가입하기
           </Link>
         </p>
@@ -84,7 +84,7 @@ export default function SigninPage() {
           </div>
           <button
             type="submit"
-            className="w-full h-13 bg-[#BFA9FF] text-[#FFFFFF] text-base rounded-lg transition-all duration-300 font-[700] hover:bg-[#AA8EFF] border-0 cursor-pointer"
+            className="w-full h-13 bg-[#BFA9FF] text-[#FFFFFF] text-base rounded-lg transition-all duration-300 font-bold hover:bg-[#AA8EFF] border-0 cursor-pointer"
           >
             로그인
           </button>
@@ -93,7 +93,7 @@ export default function SigninPage() {
         <div className="mt-2 text-right">
           <Link
             to="/signin"
-            className="font-[500] text-sm text-[#3D3D48] no-underline"
+            className="font-medium text-sm text-[#3D3D48] no-underline"
           >
             비밀번호 찾기
           </Link>
