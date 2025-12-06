@@ -4,7 +4,7 @@ import Logo from '@/assets/svg/Logo/Logo';
 import Show from '@/assets/svg/password/show';
 import Hide from '@/assets/svg/password/hide';
 
-export default function LoginPage() {
+export default function SigninPage() {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({ email: '', password: '' });
@@ -41,14 +41,14 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="bg-[#ffffff] h-screen flex justify-center items-center p-[20px] overflow-hidden">
-      <div className="text-center max-w-[320px] w-full">
-        <div className="w-[100px] mb-[30px] mx-auto">
+    <div className="bg-[#ffffff] h-screen flex justify-center items-center p-5 overflow-hidden">
+      <div className="text-center max-w-xs w-full">
+        <div className="w-25 mb-7.5 mx-auto">
           <Logo />
         </div>
-        <p className="text-[14px] text-[#3D3D48] mb-[40px]">
-          <span className="font-[500]">GAMI가 처음이라면?</span>{' '}
-          <Link to="/signup" className="text-[#73A9FF] font-[700] no-underline">
+        <p className="text-sm text-[#3D3D48] mb-10">
+          <span className="font-medium">GAMI가 처음이라면?</span>{' '}
+          <Link to="/signup" className="text-[#73A9FF] font-bold no-underline">
             회원가입하기
           </Link>
         </p>
@@ -58,42 +58,42 @@ export default function LoginPage() {
             type="text"
             name="email"
             placeholder="이메일"
-            className="w-full h-[52px] px-[20px] border border-[#B7BCC8] rounded-[8px] text-[14px] text-[#3D3D48] placeholder:text-[#6D6F79] focus:outline-none focus:border-[#73A9FF] mb-[14px]"
+            className="w-full h-13 px-5 border border-[#B7BCC8] rounded-lg text-sm text-[#3D3D48] placeholder:text-[#6D6F79] placeholder:font-medium focus:outline-none focus:border-[#73A9FF] mb-3.5"
           />
           <div className="relative">
             <input
               type={showPassword ? 'text' : 'password'}
               name="password"
               placeholder="비밀번호"
-              className="w-full h-[52px] px-[20px] pr-14 border border-[#B7BCC8] rounded-[8px] text-[14px] text-[#3D3D48] placeholder:text-[#6D6F79] focus:outline-none focus:border-[#73A9FF]"
+              className="w-full h-13 px-5 pr-14 border border-[#B7BCC8] rounded-lg text-sm text-[#3D3D48] placeholder:text-[#6D6F79] placeholder:font-medium focus:outline-none focus:border-[#73A9FF]"
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-[10px] top-1/2 -translate-y-1/2 flex items-center justify-center p-0 bg-transparent border-0 cursor-pointer"
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 flex items-center justify-center p-0 bg-transparent border-0 cursor-pointer"
             >
               {showPassword ? <Show /> : <Hide />}
             </button>
           </div>
-          <div className="h-[22px] mb-[14px]">
+          <div className="h-5.5 mb-3.5">
             {(errors.email || errors.password) && (
-              <p className="text-[12px] text-[#FF6B6B] text-left m-0 mt-[4px]">
+              <p className="text-xs text-[#FF6B6B] text-left m-0 mt-1">
                 {errors.email || errors.password}
               </p>
             )}
           </div>
           <button
             type="submit"
-            className="w-full h-[52px] bg-[#BFA9FF] text-[#FFFFFF] text-[16px] rounded-[8px] transition-all duration-300 font-[700] hover:bg-[#AA8EFF] border-0 cursor-pointer"
+            className="w-full h-13 bg-[#BFA9FF] text-[#FFFFFF] text-base rounded-lg transition-all duration-300 font-bold hover:bg-[#AA8EFF] border-0 cursor-pointer"
           >
             로그인
           </button>
         </form>
 
-        <div className="mt-[8px] text-right">
+        <div className="mt-2 text-right">
           <Link
-            to="/login"
-            className="font-[500] text-[14px] text-[#3D3D48] no-underline"
+            to="/signin"
+            className="font-medium text-sm text-[#3D3D48] no-underline"
           >
             비밀번호 찾기
           </Link>
