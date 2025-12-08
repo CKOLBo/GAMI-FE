@@ -9,7 +9,7 @@ export default function PostPage() {
       <div>
         <InputSearch />
       </div>
-      <div>
+      <div className="ml-114">
         <Button text="글 쓰기" to="" />
       </div>
     </div>
