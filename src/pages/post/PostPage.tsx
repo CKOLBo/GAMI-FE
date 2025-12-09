@@ -42,10 +42,12 @@ export default function PostPage() {
   ];
 
   return (
-    <div>
-      <div className="flex items-center my-22">
-        <div>
-          <p className="text-[40px] w-46 h-12 font-bold mx-25">익명 게시판</p>
+    <div className="w-full">
+      <div className="flex flex-col lg:flex-row items-start lg:items-center my-6 lg:my-22 px-4 lg:px-0 gap-6 lg:gap-0">
+        <div className="w-full lg:w-auto">
+          <p className="text-3xl lg:text-[40px] font-bold lg:mx-25">
+            익명 게시판
+          </p>
         </div>
         <div className="flex flex-row gap-114">
           <div>
