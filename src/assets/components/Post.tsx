@@ -43,20 +43,20 @@ export default function Post({
         </div>
       </div>
 
-      <div className="flex items-center mr-40">
-        <div className="flex flex-row gap-11">
+      <div className="flex items-center lg:mr-40 mb-4 lg:mb-0">
+        <div className="flex flex-row gap-6 lg:gap-11">
           <button
-            className="flex items-center gap-5"
+            className="flex items-center gap-3 lg:gap-5"
             onClick={() => setIsLiked(!isLiked)}
           >
             <Hart isSelect={isLiked} />
-            <span className="text-[32px] font-normal text-gray-1">
+            <span className="text-2xl lg:text-[32px] font-normal text-gray-1">
               {likeCount}
             </span>
           </button>
-          <button className="flex items-center gap-5">
+          <button className="flex items-center gap-3 lg:gap-5">
             <Comment />
-            <span className="text-[32px] font-normal text-gray-1">
+            <span className="text-2xl lg:text-[32px] font-normal text-gray-1">
               {commentCount}
             </span>
           </button>
