@@ -59,7 +59,7 @@ export default function PostPage() {
           </div>
         </div>
       </div>
-      <div>
+      <div className="px-4 lg:px-0">
         {posts.map((post) => (
           <Post
             key={post.id}
