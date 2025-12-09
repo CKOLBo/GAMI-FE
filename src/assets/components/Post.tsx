@@ -13,12 +13,12 @@ interface PostProps {
 }
 
 export default function Post({
-  title = '제목이 들어갈 곳',
-  content = '내용이 들어갈 곳',
-  author = '익명',
-  timeAgo = '1시간 전',
-  likeCount = 3,
-  commentCount = 0,
+  title,
+  content,
+  author,
+  timeAgo,
+  likeCount,
+  commentCount,
 }: PostProps) {
   const [isLiked, setIsLiked] = useState(false);
 
