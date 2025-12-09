@@ -30,7 +30,7 @@ export default function Post({
           <p className="text-gray-3 text-2xl font-bold mb-9">{content}</p>
         </div>
         <div className="flex flex-row mb-9">
-          <p className="text-[#333D48] text-xl font-bold w-10 h-6 mr-[18px]">
+          <p className="text-gray-1 text-xl font-bold w-10 h-6 mr-[18px]">
             {author}
           </p>
           <p className="text-gray-3 text-xl font-bold">{timeAgo}</p>
@@ -44,13 +44,13 @@ export default function Post({
             onClick={() => setIsLiked(!isLiked)}
           >
             <Hart isSelect={isLiked} />
-            <span className="text-[32px] font-normal text-[#333D48]">
+            <span className="text-[32px] font-normal text-gray-1">
               {likeCount}
             </span>
           </button>
           <button className="flex items-center gap-1.5">
             <Comment />
-            <span className="text-[32px] font-normal text-[#333D48]">
+            <span className="text-[32px] font-normal text-gray-1">
               {commentCount}
             </span>
           </button>
