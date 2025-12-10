@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import SigninPage from '@/pages/signin/SigninPage';
 import Signup from '@/pages/signup/SignupPage';
 import Post from '@/pages/post/PostPage';
-import PostWrite from './pages/post/PostWrite';
+import PostContent from './pages/post/PostContent';
 
 function App() {
   return (
@@ -12,7 +12,7 @@ function App() {
         <Route path="/signin" element={<SigninPage />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/post" element={<Post />} />
-        <Route path="/post-write" element={<PostWrite />} />
+        <Route path="/post-content" element={<PostContent />} />
       </Routes>
     </BrowserRouter>
   );
