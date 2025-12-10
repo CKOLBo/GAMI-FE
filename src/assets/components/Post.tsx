@@ -53,8 +53,8 @@ export default function Post({
 
   return (
     <>
-      <div className="flex flex-col lg:flex-row justify-between w-full border-y-2 -mt-[2px] cursor-pointer border-gray-2 px-4 lg:px-0">
-        <div className="flex-1 lg:pl-[38px]">
+      <div className="flex flex-col lg:flex-row justify-between w-full border-y-2 -mt-0.5 border-gray-2 px-4 lg:px-0">
+        <div className="flex-1 cursor-pointer lg:pl-[38px]">
           <div>
             <p className="font-bold text-xl sm:text-2xl lg:text-3xl xl:text-[32px] mt-6 sm:mt-8 lg:mt-9 xl:mt-11 mb-2 lg:mb-3">
               {title}
@@ -76,7 +76,7 @@ export default function Post({
         <div className="flex items-center lg:mr-20 xl:mr-40 mb-4 lg:mb-0">
           <div className="flex flex-row gap-4 sm:gap-6 lg:gap-9 xl:gap-11">
             <button
-              className="flex items-center gap-2 sm:gap-3 lg:gap-4 xl:gap-5"
+              className="flex cursor-pointer items-center gap-2 sm:gap-3 lg:gap-4 xl:gap-5"
               onClick={handleLikeClick}
             >
               <Heart isSelect={isLiked} />
@@ -85,7 +85,7 @@ export default function Post({
               </span>
             </button>
             <button
-              className="flex items-center gap-2 sm:gap-3 lg:gap-4 xl:gap-5"
+              className="flex cursor-pointer items-center gap-2 sm:gap-3 lg:gap-4 xl:gap-5"
               onClick={onCommentClick}
             >
               <Comment />
@@ -93,7 +93,7 @@ export default function Post({
                 {commentCount}
               </span>
             </button>
-            <button onClick={handleReportClick}>
+            <button className="cursor-pointer" onClick={handleReportClick}>
               <Report />
             </button>
           </div>
