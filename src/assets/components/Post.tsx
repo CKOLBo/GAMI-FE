@@ -2,6 +2,7 @@ import { useState } from 'react';
 import Heart from '@/assets/svg/Heart';
 import Comment from '@/assets/svg/Comment';
 import Report from '@/assets/svg/Report';
+import PostModal from './PostModal';
 
 interface PostProps {
   title: string;
@@ -14,7 +15,6 @@ interface PostProps {
   onCommentClick?: () => void;
   onReportClick?: () => void;
   isLiked?: boolean;
-  modal?: React.ReactNode;
 }
 
 export default function Post({
@@ -28,17 +28,26 @@ export default function Post({
   onCommentClick,
   onReportClick,
   isLiked: externalIsLiked,
-  modal,
 }: PostProps) {
   const [internalIsLiked, setInternalIsLiked] = useState(false);
   const isLiked =
     externalIsLiked !== undefined ? externalIsLiked : internalIsLiked;
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleLikeClick = () => {
     if (onLikeClick) {
       onLikeClick();
     } else {
       setInternalIsLiked(!internalIsLiked);
+    }
+  };
+
+  const handleReportClick = () => {
+    if (onReportClick) {
+      onReportClick();
+    } else {
+      setIsModalOpen(true);
     }
   };
 
@@ -84,13 +93,20 @@ export default function Post({
                 {commentCount}
               </span>
             </button>
-            <button onClick={onReportClick}>
+            <button onClick={handleReportClick}>
               <Report />
             </button>
           </div>
         </div>
       </div>
-      {modal}
+      {isModalOpen && (
+        <PostModal
+          onClose={() => setIsModalOpen(false)}
+          onReport={() => {
+            setIsModalOpen(false);
+          }}
+        />
+      )}
     </>
   );
 }
