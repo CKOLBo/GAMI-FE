@@ -25,8 +25,8 @@ export default function MainPost({
   const [likes, setLikes] = useState(likeCount);
 
   const handleLikeToggle = (e: React.MouseEvent) => {
-    e.preventDefault(); // Link 이동 방지
-    e.stopPropagation(); // 이벤트 전파 중단
+    e.preventDefault(); 
+    e.stopPropagation();
 
     if (liked) {
       setLikes(likes - 1);
@@ -39,16 +39,18 @@ export default function MainPost({
   return (
     <Link
       to={`/post/${postId}`}
-      className="block bg-[#F9F9F9] rounded-2xl px-10 py-14 h-80 hover:bg-[#F0F0F0] transition-colors cursor-pointer"
+      className="flex flex-col justify-between bg-[#F9F9F9] rounded-2xl px-10 py-14 h-80 hover:bg-[#F0F0F0] transition-colors cursor-pointer"
     >
-      <h2 className="text-4xl font-bold text-[#333D48] mb-10 break-words">
-        {title}
-      </h2>
+      <div>
+        <h2 className="text-4xl font-bold text-[#333D48] mb-10 break-words">
+          {title}
+        </h2>
 
-      <p className="text-bold text-[#6D6F79] mb-12 break-words">
-        <span className="font-medium">익명 : </span>
-        {content}
-      </p>
+        <p className="text-bold text-[#6D6F79] max-h-[96px] break-words">
+          <span className="font-medium">익명 : </span>
+          {content}
+        </p>
+      </div>
 
       <div className="flex items-center gap-4">
         <button
