@@ -1,8 +1,8 @@
-interface HartProps {
+interface HeartProps {
   isSelect: boolean;
 }
 
-export default function Hart({ isSelect }: HartProps) {
+export default function Heart({ isSelect }: HeartProps) {
   return (
     <svg
       width="35"
