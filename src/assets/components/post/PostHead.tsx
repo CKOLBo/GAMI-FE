@@ -22,7 +22,7 @@ export default function PostHead({ children }: PostHeadProps) {
                               items-stretch sm:items-center
                               gap-3 sm:gap-4 justify-between"
       >
-        <div className="w-full sm:flex-1 max-w-[400px]">
+        <div className="w-full sm:flex-1 max-w-100">
           <InputSearch />
         </div>
         {children}
