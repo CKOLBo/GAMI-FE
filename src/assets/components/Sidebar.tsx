@@ -25,14 +25,14 @@ export default function Sidebar() {
   ];
 
   return (
-    <div className="w-[180px] 2xl:w-[220px] h-screen bg-[#FFFFFF] border-r border-[#B7BCC8] flex flex-col">
-      <Link to="/main" className="pt-[24px] 2xl:pt-[28px] flex justify-center cursor-pointer">
-        <div className="w-[90px] 2xl:w-[116px] justify-center flex">
+    <div className="w-45 2xl:w-55 h-screen bg-[#FFFFFF] border-r border-[#B7BCC8] flex flex-col">
+      <Link to="/main" className="pt-6 2xl:pt-7 flex justify-center cursor-pointer">
+        <div className="w-22 2xl:w-29 justify-center flex">
           <Logo size="md" />
         </div>
       </Link>
 
-      <nav className="flex flex-col gap-[12px] 2xl:gap-[16px] px-[12px] 2xl:px-[12px] mt-[80px] 2xl:mt-[100px]">
+      <nav className="flex flex-col gap-3 2xl:gap-4 px-3 2xl:px-4 mt-20 2xl:mt-25">
         {menuItems.map((item) => {
           const Icon = item.icon;
           const isActive = location.pathname === item.path;
@@ -41,8 +41,8 @@ export default function Sidebar() {
               key={item.path}
               to={item.path}
               className={`
-                flex items-center gap-[22px] px-[10px] py-[10px] rounded-[12px]
-                text-[16px] font-[600] no-underline transition-colors
+                flex items-center gap-5.5 px-2.5 py-2.5 rounded-xl
+                text-base font-semibold no-underline transition-colors
                 ${
                   isActive
                     ? 'bg-[#F1ECFF] text-[#BFA9FF]'
@@ -59,7 +59,7 @@ export default function Sidebar() {
         })}
         <button
           onClick={handleLogout}
-          className="flex items-center gap-[22px] px-[10px] py-[10px] rounded-[12px] text-[16px] font-[600] text-[#333D48] hover:bg-[#F5F5F5] transition-colors bg-transparent border-0 cursor-pointer text-left w-full"
+          className="flex items-center gap-5.5 px-2.5 py-2.5 rounded-xl text-[16px] font-semibold text-[#333D48] hover:bg-[#F5F5F5] transition-colors bg-transparent border-0 cursor-pointer text-left w-full"
         >
           <LogoutIcon className="text-[#333D48]" />
           <span>로그아웃</span>
