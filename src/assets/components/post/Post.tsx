@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import Heart from '@/assets/svg/Heart';
+
 interface ActionButton {
   icon: React.ReactNode;
   onClick: () => void;
