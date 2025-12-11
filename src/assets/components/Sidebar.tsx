@@ -25,14 +25,14 @@ export default function Sidebar() {
   ];
 
   return (
-    <div className="w-[220px] h-screen bg-[#FFFFFF] border-r border-[#B7BCC8] flex flex-col">
-      <Link to="/main" className="pt-[28px] flex justify-center cursor-pointer">
-        <div className="w-[116px] justify-center flex">
+    <div className="w-[180px] 2xl:w-[220px] h-screen bg-[#FFFFFF] border-r border-[#B7BCC8] flex flex-col">
+      <Link to="/main" className="pt-[24px] 2xl:pt-[28px] flex justify-center cursor-pointer">
+        <div className="w-[90px] 2xl:w-[116px] justify-center flex">
           <Logo size="md" />
         </div>
       </Link>
 
-      <nav className="flex flex-col gap-[16px] px-[16px] mt-[100px]">
+      <nav className="flex flex-col gap-[12px] 2xl:gap-[16px] px-[12px] 2xl:px-[12px] mt-[80px] 2xl:mt-[100px]">
         {menuItems.map((item) => {
           const Icon = item.icon;
           const isActive = location.pathname === item.path;
