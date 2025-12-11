@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import Heart from '@/assets/svg/Heart';
 import Comment from '@/assets/svg/post/Comment';
 import Report from '@/assets/svg/post/Report';

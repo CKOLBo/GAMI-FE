@@ -10,7 +10,6 @@ import DeleteModal from '@/assets/components/modal/DeleteModal';
 export default function MyPost() {
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedPostId, setSelectedPostId] = useState<number | null>(null);
 
   const posts = [
     {
@@ -51,14 +50,12 @@ export default function MyPost() {
     },
   ];
 
-  const handleDeleteClick = (postId: number) => {
-    setSelectedPostId(postId);
+  const handleDeleteClick = () => {
     setIsModalOpen(true);
   };
 
   const handleDelete = () => {
     setIsModalOpen(false);
-    setSelectedPostId(null);
   };
 
   return (
@@ -89,7 +86,7 @@ export default function MyPost() {
                   },
                   {
                     icon: <Delete />,
-                    onClick: () => handleDeleteClick(post.id),
+                    onClick: handleDeleteClick,
                   },
                 ]}
               />
