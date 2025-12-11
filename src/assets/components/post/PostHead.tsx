@@ -1,5 +1,4 @@
-import Button from '@/assets/components/Button';
-import InputSearch from './InputSearch';
+import InputSearch from '../Input/InputSearch';
 
 interface PostHeadProps {
   children: React.ReactNode;
