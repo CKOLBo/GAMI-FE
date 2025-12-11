@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import ModalWrapper from '@/assets/shared/Modal';
-import Button from '@/assets/components/Button';
-import Arrow from '../svg/Arrow';
+import Button from '@/assets/components/Button/Button';
+import Arrow from '../../svg/Arrow';
 interface PostModalProps {
   onClose: () => void;
   onReport: () => void;
