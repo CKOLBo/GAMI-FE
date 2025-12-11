@@ -25,7 +25,7 @@ export default function PostPage() {
       title: '제목이 들어갈 곳',
       content: '내용이 들어갈 곳',
       author: '익명',
-      timeAgo: '14건 전',
+      timeAgo: '1시간 전',
       likeCount: 3,
       commentCount: 0,
     },
