@@ -97,9 +97,7 @@ export default function PostModal({ onClose, onReport }: PostModalProps) {
             취소
           </button>
 
-          <div onClick={onReport}>
-            <Button text="신고하기" to="" />
-          </div>
+          <Button text="신고하기" onClick={onReport} />
         </div>
       </div>
     </ModalWrapper>
