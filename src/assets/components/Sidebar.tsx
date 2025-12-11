@@ -59,7 +59,7 @@ export default function Sidebar() {
         })}
         <button
           onClick={handleLogout}
-          className="flex items-center gap-5.5 px-2.5 py-2.5 rounded-xl text-[16px] font-semibold text-[#333D48] hover:bg-[#F5F5F5] transition-colors bg-transparent border-0 cursor-pointer text-left w-full"
+          className="flex items-center gap-5.5 px-2.5 py-2.5 rounded-xl text-base font-semibold text-[#333D48] hover:bg-[#F5F5F5] transition-colors bg-transparent border-0 cursor-pointer text-left w-full"
         >
           <LogoutIcon className="text-[#333D48]" />
           <span>로그아웃</span>
