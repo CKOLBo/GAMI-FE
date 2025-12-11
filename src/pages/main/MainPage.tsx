@@ -9,13 +9,13 @@ export default function MainPage() {
   return (
     <div className="flex">
       <Sidebar />
-      <div className="flex-1 p-15 2xl:p-25">
-        <h1 className="text-3xl 2xl:text-4xl font-bold text-[#333D48] mb-12 2xl:mb-16">
+      <div className="flex-1 p-12 2xl:p-25">
+        <h1 className="text-3xl 2xl:text-4xl font-bold text-[#333D48] mb-8 2xl:mb-16">
           홈
         </h1>
 
         <div className="grid grid-cols-3 gap-8 2xl:gap-12 mb-6 2xl:mb-8">
-          <div className="col-span-2 bg-gradient-to-r from-[#BFA9FF] to-[#73A9FF] rounded-2xl p-12 2xl:p-20 flex items-center justify-between">
+          <div className="col-span-2 bg-gradient-to-r from-[#BFA9FF] to-[#73A9FF] rounded-2xl py-8 2xl:py-15 px-12 2xl:px-20 flex items-center justify-between">
             <div className="text-[#ffffff]">
               <h2 className="text-3xl 2xl:text-4xl font-bold mb-4 2xl:mb-6 h-8 2xl:h-12 flex items-center">
                 GAMI에 오신 걸 환영합니다! 양은준님
@@ -24,7 +24,7 @@ export default function MainPage() {
                 멘토와 멘티를 바로 연결하는 맞춤형 멘토링 서비스에요.
               </p>
             </div>
-            <div className="h-44 flex items-center justify-center">
+            <div className="h-32 2xl:h-44 flex items-center justify-center">
               <img
                 src={FireWorks}
                 alt="FireWorks"
@@ -63,8 +63,8 @@ export default function MainPage() {
         </div>
 
         <div>
-          <h2 className="text-4xl font-bold text-[#333D48] mb-4">게시글</h2>
-          <div className="grid grid-cols-3 gap-12 ">
+          <h2 className="text-3xl 2xl:text-4xl font-bold text-[#333D48] mb-4">게시글</h2>
+          <div className="grid grid-cols-3 gap-8 2xl:gap-12">
             <Post
               title="제목"
               content="내용내욘ㅇㄴㅇ랜용ㄴ앰랜ㅇㄹㄴ내용ㄴ앵용냉sodasdoaskdlfj;@@Kfalskjflaksjdfoijasdfdfasdfasdfasdddddddddddddddddddddddddddddddd"
