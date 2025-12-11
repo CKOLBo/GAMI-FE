@@ -7,24 +7,26 @@ interface DeleteModalProps {
 
 export default function DeleteModal({ onClose, onDelete }: DeleteModalProps) {
   return (
-    <ModalWrapper className="w-[450px]">
-      <div className="flex flex-col items-center">
-        <h2 className="text-2xl font-bold text-gray-1 mb-4">게시글 삭제하기</h2>
-        <p className="text-lg text-gray-3 mb-8 text-center">
+    <ModalWrapper className="w-[542px] px-10 py-10">
+      <div className="flex flex-col ">
+        <h2 className="text-2xl font-bold text-gray-1 mb-20">
+          게시글 삭제하기
+        </h2>
+        <p className="text-2xl text-gray-1 mb-14 font-semibold">
           정말 삭제하시겠습니까?
           <br />
           삭제되면 복구되지 않아요.
         </p>
-        <div className="flex gap-4 w-full">
+        <div className="flex gap-4 justify-end">
           <button
             onClick={onClose}
-            className="flex-1 px-6 py-3 rounded-lg border-2 border-gray-2 text-gray-1 font-bold text-lg hover:bg-gray-50"
+            className="px-9 py-4 border cursor-pointer border-gray-2 text-2xl font-bold text-gray-1 rounded-xl hover:bg-gray-50 transition-color"
           >
             취소
           </button>
           <button
             onClick={onDelete}
-            className="flex-1 px-6 py-3 rounded-lg bg-main-1 text-white font-bold text-lg hover:bg-main-2"
+            className="rounded-[10px] bg-main-1 w-38 h-16 cursor-pointer text-white font-bold text-2xl"
           >
             삭제하기
           </button>
