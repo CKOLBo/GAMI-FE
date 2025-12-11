@@ -18,7 +18,7 @@ export default function Button({ text, to, onClick }: ButtonProps) {
     <button
       onClick={handleClick}
       type="button"
-      className="rounded-[10px] bg-main-1 w-38 h-16 cursor-pointer text-white font-bold text-2xl"
+      className="rounded-lg bg-main-1 w-38 h-16 cursor-pointer text-white font-bold text-2xl"
     >
       {text}
     </button>
