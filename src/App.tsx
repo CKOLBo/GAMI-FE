@@ -4,6 +4,7 @@ import Signup from '@/pages/signup/SignupPage';
 import Post from '@/pages/post/PostPage';
 import PostContent from './pages/post/PostContent';
 import PostWrite from './pages/post/PostWrite';
+import MyPost from './pages/post/MyPost';
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
         <Route path="/post" element={<Post />} />
         <Route path="/post-content" element={<PostContent />} />
         <Route path="/post-write" element={<PostWrite />} />
+        <Route path="/my-post" element={<MyPost />} />
       </Routes>
     </BrowserRouter>
   );
