@@ -2,6 +2,15 @@
 
 @theme {
   --font-family-sans: 'Pretendard', sans-serif;
+
+  --color-main-3: #ff6b6b;
+  --color-main-2: #bfa9ff;
+  --color-main-1: #73a9ff;
+
+  --color-gray-4: #d6d6d7;
+  --color-gray-3: #6d6f79;
+  --color-gray-2: #b7bcc8;
+  --color-gray-1: #333d48;
 }
 
 html,
