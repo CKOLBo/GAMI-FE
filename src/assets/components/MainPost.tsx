@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import HeartIcon from '@/assets/svg/main/HeartIcon';
 import HeartFilledIcon from '@/assets/svg/main/HeartFilledIcon';
@@ -21,28 +20,18 @@ export default function MainPost({
   commentCount,
   isLiked = false,
 }: MainPostProps) {
-  const [liked, setLiked] = useState(isLiked);
-  const [likes, setLikes] = useState(likeCount);
-
   const handleLikeToggle = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-
-    if (liked) {
-      setLikes(likes - 1);
-    } else {
-      setLikes(likes + 1);
-    }
-    setLiked(!liked);
   };
 
   return (
     <Link
       to={`/post/${postId}`}
-      className="flex flex-col justify-between bg-[#F9F9F9] rounded-2xl px-6 py-7 2xl:px-10 2xl:py-14 h-60 2xl:h-80 hover:bg-[#F0F0F0] transition-colors cursor-pointer"
+      className="flex flex-col justify-between bg-[#F9F9F9] rounded-2xl px-6 py-6 2xl:px-10 2xl:py-14 h-60 2xl:h-80 hover:bg-[#F0F0F0] transition-colors cursor-pointer"
     >
       <div>
-        <h2 className="text-2xl 2xl:text-4xl font-bold text-[#333D48] mb-5 2xl:mb-10 break-words">
+        <h2 className="text-2xl 2xl:text-4xl font-bold text-[#333D48] mb-8 2xl:mb-10 break-words">
           {title}
         </h2>
 
@@ -58,8 +47,8 @@ export default function MainPost({
           className="flex items-center gap-2"
           aria-label="좋아요"
         >
-          {liked ? <HeartFilledIcon /> : <HeartIcon />}
-          <span className="text-lg text-[#333D48]">{likes}</span>
+          {isLiked ? <HeartFilledIcon /> : <HeartIcon />}
+          <span className="text-lg text-[#333D48]">{likeCount}</span>
         </button>
 
         <div className="flex items-center gap-2">
