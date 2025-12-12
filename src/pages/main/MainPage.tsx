@@ -87,7 +87,9 @@ export default function MainPage() {
         </div>
 
         <div>
-          <h2 className="text-2xl 2xl:text-4xl font-bold text-[#333D48] mb-4">게시글</h2>
+          <h2 className="text-2xl 2xl:text-4xl font-bold text-[#333D48] mb-4">
+            게시글
+          </h2>
           <div className="grid grid-cols-3 gap-8 2xl:gap-12">
             {posts.map((post) => (
               <Post
