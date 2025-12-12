@@ -7,7 +7,7 @@ interface MainPostProps {
   postId: number | string;
   title: string;
   content: string;
-  likeCount: number;
+  likeCount?: number;
   commentCount: number;
   isLiked?: boolean;
 }
@@ -16,7 +16,7 @@ export default function MainPost({
   postId,
   title,
   content,
-  likeCount,
+  likeCount = 0,
   commentCount,
   isLiked = false,
 }: MainPostProps) {

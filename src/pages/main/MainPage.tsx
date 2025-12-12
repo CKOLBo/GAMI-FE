@@ -6,6 +6,30 @@ import RightIcon from '@/assets/svg/main/RightIcon';
 import { Link } from 'react-router-dom';
 
 export default function MainPage() {
+  const posts = [
+    {
+      postId: '1',
+      title: '제목',
+      content:
+        '내용내욘ㅇㄴㅇ랜용ㄴ앰랜ㅇㄹㄴ내용ㄴ앵용냉sodasdoaskdlfj;@@Kfalskjflaksjdfoijasdfdfasdfasdfasdddddddddddddddddddddddddddddddd',
+      commentCount: 0,
+    },
+    {
+      postId: '2',
+      title: '제목',
+      content:
+        '내용내욘ㅇㄴㅇ랜용ㄴ앰랜ㅇㄹㄴ내용ㄴ앵용냉sodasdoaskdlfj;@@Kfalskjflaksjdfoijasdfdfasdfasdfasdddddddddddddddddddddddddddddddd',
+      commentCount: 0,
+    },
+    {
+      postId: '3',
+      title: '제목',
+      content:
+        '내용내욘ㅇㄴㅇ랜용ㄴ앰랜ㅇㄹㄴ내ㅝㅈ우배ㅜ애ㅑㅂ저엊뱌ㅐㅓ애ㅑㅂ저애ㅑㅂ재ㅑ엊배ㅓ애벚야ㅐ벚애ㅑㅓㅈ용ㄴ앵용냉sodasdoaskdlfj;@@Kfalskjflaksjdfoijasdfdfasdfasdfasdddddddddddddddddddddddddddddddd',
+      commentCount: 12,
+    },
+  ];
+
   return (
     <div className="flex">
       <Sidebar />
@@ -65,29 +89,15 @@ export default function MainPage() {
         <div>
           <h2 className="text-2xl 2xl:text-4xl font-bold text-[#333D48] mb-4">게시글</h2>
           <div className="grid grid-cols-3 gap-8 2xl:gap-12">
-            <Post
-              title="제목"
-              content="내용내욘ㅇㄴㅇ랜용ㄴ앰랜ㅇㄹㄴ내용ㄴ앵용냉sodasdoaskdlfj;@@Kfalskjflaksjdfoijasdfdfasdfasdfasdddddddddddddddddddddddddddddddd"
-              likeCount={0}
-              commentCount={0}
-              postId={'1'}
-            />
-            <Post
-              title="제목"
-              content="내용내욘ㅇㄴㅇ랜용ㄴ앰랜ㅇㄹㄴ내용ㄴ앵용냉sodasdoaskdlfj;@@Kfalskjflaksjdfoijasdfdfasdfasdfasdddddddddddddddddddddddddddddddd"
-              likeCount={31}
-              commentCount={0}
-              isLiked={true}
-              postId={'2'}
-            />
-            <Post
-              title="제목"
-              content="내용내욘ㅇㄴㅇ랜용ㄴ앰랜ㅇㄹㄴ내ㅝㅈ우배ㅜ애ㅑㅂ저엊뱌ㅐㅓ애ㅑㅂ저애ㅑㅂ재ㅑ엊배ㅓ애벚야ㅐ벚애ㅑㅓㅈ용ㄴ앵용냉sodasdoaskdlfj;@@Kfalskjflaksjdfoijasdfdfasdfasdfasdddddddddddddddddddddddddddddddd"
-              likeCount={112}
-              commentCount={12}
-              isLiked={true}
-              postId={'3'}
-            />
+            {posts.map((post) => (
+              <Post
+                key={post.postId}
+                title={post.title}
+                content={post.content}
+                commentCount={post.commentCount}
+                postId={post.postId}
+              />
+            ))}
           </div>
         </div>
       </div>
