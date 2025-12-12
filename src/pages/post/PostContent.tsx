@@ -32,7 +32,7 @@ export default function PostContent() {
 
           <div className="flex justify-between gap-11 mb-10 pb-14 border-b-2 border-gray-2">
             <div className="flex items-center gap-3 mb-6">
-              <Comment />
+              <Comment width="28px" height="28px" color="#333D48" />
               <h2 className="text-[32px]  font-bold text-gray-1">댓글 0개</h2>
             </div>
             <div className="flex flex-row gap-18">

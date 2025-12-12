@@ -79,7 +79,9 @@ export default function MyPost() {
                 onPostClick={() => navigate('/post-content')}
                 actions={[
                   {
-                    icon: <Comment />,
+                    icon: (
+                      <Comment width="28px" height="28px" color="#333D48" />
+                    ),
                     onClick: () => navigate('/post-content'),
                     count: post.commentCount,
                     showCount: true,
