@@ -53,7 +53,7 @@ export default function MainPage() {
                   className="h-full object-contain"
                 />
               </div>
-              <p className="text-lg 2xl:text-2xl text-[#333D48] mb-4 2xl:mb-9 font-bold">
+              <p className="text-lg 2xl:text-2xl text-[#333D48] mb-1 2xl:mb-9 font-bold">
                 나에게 어울리는{' '}
                 <span className="text-[#73A9FF] font-bold">멘토</span>를
                 찾아볼까요?
