@@ -15,9 +15,9 @@ export default function MainPage() {
         </h1>
 
         <div className="grid grid-cols-3 gap-8 2xl:gap-12 mb-6 2xl:mb-8">
-          <div className="col-span-2 bg-gradient-to-r from-[#BFA9FF] to-[#73A9FF] rounded-2xl py-8 2xl:py-15 px-12 2xl:px-20 flex items-center justify-between">
+          <div className="col-span-2 bg-gradient-to-r from-[#BFA9FF] to-[#73A9FF] rounded-2xl 2xl:py-15 px-12 2xl:px-20 flex items-center justify-between">
             <div className="text-[#ffffff]">
-              <h2 className="text-3xl 2xl:text-4xl font-bold mb-4 2xl:mb-6 h-8 2xl:h-12 flex items-center">
+              <h2 className="text-3xl 2xl:text-4xl font-bold mb-3 2xl:mb-6 h-8 2xl:h-12 flex items-center">
                 GAMI에 오신 걸 환영합니다! 양은준님
               </h2>
               <p className="text-xl 2xl:text-2xl h-8 flex items-center">
@@ -33,7 +33,7 @@ export default function MainPage() {
             </div>
           </div>
           <div className="bg-[#F9F9F9] rounded-2xl p-6 2xl:p-7">
-            <div className="flex justify-between items-center mb-3 2xl:mb-5.5">
+            <div className="flex justify-between items-center mb-2 2xl:mb-5.5">
               <h2 className="text-xl 2xl:text-2xl font-bold text-[#333D48]">
                 멘토 찾기
               </h2>
@@ -53,7 +53,7 @@ export default function MainPage() {
                   className="h-full object-contain"
                 />
               </div>
-              <p className="text-lg 2xl:text-2xl text-[#333D48] mb-5 2xl:mb-9 font-bold">
+              <p className="text-lg 2xl:text-2xl text-[#333D48] mb-4 2xl:mb-9 font-bold">
                 나에게 어울리는{' '}
                 <span className="text-[#73A9FF] font-bold">멘토</span>를
                 찾아볼까요?
@@ -63,7 +63,7 @@ export default function MainPage() {
         </div>
 
         <div>
-          <h2 className="text-3xl 2xl:text-4xl font-bold text-[#333D48] mb-4">게시글</h2>
+          <h2 className="text-2xl 2xl:text-4xl font-bold text-[#333D48] mb-4">게시글</h2>
           <div className="grid grid-cols-3 gap-8 2xl:gap-12">
             <Post
               title="제목"
@@ -82,7 +82,7 @@ export default function MainPage() {
             />
             <Post
               title="제목"
-              content="내용내욘ㅇㄴㅇ랜용ㄴ앰랜ㅇㄹㄴ내용ㄴ앵용냉sodasdoaskdlfj;@@Kfalskjflaksjdfoijasdfdfasdfasdfasdddddddddddddddddddddddddddddddd"
+              content="내용내욘ㅇㄴㅇ랜용ㄴ앰랜ㅇㄹㄴ내ㅝㅈ우배ㅜ애ㅑㅂ저엊뱌ㅐㅓ애ㅑㅂ저애ㅑㅂ재ㅑ엊배ㅓ애벚야ㅐ벚애ㅑㅓㅈ용ㄴ앵용냉sodasdoaskdlfj;@@Kfalskjflaksjdfoijasdfdfasdfasdfasdddddddddddddddddddddddddddddddd"
               likeCount={112}
               commentCount={12}
               isLiked={true}
