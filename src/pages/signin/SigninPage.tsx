@@ -43,10 +43,10 @@ export default function SigninPage() {
   return (
     <div className="bg-white h-screen flex justify-center items-center p-5 overflow-hidden">
       <div className="text-center max-w-xs w-full">
-        <div className="w-25 mb-7.5 mx-auto">
-          <Logo />
+        <div className="w-60 mb-10 mx-auto flex justify-center">
+          <Logo size='lg'/>
         </div>
-        <p className="text-sm text-gray-1 mb-10">
+        <p className="text-[16px] text-gray-1 mb-11">
           <span className="font-medium">GAMI가 처음이라면?</span>{' '}
           <Link to="/signup" className="text-main-1 font-bold no-underline">
             회원가입하기
@@ -58,39 +58,39 @@ export default function SigninPage() {
             type="text"
             name="email"
             placeholder="이메일"
-            className="w-full h-13 px-5 border border-gray-2 rounded-lg text-sm text-gray-1 placeholder:text-gray-3 placeholder:font-medium focus:outline-none focus:border-main-1 mb-3.5"
+            className="w-full h-15 px-5 border border-gray-2 rounded-[12px] text-sm text-gray-1 placeholder:text-gray-3 placeholder:font-medium focus:outline-none focus:border-main-1 mb-5"
           />
           <div className="relative">
             <input
               type={showPassword ? 'text' : 'password'}
               name="password"
               placeholder="비밀번호"
-              className="w-full h-13 px-5 pr-14 border border-gray-2 rounded-lg text-sm text-gray-1 placeholder:text-gray-3 placeholder:font-medium focus:outline-none focus:border-main-1"
+              className="w-full h-15 px-5 border border-gray-2 rounded-[12px] text-sm text-gray-1 placeholder:text-gray-3 placeholder:font-medium focus:outline-none focus:border-main-1 pr-14 "
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 flex items-center justify-center p-0 bg-transparent border-0 cursor-pointer"
+              className="absolute right-5 top-1/2 -translate-y-1/2 flex items-center justify-center p-0 bg-transparent border-0 cursor-pointer"
             >
               {showPassword ? <Show /> : <Hide />}
             </button>
           </div>
-          <div className="h-5.5 mb-3.5">
+          <div className="h-6 mb-4">
             {(errors.email || errors.password) && (
-              <p className="text-xs text-[#FF6B6B] text-left m-0 mt-1">
+              <p className="text-xs text-main-3 text-left m-0 mt-2">
                 {errors.email || errors.password}
               </p>
             )}
           </div>
           <button
             type="submit"
-            className="w-full h-13 bg-main-2 text-white text-base rounded-lg transition-all duration-300 font-bold hover:bg-[#AA8EFF] border-0 cursor-pointer"
+            className="w-full h-15 bg-main-2 text-white text-base rounded-[12px] transition-all duration-300 font-bold hover:bg-[#AA8EFF] border-0 cursor-pointer"
           >
             로그인
           </button>
         </form>
 
-        <div className="mt-2 text-right">
+        <div className="mt-3 text-right">
           <Link
             to="/signin"
             className="font-medium text-sm text-gray-1 no-underline"
