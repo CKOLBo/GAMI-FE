@@ -93,7 +93,7 @@ export default function SigninPage() {
 
         <div className="mt-2 2xl:mt-3 text-right">
           <Link
-            to="/signin"
+            to="/password"
             className="font-medium text-sm text-gray-1 no-underline"
           >
             비밀번호 찾기
