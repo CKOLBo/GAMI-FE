@@ -53,9 +53,7 @@ export default function Sidebar() {
                 }
               `}
             >
-              <Icon
-                className={isActive ? 'text-main-2' : 'text-gray-1'}
-              />
+              <Icon className={isActive ? 'text-main-2' : 'text-gray-1'} />
               <span>{item.label}</span>
             </Link>
           );
