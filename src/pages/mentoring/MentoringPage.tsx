@@ -1,5 +1,9 @@
+import Sidebar from '@/assets/components/Sidebar';
+
 export default function MentoringPage() {
     return(
-        <div>Mentoring Page</div>
+        <div className="flex">
+            <Sidebar />            
+        </div>
     );
 }
