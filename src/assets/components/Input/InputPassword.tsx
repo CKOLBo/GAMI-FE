@@ -26,12 +26,12 @@ export default function InputPassword({
         value={value}
         onChange={onChange}
         required
-        className="w-full h-[52px] px-5 pr-14 border placeholder:font-medium border-[#B7BCC8] rounded-lg text-sm text-[#3D3D48] placeholder:text-[#6D6F79] focus:outline-none focus:border-[#73A9FF]"
+        className="w-full h-[52px] px-5 pr-14 border placeholder:font-medium border-[#B7BCC8] rounded-[10px] 2xl:rounded-[12px] text-sm text-[#3D3D48] placeholder:text-[#6D6F79] focus:outline-none focus:border-[#73A9FF]"
       />
       <button
         type="button"
         onClick={() => setShowPassword(!showPassword)}
-        className="absolute right-2.5 top-1/2 -translate-y-1/2 flex items-center justify-center p-0 bg-transparent border-0 cursor-pointer"
+        className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center justify-center p-0 bg-transparent border-0 cursor-pointer"
       >
         {showPassword ? <Show /> : <Hide />}
       </button>
