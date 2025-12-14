@@ -29,7 +29,7 @@ export default function PasswordPage() {
         </div>
 
         <p className="text-sm 2xl:text-base text-gray-1 mb-8 2xl:mb-11">
-          <span className="font-medium">비밀번호를 찾았나요?</span>{' '}
+          <span className="font-medium">비밀번호가 기억나셨나요?</span>{' '}
           <Link to="/signin" className="text-main-1 font-bold no-underline">
             로그인하기
           </Link>
