@@ -1,11 +1,11 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
-import Logo from '@/assets/svg/Logo/Logo';
-import NextButton from '@/assets/components/NextButton';
-import GenderButton from '@/assets/components/GenderButton';
+import Logo from '@/assets/svg/logo/Logo';
+import NextButton from '@/assets/components/Button/NextButton';
+import GenderButton from '@/assets/components/Button/GenderButton';
 import Arrow from '@/assets/svg/Arrow';
-import CategoryButton from '@/assets/components/CategoryButton';
-import InputPassword from '@/assets/components/InputPassword';
+import CategoryButton from '@/assets/components/Button/CategoryButton';
+import InputPassword from '@/assets/components/Input/InputPassword';
 
 export default function SignupPage() {
   const navigate = useNavigate();
