@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import SigninPage from '@/pages/signin/SigninPage';
+import Signin from '@/pages/signin/SigninPage';
 import Signup from '@/pages/signup/SignupPage';
 import Main from '@/pages/main/MainPage';
 import Post from '@/pages/post/PostPage';
@@ -11,8 +11,8 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<SigninPage />} />
-        <Route path="/signin" element={<SigninPage />} />
+        <Route path="/" element={<Signin />} />
+        <Route path="/signin" element={<Signin />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/main" element={<Main />} />
         <Route path="/post" element={<Post />} />

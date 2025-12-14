@@ -1,4 +1,4 @@
-type LogoSize = 'sm' | 'md';
+type LogoSize = 'sm' | 'md' | 'lg';
 
 interface LogoProps {
   size?: LogoSize;
@@ -8,6 +8,7 @@ interface LogoProps {
 const sizeMap: Record<LogoSize, { width: number; height: number }> = {
   sm: { width: 95, height: 75 },
   md: { width: 116, height: 92 },
+  lg: { width: 160, height: 128 },
 };
 
 export default function Logo({ size = 'md', className }: LogoProps) {
