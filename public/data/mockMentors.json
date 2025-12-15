@@ -1,0 +1,44 @@
+[
+  {
+    "id": 1,
+    "name": "한국",
+    "gender": "MALE",
+    "generation": 9,
+    "major": "FE"
+  },
+  {
+    "id": 2,
+    "name": "한의준",
+    "gender": "FEMALE",
+    "generation": 9,
+    "major": "BE"
+  },
+  {
+    "id": 3,
+    "name": "양은준",
+    "gender": "FEMALE",
+    "generation": 9,
+    "major": "DESIGN"
+  },
+  {
+    "id": 4,
+    "name": "문강현",
+    "gender": "FEMALE",
+    "generation": 9,
+    "major": "FE"
+  },
+  {
+    "id": 5,
+    "name": "김준표",
+    "gender": "FEMALE",
+    "generation": 9,
+    "major": "IOS"
+  },
+  {
+    "id": 6,
+    "name": "박하민",
+    "gender": "FEMALE",
+    "generation": 9,
+    "major": "BE"
+  }
+]
