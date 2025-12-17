@@ -200,7 +200,7 @@ export default function SignupPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="flex-1 p-4 border border-solid border-gray-2 placeholder:text-gray-3 placeholder:font-medium rounded-lg text-sm outline-none focus:border-main-1"
+              className="flex-1 p-4 border border-solid text-gray-1 border-gray-2 placeholder:text-gray-3 placeholder:font-medium rounded-lg text-sm outline-none focus:border-main-1"
             />
             <button
               type="button"
@@ -217,7 +217,7 @@ export default function SignupPage() {
               value={code}
               onChange={(e) => setCode(e.target.value)}
               required
-              className="flex-1 p-4 border border-solid placeholder:font-medium border-gray-2 placeholder:text-gray-3 rounded-lg text-sm outline-none focus:border-main-1"
+              className="flex-1 p-4 border border-solid text-gray-1 placeholder:font-medium border-gray-2 placeholder:text-gray-3 rounded-lg text-sm outline-none focus:border-main-1"
             />
             <button
               type="button"
