@@ -115,9 +115,7 @@ export default function SignupPage() {
               onClick={() => setIsGenOpen(!isGenOpen)}
               className="bg-white border border-solid border-gray-2 rounded-lg text-sm font-medium p-4 w-full cursor-pointer outline-none text-left flex justify-between items-center"
             >
-              <span
-                className={generation ? 'text-gray-1' : 'text-gray-3'}
-              >
+              <span className={generation ? 'text-gray-1' : 'text-gray-3'}>
                 {generation || '기수'}
               </span>
               <Arrow
@@ -157,9 +155,8 @@ export default function SignupPage() {
       </div>
 
       <p className="text-sm font-medium mb-9 text-center">
-        자신의{' '}
-        <span className="text-main-1 font-bold no-underline">전공</span>을
-        선택해 주세요.
+        자신의 <span className="text-main-1 font-bold no-underline">전공</span>
+        을 선택해 주세요.
       </p>
 
       <form onSubmit={handleStep2Submit} className="flex flex-col items-center">
