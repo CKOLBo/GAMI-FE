@@ -92,7 +92,7 @@ export default function SignupPage() {
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
-            className="p-4 border border-solid border-gray-2 rounded-lg placeholder:text-gray-3 placeholder:font-medium text-gray-1 text-sm outline-none focus:outline-none focus:border-main-1"
+            className="p-4 border border-solid border-gray-2 rounded-xl placeholder:text-gray-3 placeholder:font-medium text-gray-1 text-sm outline-none focus:outline-none focus:border-main-1"
           />
           <div className="flex gap-[2%]">
             <GenderButton
@@ -113,7 +113,7 @@ export default function SignupPage() {
             <button
               type="button"
               onClick={() => setIsGenOpen(!isGenOpen)}
-              className="bg-white border border-solid border-gray-2 rounded-lg text-sm font-medium p-4 w-full cursor-pointer outline-none text-left flex justify-between items-center"
+              className="bg-white border border-solid border-gray-2 rounded-xl text-sm font-medium p-4 w-full cursor-pointer outline-none text-left flex justify-between items-center"
             >
               <span className={generation ? 'text-gray-1' : 'text-gray-3'}>
                 {generation || '기수'}
@@ -124,7 +124,7 @@ export default function SignupPage() {
             </button>
 
             {isGenOpen && (
-              <div className="absolute top-[calc(100%+4px)] left-0 w-full bg-white border border-solid border-gray-2 rounded-lg overflow-hidden z-10">
+              <div className="absolute top-[calc(100%+4px)] left-0 w-full bg-white border border-solid border-gray-2 rounded-xl overflow-hidden z-10">
                 {generations.map((gen) => (
                   <button
                     key={gen}
@@ -197,11 +197,11 @@ export default function SignupPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="flex-1 p-4 border border-solid text-gray-1 border-gray-2 placeholder:text-gray-3 placeholder:font-medium rounded-lg text-sm outline-none focus:border-main-1"
+              className="flex-1 p-4 border border-solid text-gray-1 border-gray-2 placeholder:text-gray-3 placeholder:font-medium rounded-xl text-sm outline-none focus:border-main-1"
             />
             <button
               type="button"
-              className="p-4 bg-main-1 text-white text-sm border-none rounded-lg cursor-pointer transition-all duration-300 font-semibold whitespace-nowrap min-w-[90px] hover:bg-[#7a9fe6] outline-none"
+              className="p-4 bg-main-1 text-white text-sm border-none rounded-xl cursor-pointer transition-all duration-300 font-semibold whitespace-nowrap min-w-[90px] hover:bg-[#7a9fe6] outline-none"
             >
               번호 발송
             </button>
@@ -214,11 +214,11 @@ export default function SignupPage() {
               value={code}
               onChange={(e) => setCode(e.target.value)}
               required
-              className="flex-1 p-4 border border-solid text-gray-1 placeholder:font-medium border-gray-2 placeholder:text-gray-3 rounded-lg text-sm outline-none focus:border-main-1"
+              className="flex-1 p-4 border border-solid text-gray-1 placeholder:font-medium border-gray-2 placeholder:text-gray-3 rounded-xl text-sm outline-none focus:border-main-1"
             />
             <button
               type="button"
-              className="p-4 bg-main-1 text-white text-sm border-none rounded-lg cursor-pointer transition-all duration-300 font-semibold whitespace-nowrap min-w-[90px] hover:bg-[#7a9fe6] outline-none"
+              className="p-4 bg-main-1 text-white text-sm border-none rounded-xl cursor-pointer transition-all duration-300 font-semibold whitespace-nowrap min-w-[90px] hover:bg-[#7a9fe6] outline-none"
             >
               인증하기
             </button>
@@ -235,7 +235,7 @@ export default function SignupPage() {
 
           <button
             type="submit"
-            className="p-4 bg-main-2 text-white text-base border-none rounded-lg cursor-pointer transition-all duration-300 mt-2.5 font-bold hover:bg-main-2-hover outline-none"
+            className="p-4 bg-main-2 text-white text-base border-none rounded-xl cursor-pointer transition-all duration-300 mt-2.5 font-bold hover:bg-main-2-hover outline-none"
           >
             회원가입
           </button>
