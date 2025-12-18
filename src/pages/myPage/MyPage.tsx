@@ -6,7 +6,6 @@ import ProfileIcon from '@/assets/svg/profile/Profile';
 import ProfileInfoItem from '@/assets/components/Profile/ProfileInfoItem';
 import { interestList } from '@/assets/shared/ListData';
 
-
 export default function MyPage() {
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
   const [isEditingCategory, setIsEditingCategory] = useState(false);
