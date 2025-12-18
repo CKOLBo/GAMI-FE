@@ -3,7 +3,7 @@ import Mentor from '@/assets/components/mentor/Mentor';
 import SearchIcon from '@/assets/svg/mentor/SearchIcon';
 import Divider from '@/assets/svg/Divider';
 import axios from 'axios';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 interface MentorData {
@@ -15,7 +15,6 @@ interface MentorData {
 }
 
 export default function MentoringPage() {
-  const [mentors, setMentors] = useState<MentorData[]>([]);
   const [allMentors, setAllMentors] = useState<MentorData[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -24,24 +23,21 @@ export default function MentoringPage() {
       .get('/data/mockMentors.json')
       .then((res) => {
         setAllMentors(res.data);
-        setMentors(res.data);
       })
       .catch((err) => {
         console.error(err);
       });
   }, []);
 
-  useEffect(() => {
+  const mentors = useMemo(() => {
     if (searchQuery.trim() === '') {
-      setMentors(allMentors);
-    } else {
-      const filtered = allMentors.filter(
-        (mentor) =>
-          mentor.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          mentor.major.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-      setMentors(filtered);
+      return allMentors;
     }
+    return allMentors.filter(
+      (mentor) =>
+        mentor.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        mentor.major.toLowerCase().includes(searchQuery.toLowerCase())
+    );
   }, [searchQuery, allMentors]);
 
   return (
