@@ -53,7 +53,9 @@ export default function MentoringPage() {
           <div className="px-25 pt-25 bg-white">
             <div className="flex items-center">
               <h1 className="flex items-center gap-4 text-[40px] font-bold text-gray-1">
-                <span className="text-[40px] text-gray-1 font-bold">멘토링</span>
+                <span className="text-[40px] text-gray-1 font-bold">
+                  멘토링
+                </span>
                 <Divider className="flex-shrink-0" />
                 <Link
                   to="/mentoring-random"

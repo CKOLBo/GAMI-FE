@@ -58,7 +58,8 @@ export default function RandomMentoring() {
             </div>
 
             <p className="text-[16px] 2xl:text-[20px] font-bold text-gray-1 text-center mb-16">
-              당신에게 맞는 <span className='text-main-1'>멘토</span>를 추천해드릴게요.
+              당신에게 맞는 <span className="text-main-1">멘토</span>를
+              추천해드릴게요.
               <br />
               아래 버튼을 눌러 시작해보세요.
             </p>

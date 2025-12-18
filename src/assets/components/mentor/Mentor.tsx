@@ -14,9 +14,7 @@ export default function Mentor({
   onApply,
 }: MentorProps) {
   return (
-    <div
-      className="relative w-[468px] h-[228px] rounded-[18px] bg-white p-3 shadow-GAMI"
-    >
+    <div className="relative w-[468px] h-[228px] rounded-[18px] bg-white p-3 shadow-GAMI">
       <div className="flex items-start gap-5 h-full">
         <div className="flex-shrink-0 mt-4 ml-4">
           <Profile />
