@@ -1,5 +1,6 @@
 import Sidebar from '@/assets/components/Sidebar';
 import Mentor from '@/assets/components/mentor/Mentor';
+import SearchIcon from '@/assets/svg/mentor/SearchIcon';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 
@@ -29,17 +30,22 @@ export default function MentoringPage() {
     <div className="flex min-h-screen bg-white">
       <Sidebar />
 
-      <main className="flex-1 p-25">
+      <main className="flex-1 p-25 ml-45 2xl:ml-55">
         <div className="mb-32 flex items-center">
-          <h1 className="text-[40px] font-semibold text-gray-1">
-            멘토링 |<span className="text-[32px] text-gray-2"> 랜덤 멘토링</span>
+          <h1 className="text-[40px] font-bold text-gray-1">
+            멘토링 |<span className="text-[32px] text-gray-2 font-bold"> 랜덤 멘토링</span>
           </h1>
 
-          <input
-            type="text"
-            placeholder="전공 또는 멘토의 이름을 입력해주세요."
-            className="ml-25 w-150 rounded-full border px-4 py-2 text-[24px] text-gray-3 focus:outline-none font-bold"
-          />
+          <div className="ml-25 relative w-150">
+            <div className="absolute left-5 top-1/2 -translate-y-1/2 z-10">
+              <SearchIcon />
+            </div>
+            <input
+              type="text"
+              placeholder="전공 또는 멘토의 이름을 입력해주세요."
+              className="w-full h-16 rounded-full bg-white-1 border border-gray-4 pl-16 pr-4 py-2 text-[24px] text-gray-1 placeholder:text-gray-3 focus:outline-main-1 font-bold"
+            />
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-12">
