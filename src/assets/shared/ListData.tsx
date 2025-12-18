@@ -1,0 +1,15 @@
+export const interestList = [
+  { id: 'FE', label: 'FE' },
+  { id: 'BE', label: 'BE' },
+  { id: 'iOS', label: 'iOS' },
+  { id: 'Mobile Robotics', label: 'Mobile Robotics' },
+  { id: 'Android', label: 'Android' },
+  { id: 'Design', label: 'Design' },
+  { id: 'DevOps', label: 'DevOps' },
+  { id: 'AI', label: 'AI' },
+  { id: 'IT Network', label: 'IT Network' },
+  { id: 'Flutter', label: 'Flutter' },
+  { id: 'Cyber Security', label: 'Cyber Security' },
+  { id: 'Game Development', label: 'Game Development' },
+  { id: 'Cloud Computing', label: 'Cloud Computing' },
+];

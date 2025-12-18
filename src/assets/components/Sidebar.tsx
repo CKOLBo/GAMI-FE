@@ -21,7 +21,7 @@ export default function Sidebar() {
     { path: '/mentoring', label: '멘토링', icon: MentoringIcon },
     { path: '/chat', label: '채팅', icon: ChatIcon },
     { path: '/post', label: '익명 게시판', icon: PostIcon },
-    { path: '/myprofile', label: '마이페이지', icon: ProfileIcon },
+    { path: '/my-page', label: '마이페이지', icon: ProfileIcon },
   ];
 
   return (
