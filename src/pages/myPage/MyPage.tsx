@@ -10,9 +10,9 @@ import { interestList } from '@/assets/shared/ListData';
 export default function MyPage() {
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
   const [isEditingCategory, setIsEditingCategory] = useState(false);
-  const initialInterests = ['FE'];
-  const [selectedInterests, setSelectedInterests] = useState<string[]>(initialInterests);
-  const [tempSelectedInterests, setTempSelectedInterests] = useState<string[]>(initialInterests);
+  const initialInterest = 'FE';
+  const [selectedInterest, setSelectedInterest] = useState<string>(initialInterest);
+  const [tempSelectedInterest, setTempSelectedInterest] = useState<string>(initialInterest);
 
   const userInfo = {
     generation: '9기',
@@ -24,20 +24,18 @@ export default function MyPage() {
   const toggleInterest = (id: string) => {
     if (!isEditingCategory) {
       setIsEditingCategory(true);
-      setTempSelectedInterests(selectedInterests);
+      setTempSelectedInterest(selectedInterest);
     }
-    setTempSelectedInterests((prev) =>
-      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
-    );
+    setTempSelectedInterest((prev) => (prev === id ? '' : id));
   };
 
   const handleCategoryCancel = () => {
-    setTempSelectedInterests(selectedInterests);
+    setTempSelectedInterest(selectedInterest);
     setIsEditingCategory(false);
   };
 
   const handleCategorySave = () => {
-    setSelectedInterests(tempSelectedInterests);
+    setSelectedInterest(tempSelectedInterest);
     setIsEditingCategory(false);
   };
 
@@ -84,8 +82,8 @@ export default function MyPage() {
                 label={interest.label}
                 isSelected={
                   isEditingCategory
-                    ? tempSelectedInterests.includes(interest.id)
-                    : selectedInterests.includes(interest.id)
+                    ? tempSelectedInterest === interest.id
+                    : selectedInterest === interest.id
                 }
                 onClick={() => toggleInterest(interest.id)}
               />
