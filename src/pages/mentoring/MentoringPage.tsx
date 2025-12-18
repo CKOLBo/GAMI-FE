@@ -81,9 +81,9 @@ export default function MentoringPage() {
         <div className="px-25 pt-[220px] pb-25">
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-12">
             {mentors.length > 0 ? (
-              mentors.map((mentor, index) => (
+              mentors.map((mentor) => (
                 <Mentor
-                  key={`${mentor.id}-${index}`}
+                  key={mentor.id}
                   name={mentor.name}
                   generation={mentor.generation}
                   major={mentor.major}
