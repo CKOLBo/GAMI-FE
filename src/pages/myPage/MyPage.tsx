@@ -10,10 +10,9 @@ import { interestList } from '@/assets/shared/ListData';
 export default function MyPage() {
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
   const [isEditingCategory, setIsEditingCategory] = useState(false);
-  const [selectedInterests, setSelectedInterests] = useState<string[]>(['FE']);
-  const [tempSelectedInterests, setTempSelectedInterests] = useState<string[]>([
-    'FE',
-  ]);
+  const initialInterests = ['FE'];
+  const [selectedInterests, setSelectedInterests] = useState<string[]>(initialInterests);
+  const [tempSelectedInterests, setTempSelectedInterests] = useState<string[]>(initialInterests);
 
   const userInfo = {
     generation: '9기',
