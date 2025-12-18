@@ -1,6 +1,6 @@
 import Sidebar from '@/assets/components/Sidebar';
 import Mentor from '@/assets/components/mentor/Mentor';
-import SearchIcon from '@/assets/svg/mentor/SearchIcon';
+import SearchIcon from '@/assets/svg/main/SearchIcon';
 import Divider from '@/assets/svg/Divider';
 import axios from 'axios';
 import { useEffect, useMemo, useState } from 'react';

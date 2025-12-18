@@ -1,5 +1,5 @@
 import Sidebar from '@/assets/components/Sidebar';
-import SearchIcon from '@/assets/svg/mentor/SearchIcon';
+import SearchIcon from '@/assets/svg/main/SearchIcon';
 import Divider from '@/assets/svg/Divider';
 import { Link } from 'react-router-dom';
 import Mentor from '@/assets/svg/mentor/Mentor.png';
