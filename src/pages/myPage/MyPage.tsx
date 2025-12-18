@@ -46,7 +46,7 @@ export default function MyPage() {
       <div className="flex-1 flex flex-col justify-center items-center">
         <div className="flex flex-col items-center mb-8 w-full max-w-2xl">
           <div className="mb-6 2xl:mb-8">
-            <ProfileIcon className='w-[160px] h-[160px]'/>
+            <ProfileIcon className="w-[160px] h-[160px]" />
           </div>
 
           <div className="flex items-center gap-[10px]">
