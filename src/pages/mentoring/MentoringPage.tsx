@@ -37,7 +37,7 @@ export default function MentoringPage() {
     return allMentors.filter(
       (mentor) =>
         mentor.name.toLowerCase().includes(trimmedQuery) ||
-        mentor.major.toLowerCase().includes(trimmedQuery),
+        mentor.major.toLowerCase().includes(trimmedQuery)
     );
   }, [searchQuery, allMentors]);
 
