@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import ReportModal from '@/assets/components/modal/ReportModal';
 
 const Search = ({ className }: { className?: string }) => (
   <svg
@@ -17,6 +18,7 @@ const Search = ({ className }: { className?: string }) => (
 );
 
 export default function AdminReport() {
+    const [isModalOpen, setIsModalOpen] = useState(false);
   const [reports] = useState([
     {
       id: 1,
@@ -53,6 +55,14 @@ export default function AdminReport() {
     }
   };
 
+  const handleReportClick = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleReport = () => {
+    setIsModalOpen(false);
+  };
+
   return (
     <div className="flex flex-col items-center px-4">
       <div className="w-full max-w-[1300px]">
@@ -84,8 +94,8 @@ export default function AdminReport() {
             </span>
 
             <div className="shrink-0 w-[160px] pr-28 flex justify-center">
-              <button className="flex items-center gap-2 px-[14px] py-[10px] bg-main-1 text-white rounded-md whitespace-nowrap">
-                <Search className="w-4 h-4" />
+              <button onClick={()=>handleReportClick()} className="flex cursor-pointer items-center gap-2 px-[14px] py-[10px] bg-main-1 text-white rounded-md whitespace-nowrap">
+                <Search className="w-5 h-5" />
                 <span className="text-xl font-semibold">추가설명</span>
               </button>
             </div>
@@ -98,6 +108,12 @@ export default function AdminReport() {
           </div>
         ))}
       </div>
+      {isModalOpen && (
+        <ReportModal
+          onClose={() => setIsModalOpen(false)}
+          onReport={handleReport}
+        />
+      )}
     </div>
   );
 }
