@@ -1,11 +1,5 @@
 import { useState } from 'react';
 
-const ChevronDown = ({ className }: { className?: string }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-  </svg>
-);
-
 const Search = ({ className }: { className?: string }) => (
   <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -38,7 +32,6 @@ export default function AdminReport() {
                   <span className="text-sm font-medium text-[#FFAC0B]">
                     {report.status}
                   </span>
-                  <ChevronDown className="w-4 h-4 text-[#FFAC0B]" />
                 </button>
               </div>
 
