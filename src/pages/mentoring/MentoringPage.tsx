@@ -30,13 +30,14 @@ export default function MentoringPage() {
   }, []);
 
   const mentors = useMemo(() => {
-    if (searchQuery.trim() === '') {
+    const trimmedQuery = searchQuery.trim().toLowerCase();
+    if (trimmedQuery === '') {
       return allMentors;
     }
     return allMentors.filter(
       (mentor) =>
-        mentor.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        mentor.major.toLowerCase().includes(searchQuery.toLowerCase())
+        mentor.name.toLowerCase().includes(trimmedQuery) ||
+        mentor.major.toLowerCase().includes(trimmedQuery),
     );
   }, [searchQuery, allMentors]);
 
