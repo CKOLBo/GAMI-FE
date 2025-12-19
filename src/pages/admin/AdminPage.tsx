@@ -16,7 +16,7 @@ export default function AdminPage() {
           <div className="w-full flex justify-center mb-8">
             <AdminHead />
           </div>
-          <div className='w-full'>
+          <div className="w-full">
             <AdminReport />
           </div>
           <hr className="max-w-[1300px] w-full" />
