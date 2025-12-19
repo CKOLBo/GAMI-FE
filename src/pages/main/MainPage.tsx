@@ -39,7 +39,7 @@ export default function MainPage() {
         </h1>
 
         <div className="grid grid-cols-3 gap-8 2xl:gap-12 mb-6 2xl:mb-8">
-          <div className="col-span-2 bg-gradient-to-r from-main-2 to-main-1 rounded-2xl 2xl:py-15 px-12 2xl:px-20 flex items-center justify-between">
+          <div className="col-span-2 bg-gradient-to-r from-main-2 to-main-1 rounded-2xl 2xl:py-15 px-12 2xl:px-20 flex items-center justify-between shadow-GAMI">
             <div className="text-white">
               <h2 className="text-3xl 2xl:text-4xl font-bold mb-3 2xl:mb-6 h-8 2xl:h-12 flex items-center">
                 GAMI에 오신 걸 환영합니다! 양은준님
@@ -56,7 +56,7 @@ export default function MainPage() {
               />
             </div>
           </div>
-          <div className="bg-white-1 rounded-2xl p-6 2xl:p-7">
+          <div className="bg-white shadow-GAMI rounded-2xl p-6 2xl:p-7">
             <div className="flex justify-between items-center mb-2 2xl:mb-5.5">
               <h2 className="text-xl 2xl:text-2xl font-bold text-gray-1">
                 멘토 찾기
