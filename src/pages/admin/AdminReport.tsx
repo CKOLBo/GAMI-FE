@@ -18,7 +18,7 @@ const Search = ({ className }: { className?: string }) => (
 );
 
 export default function AdminReport() {
-    const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [reports] = useState([
     {
       id: 1,
@@ -69,7 +69,7 @@ export default function AdminReport() {
         {reports.map((report) => (
           <div
             key={report.id}
-            className="bg-[#F9F9F9] mb-8 h-[80px] rounded-lg px-12 flex items-center gap-4"
+            className="bg-[#F9F9F9] mb-8 h-20 rounded-lg px-12 flex items-center gap-4"
           >
             <span className="text-2xl font-bold shrink-0 w-[60px] text-center">
               {report.id}
@@ -93,8 +93,11 @@ export default function AdminReport() {
               {report.reason}
             </span>
 
-            <div className="shrink-0 w-[160px] pr-28 flex justify-center">
-              <button onClick={()=>handleReportClick()} className="flex cursor-pointer items-center gap-2 px-[14px] py-[10px] bg-main-1 text-white rounded-md whitespace-nowrap">
+            <div className="shrink-0 w-40 pr-28 flex justify-center">
+              <button
+                onClick={() => handleReportClick()}
+                className="flex cursor-pointer items-center gap-2 px-3.5 py-2.5 bg-main-1 text-white rounded-md whitespace-nowrap"
+              >
                 <Search className="w-5 h-5" />
                 <span className="text-xl font-semibold">추가설명</span>
               </button>
