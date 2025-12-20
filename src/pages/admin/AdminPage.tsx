@@ -8,7 +8,7 @@ export default function AdminPage() {
   return (
     <div className="flex">
       <Sidebar />
-      <div className="flex-1">
+      <div className="flex-1 xl:ml-55 ml-45">
         <div className="ml-25 mt-16 mb-10">
           <h2 className="font-bold text-gray-1 text-[40px]">관리자</h2>
         </div>
