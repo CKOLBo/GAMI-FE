@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import ReportModal from '@/assets/components/modal/ReportModal';
+import { useNavigate } from 'react-router-dom';
 
 const Search = ({ className }: { className?: string }) => (
   <svg
@@ -18,6 +19,7 @@ const Search = ({ className }: { className?: string }) => (
 );
 
 export default function AdminReport() {
+  const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [reports] = useState([
     {
@@ -104,7 +106,10 @@ export default function AdminReport() {
             </div>
 
             <div className="shrink-0 w-[120px] flex justify-center">
-              <button className="text-main-1 font-semibold text-2xl whitespace-nowrap">
+              <button
+                onClick={() => navigate('/post-content')}
+                className="text-main-1 font-semibold cursor-pointer text-2xl whitespace-nowrap"
+              >
                 바로가기
               </button>
             </div>
