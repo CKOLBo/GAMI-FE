@@ -4,6 +4,7 @@ import Profile from '@/assets/svg/profile/Profile';
 import BellIcon from '@/assets/svg/common/BellIcon';
 import SearchIcon from '@/assets/svg/main/SearchIcon';
 import Divider from '@/assets/svg/Divider';
+import MentorRequestModal from '@/assets/components/modal/MentorRequestModal';
 import { useState } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
@@ -46,7 +47,17 @@ export default function ChatPage() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [loading, setLoading] = useState(false);
   const [messageInput, setMessageInput] = useState('');
+  const [isMentorRequestModalOpen, setIsMentorRequestModalOpen] = useState(false);
   const currentUserId = 1;
+
+  const mentorRequests = [
+    { id: 1, name: '양은준' },
+    { id: 2, name: '한국' },
+    { id: 3, name: '양은준' },
+    { id: 4, name: '한국' },
+    { id: 5, name: '양은준' },
+    { id: 6, name: '한국' },
+  ];
 
   const chatList: ChatItem[] = [
     {
@@ -133,6 +144,14 @@ export default function ChatPage() {
     setMessages([]);
   };
 
+  const handleAcceptMentor = (id: number) => {
+    console.log(`멘토 신청 수락: ${id}`);
+  };
+
+  const handleBellClick = () => {
+    setIsMentorRequestModalOpen(true);
+  };
+
 
   return (
     <div className="flex min-h-screen">
@@ -153,7 +172,13 @@ export default function ChatPage() {
                   요청
                 </Link>
               </h1>
-              <BellIcon className="text-gray-3" />
+              <button
+                onClick={handleBellClick}
+                className="relative p-1 cursor-pointer hover:opacity-80 transition-opacity border-none bg-transparent"
+                type="button"
+              >
+                <BellIcon className="text-gray-3 pointer-events-none" />
+              </button>
             </div>
             <div className="relative">
               <div className="absolute left-5 top-1/2 -translate-y-1/2 z-10">
@@ -341,6 +366,13 @@ export default function ChatPage() {
           </div>
         )}
       </div>
+      {isMentorRequestModalOpen && (
+        <MentorRequestModal
+          onClose={() => setIsMentorRequestModalOpen(false)}
+          onAccept={handleAcceptMentor}
+          requests={mentorRequests}
+        />
+      )}
     </div>
   );
 }
