@@ -26,7 +26,7 @@ export default function InputPassword({
         value={value}
         onChange={onChange}
         required
-        className="w-full h-15 px-5 pr-14 border placeholder:font-medium border-gray-2 rounded-xl text-sm text-gray-1 placeholder:text-gray-3 focus:outline-none focus:border-main-1"
+        className="w-full h-15 px-5 pr-14 border placeholder:font-medium border-gray-2 rounded-xl text-gray-1 placeholder:text-gray-3 focus:outline-none focus:border-main-1"
       />
       <button
         type="button"
