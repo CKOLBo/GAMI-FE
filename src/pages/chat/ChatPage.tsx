@@ -6,6 +6,7 @@ import SearchIcon from '@/assets/svg/main/SearchIcon';
 import Divider from '@/assets/svg/Divider';
 import { useState } from 'react';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
 
 interface ChatItem {
   id: number;
@@ -44,6 +45,8 @@ export default function ChatPage() {
   const [roomDetail, setRoomDetail] = useState<ChatRoomDetail | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [loading, setLoading] = useState(false);
+  const [messageInput, setMessageInput] = useState('');
+  const currentUserId = 1;
 
   const chatList: ChatItem[] = [
     {
@@ -80,27 +83,54 @@ export default function ChatPage() {
       ]);
 
       setRoomDetail(roomResponse.data);
-      setMessages(messagesResponse.data.messages);
+      if (messagesResponse.data && Array.isArray(messagesResponse.data.messages)) {
+        setMessages(messagesResponse.data.messages);
+      } else {
+        setMessages([]);
+      }
     } catch (error) {
       console.error('채팅방 정보 로드 실패:', error);
+      setMessages([]);
     } finally {
       setLoading(false);
     }
   };
 
-  const formatDate = (dateString: string) => {
+  const formatMessageDate = (dateString: string) => {
     const date = new Date(dateString);
-    const now = new Date();
-    const diff = now.getTime() - date.getTime();
-    const minutes = Math.floor(diff / 60000);
-    const hours = Math.floor(diff / 3600000);
-    const days = Math.floor(diff / 86400000);
+    return date.toLocaleDateString('ko-KR', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+  };
 
-    if (minutes < 1) return '방금 전';
-    if (minutes < 60) return `${minutes}분 전`;
-    if (hours < 24) return `${hours}시간 전`;
-    if (days < 7) return `${days}일 전`;
-    return date.toLocaleDateString('ko-KR');
+  const formatMessageTime = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleTimeString('ko-KR', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    });
+  };
+
+  const handleSendMessage = async () => {
+    if (!messageInput.trim() || !selectedRoomId) return;
+
+    try {
+      await axios.post(`/api/chat/${selectedRoomId}/messages`, {
+        message: messageInput,
+      });
+      setMessageInput('');
+    } catch (error) {
+      console.error('메시지 전송 실패:', error);
+    }
+  };
+
+  const handleExit = () => {
+    setSelectedRoomId(null);
+    setRoomDetail(null);
+    setMessages([]);
   };
 
 
@@ -111,14 +141,17 @@ export default function ChatPage() {
         <div className="w-96 2xl:w-[480px] border-r border-gray-2 bg-white flex flex-col min-h-screen">
           <div className="px-6 2xl:px-8 pt-6 2xl:pt-8 pb-4 2xl:pb-5">
             <div className="flex items-center justify-between mb-4 2xl:mb-5">
-              <h1 className="flex items-center gap-4 text-[40px] font-bold text-gray-1">
+              <h1 className="flex items-center gap-4 text-[40px] font-bold">
                 <span className="text-[40px] text-gray-1 font-bold">
                   채팅
                 </span>
                 <Divider className="flex-shrink-0" />
-                <span className="text-[32px] text-gray-2 font-bold">
+                <Link
+                  to="/chat-apply"
+                  className="text-[32px] text-gray-2 font-bold hover:text-gray-1 transition-colors cursor-pointer"
+                >
                   요청
-                </span>
+                </Link>
               </h1>
               <BellIcon className="text-gray-3" />
             </div>
@@ -174,20 +207,33 @@ export default function ChatPage() {
         {selectedRoomId && roomDetail ? (
           <div className="flex-1 flex flex-col bg-white">
             <div className="px-6 2xl:px-8 py-4 2xl:py-6 border-b border-gray-2">
-              <div className="flex items-center gap-4 2xl:gap-5">
-                <div className="flex-shrink-0">
-                  <div className="w-12 2xl:w-14 h-12 2xl:h-14 rounded-full flex items-center justify-center">
-                    <Profile width={40} height={40} />
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4 2xl:gap-5">
+                  <div className="flex-shrink-0">
+                    <div className="w-12 2xl:w-14 h-12 2xl:h-14 rounded-full flex items-center justify-center">
+                      <Profile width={40} height={40} />
+                    </div>
+                  </div>
+                  <div>
+                    <h2 className="text-lg 2xl:text-xl font-bold text-gray-1 mb-1">
+                      {roomDetail.name}
+                    </h2>
+                    <div className="flex gap-2">
+                      <span className="rounded-md px-3 py-0.5 text-white text-sm font-semibold bg-main-1">
+                        {roomDetail.generation}기
+                      </span>
+                      <span className="rounded-md px-3 py-0.5 text-white text-sm font-semibold bg-main-2">
+                        {roomDetail.major}
+                      </span>
+                    </div>
                   </div>
                 </div>
-                <div>
-                  <h2 className="text-lg 2xl:text-xl font-bold text-gray-1">
-                    {roomDetail.name}
-                  </h2>
-                  <p className="text-sm 2xl:text-base text-gray-3">
-                    {roomDetail.generation}기 · {roomDetail.major}
-                  </p>
-                </div>
+                <button
+                  onClick={handleExit}
+                  className="px-4 py-2 text-main-3 font-semibold hover:bg-gray-50 rounded-lg transition-colors"
+                >
+                  나가기
+                </button>
               </div>
             </div>
 
@@ -196,24 +242,56 @@ export default function ChatPage() {
                 <div className="flex items-center justify-center h-full">
                   <p className="text-base 2xl:text-lg text-gray-3">로딩 중...</p>
                 </div>
-              ) : messages.length > 0 ? (
+              ) : Array.isArray(messages) && messages.length > 0 ? (
                 <div className="space-y-4">
-                  {messages.map((message) => (
-                    <div
-                      key={message.messageId}
-                      className="flex flex-col gap-1"
-                    >
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-semibold text-gray-1">
-                          {message.senderName}
-                        </span>
-                        <span className="text-xs text-gray-3">
-                          {formatDate(message.createdAt)}
-                        </span>
+                  {messages.map((message, index) => {
+                    const isMyMessage = message.senderId === currentUserId;
+                    const prevMessage = index > 0 ? messages[index - 1] : null;
+                    const currentDate = formatMessageDate(message.createdAt);
+                    const prevDate = prevMessage
+                      ? formatMessageDate(prevMessage.createdAt)
+                      : null;
+                    const showDate = currentDate !== prevDate;
+
+                    return (
+                      <div key={message.messageId}>
+                        {showDate && (
+                          <div className="flex justify-center my-4">
+                            <span className="text-sm text-gray-3">
+                              {currentDate}
+                            </span>
+                          </div>
+                        )}
+                        <div
+                          className={`flex ${isMyMessage ? 'justify-end' : 'justify-start'}`}
+                        >
+                          <div
+                            className={`flex flex-col max-w-[70%] ${
+                              isMyMessage ? 'items-end' : 'items-start'
+                            }`}
+                          >
+                            {!isMyMessage && (
+                              <span className="text-sm font-semibold text-gray-1 mb-1">
+                                {message.senderName}
+                              </span>
+                            )}
+                            <div
+                              className={`px-4 py-2 rounded-lg ${
+                                isMyMessage
+                                  ? 'bg-main-1 text-white'
+                                  : 'bg-white-1 text-gray-1'
+                              }`}
+                            >
+                              <p className="text-base">{message.message}</p>
+                            </div>
+                            <span className="text-xs text-gray-3 mt-1">
+                              {formatMessageTime(message.createdAt)}
+                            </span>
+                          </div>
+                        </div>
                       </div>
-                      <p className="text-base text-gray-1">{message.message}</p>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               ) : (
                 <div className="flex items-center justify-center h-full">
@@ -222,6 +300,29 @@ export default function ChatPage() {
                   </p>
                 </div>
               )}
+            </div>
+
+            <div className="px-6 2xl:px-8 py-4 2xl:py-6 border-t border-gray-2">
+              <div className="flex items-center gap-3">
+                <input
+                  type="text"
+                  placeholder="메세지 입력..."
+                  value={messageInput}
+                  onChange={(e) => setMessageInput(e.target.value)}
+                  onKeyPress={(e) => {
+                    if (e.key === 'Enter') {
+                      handleSendMessage();
+                    }
+                  }}
+                  className="flex-1 px-4 py-3 border border-gray-2 rounded-lg focus:outline-none focus:border-main-1"
+                />
+                <button
+                  onClick={handleSendMessage}
+                  className="px-6 py-3 bg-main-1 text-white font-semibold rounded-lg hover:bg-main-1-hover transition-colors"
+                >
+                  보내기
+                </button>
+              </div>
             </div>
           </div>
         ) : (
