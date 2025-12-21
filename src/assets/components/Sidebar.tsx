@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import Logo from '@/assets/svg/logo/Logo';
 import HomeIcon from '@/assets/svg/sidebar/HomeIcon';
@@ -6,6 +7,7 @@ import ChatIcon from '@/assets/svg/sidebar/ChatIcon';
 import PostIcon from '@/assets/svg/sidebar/PostIcon';
 import ProfileIcon from '@/assets/svg/sidebar/ProfileIcon';
 import LogoutIcon from '@/assets/svg/sidebar/LogoutIcon';
+import LogoutModal from '@/assets/components/modal/LogoutModal';
 
 interface MenuItem {
   path: string;
@@ -17,6 +19,11 @@ interface MenuItem {
 export default function Sidebar() {
   const location = useLocation();
   const navigate = useNavigate();
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
+
+  const handleLogoutClick = () => {
+    setIsLogoutModalOpen(true);
+  };
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -92,7 +99,7 @@ export default function Sidebar() {
         })}
 
         <button
-          onClick={handleLogout}
+          onClick={handleLogoutClick}
           className="flex items-center gap-5.5 px-2.5 py-2.5 rounded-xl
                      text-base font-semibold text-gray-1 hover:bg-[#F5F5F5]
                      transition-colors bg-transparent border-0 cursor-pointer
@@ -102,6 +109,12 @@ export default function Sidebar() {
           <span>로그아웃</span>
         </button>
       </nav>
+      {isLogoutModalOpen && (
+        <LogoutModal
+          onClose={() => setIsLogoutModalOpen(false)}
+          onLogout={handleLogout}
+        />
+      )}
     </div>
   );
 }
