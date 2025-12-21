@@ -6,6 +6,7 @@ import GenderButton from '@/assets/components/Button/GenderButton';
 import Arrow from '@/assets/svg/Arrow';
 import CategoryButton from '@/assets/components/Button/CategoryButton';
 import InputPassword from '@/assets/components/Input/InputPassword';
+import ToSModal from '@/assets/components/modal/ToSModal';
 
 export default function SignupPage() {
   const navigate = useNavigate();
@@ -22,6 +23,32 @@ export default function SignupPage() {
   const [code, setCode] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPw, setConfirmPw] = useState('');
+
+  const [agreeAll, setAgreeAll] = useState(false);
+  const [agreeService, setAgreeService] = useState(false);
+  const [agreePrivacy, setAgreePrivacy] = useState(false);
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleToSClick = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleAgreeAll = (checked: boolean) => {
+    setAgreeAll(checked);
+    setAgreeService(checked);
+    setAgreePrivacy(checked);
+  };
+
+  const handleAgreeItem = (type: 'service' | 'privacy', checked: boolean) => {
+    if (type === 'service') setAgreeService(checked);
+    if (type === 'privacy') setAgreePrivacy(checked);
+
+    setAgreeAll(
+      (type === 'service' ? checked : agreeService) &&
+        (type === 'privacy' ? checked : agreePrivacy)
+    );
+  };
 
   const generations = ['7기', '8기', '9기'];
   const interestList = [
@@ -216,6 +243,7 @@ export default function SignupPage() {
               required
               className="flex-1 p-4 border border-solid text-gray-1 placeholder:font-medium border-gray-2 placeholder:text-gray-3 rounded-xl text-sm outline-none focus:border-main-1"
             />
+
             <button
               type="button"
               className="p-4 bg-main-1 text-white text-sm border-none rounded-xl cursor-pointer transition-all duration-300 font-semibold whitespace-nowrap min-w-[90px] hover:bg-[#7a9fe6] outline-none"
@@ -233,14 +261,65 @@ export default function SignupPage() {
             onChange={(e) => setConfirmPw(e.target.value)}
           />
 
+          <div className="p-4 flex flex-col gap-3 text-left">
+            <label className="bg-[#F9F9F9] rounded-lg p-4 flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={agreeAll}
+                onChange={(e) => handleAgreeAll(e.target.checked)}
+                className="w-4 h-4"
+              />
+              <span className="text-sm font-medium text-gray-3">
+                전체 약관 동의
+              </span>
+            </label>
+
+            <div className="flex justify-between ml-2 items-center">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={agreeService}
+                  onChange={(e) => handleAgreeItem('service', e.target.checked)}
+                  className="w-4 h-4"
+                />
+                <span className="text-sm text-gray-1">
+                  [필수] GAMI 이용 약관 동의
+                </span>
+              </label>
+              <button
+                type="button"
+                onClick={handleToSClick}
+                className="cursor-pointer"
+              >
+                <Arrow className="w-4 h-4 text-gray-3" />
+              </button>
+            </div>
+
+            <div className="flex justify-between ml-2 items-center">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={agreePrivacy}
+                  onChange={(e) => handleAgreeItem('privacy', e.target.checked)}
+                  className="w-4 h-4"
+                />
+                <span className="text-sm text-gray-1">
+                  [필수] 개인정보 수집 및 이용 동의
+                </span>
+              </label>
+              <Arrow className="w-4 h-4 text-gray-3" />
+            </div>
+          </div>
+
           <button
             type="submit"
-            className="p-4 bg-main-2 text-white text-base border-none rounded-xl cursor-pointer transition-all duration-300 mt-2.5 font-bold hover:bg-main-2-hover outline-none"
+            className="p-4 bg-main-2 text-white text-base border-none rounded-xl cursor-pointer font-bold transition-all hover:bg-main-2-hover outline-none"
           >
             회원가입
           </button>
         </form>
       </div>
+      {isModalOpen && <ToSModal onClose={() => setIsModalOpen(false)} />}
     </div>
   );
 
