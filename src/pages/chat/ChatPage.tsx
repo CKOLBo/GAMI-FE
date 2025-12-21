@@ -83,12 +83,11 @@ export default function ChatPage() {
             <div className="mb-8 2xl:mb-12 flex justify-center">
               <Logo size="lg" />
             </div>
-            <p className="text-2xl 2xl:text-3xl font-bold text-gray-1 mb-2 2xl:mb-3">
-              <span className="text-main-1">멘토</span>와{' '}
+            <p className="text-2xl 2xl:text-3xl font-bold text-gray-3">
+              <span className="text-main-2">멘토</span>와{' '}
               <span className="text-main-1">멘티</span>를 바로 연결하는
-            </p>
-            <p className="text-xl 2xl:text-2xl font-semibold text-gray-3">
-              맞춤형 멘토링 서비스
+              <br />
+                맞춤형 멘토링 서비스
             </p>
           </div>
         </div>
