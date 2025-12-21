@@ -13,8 +13,8 @@ export default function Line() {
         x2="1"
         y2="39"
         stroke="#B7BCC8"
-        stroke-width="2"
-        stroke-linecap="round"
+        strokeWidth="2"
+        strokeLinecap="round"
       />
     </svg>
   );
