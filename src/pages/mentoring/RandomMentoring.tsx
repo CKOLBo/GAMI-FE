@@ -1,5 +1,4 @@
 import Sidebar from '@/assets/components/Sidebar';
-import SearchIcon from '@/assets/svg/main/SearchIcon';
 import Divider from '@/assets/svg/Divider';
 import { Link } from 'react-router-dom';
 import Mentor from '@/assets/svg/mentor/Mentor.png';
@@ -29,17 +28,6 @@ export default function RandomMentoring() {
                   랜덤 멘토링
                 </span>
               </h1>
-
-              <div className="ml-25 relative w-150">
-                <div className="absolute left-5 top-1/2 -translate-y-1/2 z-10">
-                  <SearchIcon />
-                </div>
-                <input
-                  type="text"
-                  placeholder="전공 또는 멘토의 이름을 입력해주세요."
-                  className="w-full h-16 rounded-full bg-white-1 border border-gray-4 pl-16 pr-4 py-2 text-[24px] text-gray-1 placeholder:text-gray-3 focus:outline-main-1 font-bold"
-                />
-              </div>
             </div>
           </div>
           <div className="h-16 bg-[linear-gradient(180deg,#FFF_0%,rgba(255,255,255,0)_100%)]"></div>
@@ -66,7 +54,7 @@ export default function RandomMentoring() {
 
             <button
               onClick={handleRandomSearch}
-              className="w-[376px] h-13 2xl:h-15 bg-main-1 text-white text-base rounded-[10px] 2xl:rounded-[12px] transition-all duration-300 font-bold hover:bg-main-1-hover border-0 cursor-pointer"
+              className="w-[376px] h-13 2xl:h-15 bg-main-1 text-white text-[24px] rounded-[10px] 2xl:rounded-[12px] transition-all duration-300 font-bold hover:bg-main-1-hover border-0 cursor-pointer"
             >
               랜덤 검색
             </button>
