@@ -45,13 +45,18 @@ export default function EditPassword({ onClose }: EditPasswordProps) {
 
       toast.success('비밀번호가 변경되었습니다.');
       onClose();
-    } catch (err: any) {
-      console.error('Password change error:', err);
-
-      if (err.response?.status === 401) {
-        toast.error('현재 비밀번호가 올바르지 않습니다.');
-      } else if (err.response?.data?.message) {
-        toast.error(err.response.data.message);
+    } catch (err: unknown) {
+      if (err && typeof err === 'object' && 'response' in err) {
+        const error = err as {
+          response?: { status?: number; data?: { message?: string } };
+        };
+        if (error.response?.status === 401) {
+          toast.error('현재 비밀번호가 올바르지 않습니다.');
+        } else if (error.response?.data?.message) {
+          toast.error(error.response.data.message);
+        } else {
+          toast.error('비밀번호 변경에 실패했습니다.');
+        }
       } else {
         toast.error('비밀번호 변경에 실패했습니다.');
       }
