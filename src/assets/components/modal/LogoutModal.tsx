@@ -31,4 +31,3 @@ export default function LogoutModal({ onClose, onLogout }: LogoutModalProps) {
     </ModalWrapper>
   );
 }
-

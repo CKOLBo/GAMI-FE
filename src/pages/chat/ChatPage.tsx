@@ -47,7 +47,8 @@ export default function ChatPage() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [loading, setLoading] = useState(false);
   const [messageInput, setMessageInput] = useState('');
-  const [isMentorRequestModalOpen, setIsMentorRequestModalOpen] = useState(false);
+  const [isMentorRequestModalOpen, setIsMentorRequestModalOpen] =
+    useState(false);
   const currentUserId = 1;
 
   const mentorRequests = [
@@ -94,7 +95,10 @@ export default function ChatPage() {
       ]);
 
       setRoomDetail(roomResponse.data);
-      if (messagesResponse.data && Array.isArray(messagesResponse.data.messages)) {
+      if (
+        messagesResponse.data &&
+        Array.isArray(messagesResponse.data.messages)
+      ) {
         setMessages(messagesResponse.data.messages);
       } else {
         setMessages([]);
@@ -152,7 +156,6 @@ export default function ChatPage() {
     setIsMentorRequestModalOpen(true);
   };
 
-
   return (
     <div className="flex min-h-screen">
       <Sidebar />
@@ -161,9 +164,7 @@ export default function ChatPage() {
           <div className="px-6 2xl:px-8 pt-6 2xl:pt-8 pb-4 2xl:pb-5">
             <div className="flex items-center justify-between mb-4 2xl:mb-5">
               <h1 className="flex items-center gap-4 text-[40px] font-bold">
-                <span className="text-[40px] text-gray-1 font-bold">
-                  채팅
-                </span>
+                <span className="text-[40px] text-gray-1 font-bold">채팅</span>
                 <Divider className="flex-shrink-0" />
                 <Link
                   to="/chat-apply"
@@ -265,7 +266,9 @@ export default function ChatPage() {
             <div className="flex-1 overflow-y-auto px-6 2xl:px-8 py-4 2xl:py-6">
               {loading ? (
                 <div className="flex items-center justify-center h-full">
-                  <p className="text-base 2xl:text-lg text-gray-3">로딩 중...</p>
+                  <p className="text-base 2xl:text-lg text-gray-3">
+                    로딩 중...
+                  </p>
                 </div>
               ) : Array.isArray(messages) && messages.length > 0 ? (
                 <div className="space-y-4">
@@ -360,7 +363,7 @@ export default function ChatPage() {
                 <span className="text-main-2">멘토</span>와{' '}
                 <span className="text-main-1">멘티</span>를 바로 연결하는
                 <br />
-                  맞춤형 멘토링 서비스
+                맞춤형 멘토링 서비스
               </p>
             </div>
           </div>
@@ -376,4 +379,3 @@ export default function ChatPage() {
     </div>
   );
 }
-

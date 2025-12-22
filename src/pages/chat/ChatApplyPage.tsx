@@ -20,7 +20,8 @@ interface ApplyRequest {
 export default function ChatApplyPage() {
   const [sentRequests, setSentRequests] = useState<ApplyRequest[]>([]);
   const [loading, setLoading] = useState(false);
-  const [isMentorRequestModalOpen, setIsMentorRequestModalOpen] = useState(false);
+  const [isMentorRequestModalOpen, setIsMentorRequestModalOpen] =
+    useState(false);
 
   const mentorRequests = [
     { id: 1, name: '양은준' },
@@ -199,4 +200,3 @@ export default function ChatApplyPage() {
     </div>
   );
 }
-

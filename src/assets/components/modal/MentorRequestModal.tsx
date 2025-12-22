@@ -30,9 +30,7 @@ export default function MentorRequestModal({
           <X />
         </button>
 
-        <h2 className="text-2xl font-bold text-gray-1 mb-2">
-          멘토 신청 목록
-        </h2>
+        <h2 className="text-2xl font-bold text-gray-1 mb-2">멘토 신청 목록</h2>
 
         <p className="text-base text-gray-3 mb-6">
           신청 된 멘토를 확인해주세요.
@@ -71,4 +69,3 @@ export default function MentorRequestModal({
     </ModalWrapper>
   );
 }
-
