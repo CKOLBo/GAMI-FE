@@ -49,7 +49,7 @@ export default function MentoringPage() {
 
       <main className="flex-1 ml-45 2xl:ml-55">
         <div className="fixed top-0 left-45 2xl:left-55 right-0 z-40">
-          <div className="px-7 2xl:px-12 pt-7 2xl:pt-12 bg-white">
+          <div className="px-7 2xl:px-15 pt-7 2xl:pt-15 bg-white">
             <div className="flex items-center">
               <h1 className="flex items-center gap-4 text-[40px] font-bold text-gray-1">
                 <span className="text-3xl 2xl:text-[40px] text-gray-1 font-bold">
@@ -73,7 +73,7 @@ export default function MentoringPage() {
                   placeholder="전공 또는 멘토의 이름을 입력해주세요."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full h-9 2xl:h-16 rounded-full bg-white-1 border border-gray-4 pl-10 pr-4 py-1 text-base 2xl:text-[24px] text-gray-1 placeholder:text-gray-3 focus:outline-main-1 font-bold"
+                  className="w-full h-9 2xl:h-12 rounded-full bg-white-1 border border-gray-4 pl-10 2xl:pl-14 pr-4 py-1 text-base 2xl:text-[24px] text-gray-1 placeholder:text-gray-3 focus:outline-main-1 font-bold"
                 />
               </div>
             </div>
