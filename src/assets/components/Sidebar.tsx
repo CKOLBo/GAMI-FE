@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
 import axios from 'axios';
 import Logo from '@/assets/svg/logo/Logo';
 import HomeIcon from '@/assets/svg/sidebar/HomeIcon';
@@ -20,6 +21,7 @@ interface MenuItem {
 export default function Sidebar() {
   const location = useLocation();
   const navigate = useNavigate();
+  const { logout } = useAuth();
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
   const handleLogoutClick = () => {
@@ -36,11 +38,10 @@ export default function Sidebar() {
           },
         });
       }
-      localStorage.removeItem('token');
-      navigate('/signin');
     } catch (error) {
       console.error('로그아웃 실패:', error);
-      localStorage.removeItem('token');
+    } finally {
+      logout();
       navigate('/signin');
     }
   };
