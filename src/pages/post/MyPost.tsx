@@ -6,6 +6,7 @@ import PostHead from '@/assets/components/post/PostHead';
 import Delete from '@/assets/svg/post/Delete';
 import DeleteModal from '@/assets/components/modal/DeleteModal';
 import axios from 'axios';
+import Sidebar from '@/assets/components/Sidebar';
 
 interface MyPostType {
   id: number;
@@ -43,7 +44,8 @@ export default function MyPost() {
 
   return (
     <>
-      <div className="w-full">
+      <div className="w-full ml-30">
+        <Sidebar />
         <div className="max-w-[1500px] mx-auto px-4 lg:px-6">
           <PostHead>
             <div className="flex flex-wrap gap-3 sm:gap-4 lg:gap-6">
