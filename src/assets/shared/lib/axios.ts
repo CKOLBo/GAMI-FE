@@ -48,14 +48,7 @@ instance.interceptors.response.use(
         originalRequest.url?.includes('/auth/signup');
 
       if (isAuthEndpoint) {
-        return Promise.resolve({
-          ...error.response,
-          status: 401,
-          statusText: error.response.statusText,
-          headers: error.response.headers,
-          config: error.config,
-          data: error.response.data,
-        } as AxiosResponse);
+        return Promise.resolve(error.response);
       }
 
       originalRequest._retry = true;
