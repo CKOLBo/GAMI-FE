@@ -34,10 +34,10 @@ export default function NotFoundPage() {
           </button>
 
           <Link
-            to="/signin"
+            to="/main"
             className="max-w-[152px] w-[120px] max-h-[64px] h-[48px] rounded-[10px] bg-[#73A9FF] text-white text-base transition-all duration-300 font-bold hover:bg-main-1-hover flex items-center justify-center no-underline"
           >
-            로그인
+            홈으로
           </Link>
         </div>
       </div>
