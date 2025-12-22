@@ -1,11 +1,13 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
 import Logo from '@/assets/svg/logo/Logo';
 import Show from '@/assets/svg/password/show';
 import Hide from '@/assets/svg/password/hide';
 
 export default function SigninPage() {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({ email: '', password: '' });
 
@@ -30,6 +32,14 @@ export default function SigninPage() {
 
     if (!newErrors.email && !newErrors.password) {
       if (email === 'test@gsm.hs.kr' && password === '1234') {
+        login(
+          {
+            id: 1,
+            email: email,
+            name: '테스트 사용자',
+          },
+          'mock-token'
+        );
         navigate('/main');
       } else {
         setErrors({
