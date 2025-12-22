@@ -8,6 +8,7 @@ import CategoryButton from '@/assets/components/Button/CategoryButton';
 import InputPassword from '@/assets/components/Input/InputPassword';
 import ToSModal from '@/assets/components/modal/ToSModal';
 import PrivacyModal from '@/assets/components/modal/PrivacyModal';
+import { instance } from '@/assets/shared/lib/axios';
 
 export default function SignupPage() {
   const navigate = useNavigate();
@@ -28,6 +29,10 @@ export default function SignupPage() {
   const [agreeAll, setAgreeAll] = useState(false);
   const [agreeService, setAgreeService] = useState(false);
   const [agreePrivacy, setAgreePrivacy] = useState(false);
+
+  const [isCodeSent, setIsCodeSent] = useState(false);
+  const [isCodeVerified, setIsCodeVerified] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const [isToSModalOpen, setIsToSModalOpen] = useState(false);
   const [isPrivacyModalOpen, setIsPrivacyModalOpen] = useState(false);
@@ -58,19 +63,19 @@ export default function SignupPage() {
 
   const generations = ['7기', '8기', '9기'];
   const interestList = [
-    { id: 'FE', label: 'FE' },
-    { id: 'BE', label: 'BE' },
-    { id: 'iOS', label: 'iOS' },
-    { id: 'Mobile Robotics', label: 'Mobile Robotics' },
-    { id: 'Android', label: 'Android' },
-    { id: 'Design', label: 'Design' },
-    { id: 'DevOps', label: 'DevOps' },
+    { id: 'FRONTEND', label: 'FE' },
+    { id: 'BACKEND', label: 'BE' },
+    { id: 'IOS', label: 'iOS' },
+    { id: 'MOBILE_ROBOTICS', label: 'Mobile Robotics' },
+    { id: 'ANDROID', label: 'Android' },
+    { id: 'DESIGN', label: 'Design' },
+    { id: 'DEVOPS', label: 'DevOps' },
     { id: 'AI', label: 'AI' },
-    { id: 'IT Network', label: 'IT Network' },
-    { id: 'Flutter', label: 'Flutter' },
-    { id: 'Cyber Security', label: 'Cyber Security' },
-    { id: 'Game Development', label: 'Game Development' },
-    { id: 'Cloud Computing', label: 'Cloud Computing' },
+    { id: 'IT_NETWORK', label: 'IT Network' },
+    { id: 'FLUTTER', label: 'Flutter' },
+    { id: 'CYBER_SECURITY', label: 'Cyber Security' },
+    { id: 'GAME_DEVELOPMENT', label: 'Game Development' },
+    { id: 'CLOUD_COMPUTING', label: 'Cloud Computing' },
   ];
 
   const toggleInterest = (id: string) => {
@@ -79,31 +84,138 @@ export default function SignupPage() {
     );
   };
 
+  const handleSendCode = async () => {
+    if (!email) {
+      alert('이메일을 입력해주세요.');
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      alert('올바른 이메일 형식이 아닙니다.');
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      await instance.post('/api/auth/email/send-code', {
+        email,
+        verificationType: 'SIGN_UP',
+      });
+
+      setIsCodeSent(true);
+      alert('인증 코드가 발송되었습니다. 이메일을 확인해주세요.');
+    } catch (error: any) {
+      console.error('인증 코드 발송 실패:', error);
+      if (error.code === 'ECONNABORTED') {
+        alert('요청 시간이 초과되었습니다. 잠시 후 다시 시도해주세요.');
+      } else if (error.response?.status === 429) {
+        alert('요청 횟수를 초과했습니다. 잠시 후 다시 시도해주세요.');
+      } else if (error.response?.status === 400) {
+        alert(error.response?.data?.message || '입력값에 오류가 있습니다.');
+      } else {
+        alert('인증 코드 발송에 실패했습니다. 다시 시도해주세요.');
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleVerifyCode = async () => {
+    if (!code) {
+      alert('인증 코드를 입력해주세요.');
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      await instance.post('/api/auth/email/verification-code', {
+        email,
+        code,
+      });
+
+      setIsCodeVerified(true);
+      alert('이메일 인증이 완료되었습니다.');
+    } catch (error: any) {
+      console.error('인증 코드 검증 실패:', error);
+      if (error.response?.status === 400) {
+        alert('잘못된 인증 코드입니다. 다시 확인해주세요.');
+      } else if (error.response?.status === 429) {
+        alert('요청 횟수를 초과했습니다. 잠시 후 다시 시도해주세요.');
+      } else {
+        alert('인증 코드 검증에 실패했습니다. 다시 시도해주세요.');
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleStep1Submit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!name || !gender || !generation) {
+      alert('모든 항목을 입력해주세요.');
+      return;
+    }
     setStep(2);
   };
 
   const handleStep2Submit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (interests.length === 0) {
+      alert('최소 1개 이상의 전공을 선택해주세요.');
+      return;
+    }
     setStep(3);
   };
 
-  const handleStep3Submit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleStep3Submit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    if (!agreeService || !agreePrivacy) {
+      alert('필수 약관에 모두 동의해주세요.');
+      return;
+    }
+
+    if (!isCodeVerified) {
+      alert('이메일 인증을 완료해주세요.');
+      return;
+    }
+
     if (password !== confirmPw) {
       alert('비밀번호가 일치하지 않습니다.');
       return;
     }
-    console.log({
-      name,
-      gender,
-      generation,
-      interests,
-      email,
-      password,
-    });
-    navigate('/signin');
+
+    if (password.length < 8) {
+      alert('비밀번호는 최소 8자 이상이어야 합니다.');
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const generationNumber = parseInt(generation.replace(/[^0-9]/g, ''));
+
+      await instance.post('/api/auth/signup', {
+        email,
+        password,
+        name,
+        generation: generationNumber,
+        gender: gender.toUpperCase(),
+        major: interests[0],
+      });
+
+      alert('회원가입이 완료되었습니다!');
+      navigate('/signin');
+    } catch (error: any) {
+      console.error('회원가입 실패:', error);
+      if (error.response?.status === 400) {
+        alert('입력값에 오류가 있습니다. 다시 확인해주세요.');
+      } else {
+        alert('회원가입에 실패했습니다. 다시 시도해주세요.');
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const renderStep1 = () => (
@@ -146,7 +258,7 @@ export default function SignupPage() {
             <button
               type="button"
               onClick={() => setIsGenOpen(!isGenOpen)}
-              className="bg-white border border-solid h-15 border-gray-2 rounded-xl  font-medium p-4 w-full cursor-pointer outline-none text-left flex justify-between items-center"
+              className="bg-white border border-solid h-15 border-gray-2 rounded-xl font-medium p-4 w-full cursor-pointer outline-none text-left flex justify-between items-center"
             >
               <span className={generation ? 'text-gray-1' : 'text-gray-3'}>
                 {generation || '기수'}
@@ -166,7 +278,7 @@ export default function SignupPage() {
                       setGeneration(gen);
                       setIsGenOpen(false);
                     }}
-                    className="w-full p-4 text-left  font-medium text-gray-1 bg-white hover:bg-[#F5F6F8] transition-colors duration-200 border-none cursor-pointer"
+                    className="w-full p-4 text-left font-medium text-gray-1 bg-white hover:bg-[#F5F6F8] transition-colors duration-200 border-none cursor-pointer"
                   >
                     {gen}
                   </button>
@@ -182,7 +294,7 @@ export default function SignupPage() {
   );
 
   const renderStep2 = () => (
-    <div className="min-h-screen  bg-white flex flex-col items-center justify-center px-4 py-8">
+    <div className="min-h-screen bg-white flex flex-col items-center justify-center px-4 py-8">
       <div className="w-[120px] mb-7 mx-auto">
         <Logo />
       </div>
@@ -231,35 +343,52 @@ export default function SignupPage() {
               type="email"
               placeholder="이메일"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                setIsCodeSent(false);
+                setIsCodeVerified(false);
+              }}
               required
-              className="flex-1 p-4 border border-solid text-gray-1 border-gray-2 placeholder:text-gray-3 placeholder:font-medium rounded-xl outline-none focus:border-main-1"
+              disabled={isCodeVerified}
+              className="flex-1 p-4 border border-solid text-gray-1 border-gray-2 placeholder:text-gray-3 placeholder:font-medium rounded-xl outline-none focus:border-main-1 disabled:bg-gray-100 disabled:cursor-not-allowed"
             />
             <button
               type="button"
-              className="p-4 bg-main-1 text-white border-none rounded-xl cursor-pointer transition-all duration-300 font-semibold whitespace-nowrap min-w-[90px] hover:bg-[#7a9fe6] outline-none"
+              onClick={handleSendCode}
+              disabled={isLoading || isCodeVerified}
+              className="p-4 bg-main-1 text-white border-none rounded-xl cursor-pointer transition-all duration-300 font-semibold whitespace-nowrap min-w-[90px] hover:bg-[#7a9fe6] outline-none disabled:bg-gray-300 disabled:cursor-not-allowed"
             >
-              번호 발송
+              {isLoading ? '발송 중...' : isCodeSent ? '재발송' : '번호 발송'}
             </button>
           </div>
 
-          <div className="flex gap-2.5 h-15 items-stretch">
-            <input
-              type="text"
-              placeholder="인증번호"
-              value={code}
-              onChange={(e) => setCode(e.target.value)}
-              required
-              className="flex-1 p-4 border border-solid text-gray-1 placeholder:font-medium border-gray-2 placeholder:text-gray-3 rounded-xl outline-none focus:border-main-1"
-            />
+          {isCodeSent && (
+            <div className="flex gap-2.5 h-15 items-stretch">
+              <input
+                type="text"
+                placeholder="인증번호"
+                value={code}
+                onChange={(e) => setCode(e.target.value)}
+                required
+                disabled={isCodeVerified}
+                className="flex-1 p-4 border border-solid text-gray-1 placeholder:font-medium border-gray-2 placeholder:text-gray-3 rounded-xl outline-none focus:border-main-1 disabled:bg-gray-100 disabled:cursor-not-allowed"
+              />
 
-            <button
-              type="button"
-              className="p-4 bg-main-1 text-white border-none rounded-xl cursor-pointer transition-all duration-300 font-semibold whitespace-nowrap min-w-[90px] hover:bg-[#7a9fe6] outline-none"
-            >
-              인증하기
-            </button>
-          </div>
+              <button
+                type="button"
+                onClick={handleVerifyCode}
+                disabled={isLoading || isCodeVerified}
+                className="p-4 bg-main-1 text-white border-none rounded-xl cursor-pointer transition-all duration-300 font-semibold whitespace-nowrap min-w-[90px] hover:bg-[#7a9fe6] outline-none disabled:bg-green-500"
+              >
+                {isCodeVerified
+                  ? '인증완료'
+                  : isLoading
+                    ? '인증 중...'
+                    : '인증하기'}
+              </button>
+            </div>
+          )}
+
           <InputPassword
             value={password}
             onChange={(e) => setPassword(e.target.value)}
@@ -294,7 +423,7 @@ export default function SignupPage() {
               <button
                 type="button"
                 onClick={handleToSClick}
-                className="cursor-pointer"
+                className="cursor-pointer bg-transparent border-none"
               >
                 <Arrow className="w-6 h-6 text-gray-3" />
               </button>
@@ -315,7 +444,7 @@ export default function SignupPage() {
               <button
                 type="button"
                 onClick={handlePrivacyClick}
-                className="cursor-pointer"
+                className="cursor-pointer bg-transparent border-none"
               >
                 <Arrow className="w-6 h-6 text-gray-3" />
               </button>
@@ -324,9 +453,10 @@ export default function SignupPage() {
 
           <button
             type="submit"
-            className="h-16 p-4 bg-main-2 text-white border-none text-xl rounded-xl cursor-pointer font-bold transition-all hover:bg-main-2-hover outline-none"
+            disabled={isLoading || !isCodeVerified}
+            className="h-16 p-4 bg-main-2 text-white border-none text-xl rounded-xl cursor-pointer font-bold transition-all hover:bg-main-2-hover outline-none disabled:bg-gray-300 disabled:cursor-not-allowed"
           >
-            회원가입
+            {isLoading ? '처리 중...' : '회원가입'}
           </button>
         </form>
       </div>
