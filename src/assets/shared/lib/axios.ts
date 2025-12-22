@@ -39,6 +39,7 @@ instance.interceptors.response.use(
 
     const originalRequest = error.config as InternalAxiosRequestConfig & {
       _retry?: boolean;
+      _skipErrorHandler?: boolean;
     };
 
     if (error.response?.status === 401 && !originalRequest._retry) {
@@ -47,8 +48,14 @@ instance.interceptors.response.use(
         originalRequest.url?.includes('/auth/signup');
 
       if (isAuthEndpoint) {
-        (error as any).silent = true;
-        return Promise.reject(error);
+        return Promise.resolve({
+          ...error.response,
+          status: 401,
+          statusText: error.response.statusText,
+          headers: error.response.headers,
+          config: error.config,
+          data: error.response.data,
+        } as AxiosResponse);
       }
 
       originalRequest._retry = true;
