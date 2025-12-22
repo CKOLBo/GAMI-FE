@@ -8,6 +8,13 @@ interface LoginResponse {
   refreshToken: string;
   accessTokenExpiresIn: string;
   refreshTokenExpiresIn: string;
+  userId?: number;
+}
+
+interface UserInfo {
+  id: number;
+  email: string;
+  name?: string;
 }
 
 interface LoginCredentials {
@@ -42,18 +49,28 @@ export function useLogin(): UseLoginReturn {
         throw new Error('이메일 또는 비밀번호가 일치하지 않습니다.');
       }
 
-      const { accessToken, refreshToken } = response.data;
+      const { accessToken, refreshToken, userId } = response.data;
 
       setCookie('accessToken', accessToken);
       setCookie('refreshToken', refreshToken);
 
-      setAuthUser(
-        {
-          id: 0,
+      let userInfo: UserInfo;
+
+      if (userId) {
+        userInfo = {
+          id: userId,
           email: credentials.email,
-        },
-        accessToken
-      );
+        };
+      } else {
+        try {
+          const userResponse = await instance.get<UserInfo>('/api/user/me');
+          userInfo = userResponse.data;
+        } catch (userError) {
+          throw new Error('사용자 정보를 가져오는데 실패했습니다.');
+        }
+      }
+
+      setAuthUser(userInfo, accessToken);
     } catch (error) {
       if (error instanceof Error) {
         throw error;
