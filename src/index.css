@@ -114,3 +114,13 @@ input[type='email']:user-invalid {
 input::-webkit-validation-bubble-message {
   color: #ff6b6b;
 }
+
+.Toastify__toast {
+  font-size: 13px;
+  width: 380px;
+  min-height: 56px;
+}
+
+.Toastify__toast-body {
+  font-size: 13px;
+}

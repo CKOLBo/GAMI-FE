@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Outlet } from 'react-router-dom';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -17,6 +17,13 @@ import ChatPage from '@/pages/chat/ChatPage';
 import ChatApplyPage from '@/pages/chat/ChatApplyPage';
 import Admin from './pages/admin/AdminPage';
 import NotFound from './pages/404/NotFoundPage';
+import ProtectedRoute from '@/assets/components/ProtectedRoute';
+
+const ProtectedLayout = () => (
+  <ProtectedRoute>
+    <Outlet />
+  </ProtectedRoute>
+);
 
 function App() {
   return (
@@ -26,18 +33,20 @@ function App() {
           <Route path="/" element={<Signin />} />
           <Route path="/signin" element={<Signin />} />
           <Route path="/signup" element={<Signup />} />
-          <Route path="/main" element={<Main />} />
-          <Route path="/post" element={<Post />} />
-          <Route path="/post-content" element={<PostContent />} />
-          <Route path="/post-write" element={<PostWrite />} />
-          <Route path="/my-post" element={<MyPost />} />
-          <Route path="/password" element={<Password />} />
-          <Route path="/mentoring" element={<Mentoring />} />
-          <Route path="/mentoring-random" element={<RandomMentoring />} />
-          <Route path="/my-page" element={<MyPage />} />
-          <Route path="/chat" element={<ChatPage />} />
-          <Route path="/chat-apply" element={<ChatApplyPage />} />
-          <Route path="/admin" element={<Admin />} />
+          <Route element={<ProtectedLayout />}>
+            <Route path="/main" element={<Main />} />
+            <Route path="/post" element={<Post />} />
+            <Route path="/post-content" element={<PostContent />} />
+            <Route path="/post-write" element={<PostWrite />} />
+            <Route path="/my-post" element={<MyPost />} />
+            <Route path="/password" element={<Password />} />
+            <Route path="/mentoring" element={<Mentoring />} />
+            <Route path="/mentoring-random" element={<RandomMentoring />} />
+            <Route path="/my-page" element={<MyPage />} />
+            <Route path="/chat" element={<ChatPage />} />
+            <Route path="/chat-apply" element={<ChatApplyPage />} />
+            <Route path="/admin" element={<Admin />} />
+          </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>
 
