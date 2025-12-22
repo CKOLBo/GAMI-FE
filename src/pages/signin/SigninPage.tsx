@@ -5,9 +5,9 @@ import { useAuth } from '@/contexts/AuthContext';
 import Logo from '@/assets/svg/logo/Logo';
 import Show from '@/assets/svg/password/show';
 import Hide from '@/assets/svg/password/hide';
-import { baseURL } from '@/assets/shared/lib/axios';
+import { instance } from '@/assets/shared/lib/axios';
 import { setCookie } from '@/assets/shared/lib/cookie';
-import axios, { AxiosError } from 'axios';
+import { AxiosError } from 'axios';
 
 export default function SigninPage() {
   const navigate = useNavigate();
@@ -38,14 +38,13 @@ export default function SigninPage() {
 
     setIsLoading(true);
     try {
-      const url = `${baseURL}/api/auth/signin`;
-      const response = await axios.post<{
+      const response = await instance.post<{
         accessToken: string;
         refreshToken: string;
         accessTokenExpiresIn: string;
         refreshTokenExpiresIn: string;
       }>(
-        url,
+        '/api/auth/signin',
         {
           email,
           password,
