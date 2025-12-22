@@ -71,7 +71,7 @@ export default function EditPassword({ onClose }: EditPasswordProps) {
         <button
           type="button"
           onClick={onClose}
-          className="absolute top-0 right-0 bg-transparent border-0"
+          className="absolute top-0 right-0 bg-transparent border-0 cursor-pointer"
           aria-label="닫기"
         >
           <X />
