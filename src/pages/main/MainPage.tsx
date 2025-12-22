@@ -33,7 +33,7 @@ export default function MainPage() {
   return (
     <div className="flex">
       <Sidebar />
-      <div className="flex-1 p-7 2xl:p-12 ml-45 2xl:ml-55">
+      <div className="flex-1 p-7 2xl:p-15 ml-45 2xl:ml-55">
         <h1 className="text-3xl 2xl:text-[40px] font-bold text-gray-1 mb-8">
           홈
         </h1>
