@@ -198,7 +198,7 @@ export default function ChatPage() {
                 <div
                   key={chat.id}
                   onClick={() => handleChatClick(chat.id)}
-                  className={`mx-2 px-4 2xl:px-6 py-4 2xl:py-5 rounded-lg hover:bg-white-1 cursor-pointer transition-colors ${
+                  className={`mb-mx-2 px-4 2xl:px-6 py-4 2xl:py-5 rounded-lg hover:bg-white-1 cursor-pointer transition-colors ${
                     selectedRoomId === chat.id ? 'bg-white-1' : ''
                   }`}
                 >
@@ -255,7 +255,7 @@ export default function ChatPage() {
                 </div>
                 <button
                   onClick={handleExit}
-                  className="px-4 py-2 text-main-3 font-semibold hover:bg-gray-50 rounded-lg transition-colors"
+                  className="bg-main-3 px-4 py-2 text-white font-semibold rounded-lg transition-colors w-[120px] h-[52px] text-[20px]"
                 >
                   나가기
                 </button>
@@ -327,11 +327,11 @@ export default function ChatPage() {
               )}
             </div>
 
-            <div className="px-6 2xl:px-8 py-4 2xl:py-6 border-t border-gray-2">
-              <div className="flex items-center gap-3">
+            <div className="px-6 2xl:px-8 py-4 2xl:py-6">
+              <div className="relative">
                 <input
                   type="text"
-                  placeholder="메세지 입력..."
+                  placeholder="메시지 입력..."
                   value={messageInput}
                   onChange={(e) => setMessageInput(e.target.value)}
                   onKeyPress={(e) => {
@@ -339,11 +339,11 @@ export default function ChatPage() {
                       handleSendMessage();
                     }
                   }}
-                  className="flex-1 px-4 py-3 border border-gray-2 rounded-lg focus:outline-none focus:border-main-1"
+                  className="w-full px-4 py-3 pr-20 border border-gray-2 rounded-full focus:outline-none focus:border-main-1"
                 />
                 <button
                   onClick={handleSendMessage}
-                  className="px-6 py-3 bg-main-1 text-white font-semibold rounded-lg hover:bg-main-1-hover transition-colors"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-main-1 font-semibold hover:text-main-1-hover transition-colors bg-transparent border-none cursor-pointer"
                 >
                   보내기
                 </button>
