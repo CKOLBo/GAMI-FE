@@ -7,6 +7,7 @@ import Arrow from '@/assets/svg/Arrow';
 import CategoryButton from '@/assets/components/Button/CategoryButton';
 import InputPassword from '@/assets/components/Input/InputPassword';
 import ToSModal from '@/assets/components/modal/ToSModal';
+import PrivacyModal from '@/assets/components/modal/PrivacyModal';
 
 export default function SignupPage() {
   const navigate = useNavigate();
@@ -28,10 +29,15 @@ export default function SignupPage() {
   const [agreeService, setAgreeService] = useState(false);
   const [agreePrivacy, setAgreePrivacy] = useState(false);
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isToSModalOpen, setIsToSModalOpen] = useState(false);
+  const [isPrivacyModalOpen, setIsPrivacyModalOpen] = useState(false);
 
   const handleToSClick = () => {
-    setIsModalOpen(true);
+    setIsToSModalOpen(true);
+  };
+
+  const handlePrivacyClick = () => {
+    setIsPrivacyModalOpen(true);
   };
 
   const handleAgreeAll = (checked: boolean) => {
@@ -102,11 +108,11 @@ export default function SignupPage() {
 
   const renderStep1 = () => (
     <div className="bg-white min-h-screen flex justify-center items-center">
-      <div className="text-center max-w-80 w-full">
+      <div className="text-center max-w-94 w-full">
         <div className="w-[120px] mb-7 mx-auto">
           <Logo />
         </div>
-        <p className="text-sm font-medium text-gray-1 mb-9">
+        <p className="font-medium text-gray-1 mb-9">
           이미 회원이신가요?{' '}
           <Link to="/signin" className="text-main-1 font-bold no-underline">
             로그인
@@ -119,9 +125,9 @@ export default function SignupPage() {
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
-            className="p-4 border border-solid border-gray-2 rounded-xl placeholder:text-gray-3 placeholder:font-medium text-gray-1 text-sm outline-none focus:outline-none focus:border-main-1"
+            className="h-15 p-4 border border-solid border-gray-2 rounded-xl placeholder:text-gray-3 placeholder:font-medium text-gray-1 outline-none focus:outline-none focus:border-main-1"
           />
-          <div className="flex gap-[2%]">
+          <div className="h-15 flex gap-[2%]">
             <GenderButton
               gender="male"
               label="남자"
@@ -140,7 +146,7 @@ export default function SignupPage() {
             <button
               type="button"
               onClick={() => setIsGenOpen(!isGenOpen)}
-              className="bg-white border border-solid border-gray-2 rounded-xl text-sm font-medium p-4 w-full cursor-pointer outline-none text-left flex justify-between items-center"
+              className="bg-white border border-solid h-15 border-gray-2 rounded-xl  font-medium p-4 w-full cursor-pointer outline-none text-left flex justify-between items-center"
             >
               <span className={generation ? 'text-gray-1' : 'text-gray-3'}>
                 {generation || '기수'}
@@ -160,7 +166,7 @@ export default function SignupPage() {
                       setGeneration(gen);
                       setIsGenOpen(false);
                     }}
-                    className="w-full p-4 text-left text-sm font-medium text-gray-1 bg-white hover:bg-[#F5F6F8] transition-colors duration-200 border-none cursor-pointer"
+                    className="w-full p-4 text-left  font-medium text-gray-1 bg-white hover:bg-[#F5F6F8] transition-colors duration-200 border-none cursor-pointer"
                   >
                     {gen}
                   </button>
@@ -176,18 +182,21 @@ export default function SignupPage() {
   );
 
   const renderStep2 = () => (
-    <div className="min-h-screen bg-white flex flex-col items-center justify-center px-4 py-8">
+    <div className="min-h-screen  bg-white flex flex-col items-center justify-center px-4 py-8">
       <div className="w-[120px] mb-7 mx-auto">
         <Logo />
       </div>
 
-      <p className="text-sm font-medium mb-9 text-center">
+      <p className="font-medium mb-9 text-center">
         자신의 <span className="text-main-1 font-bold no-underline">전공</span>
         을 선택해 주세요.
       </p>
 
-      <form onSubmit={handleStep2Submit} className="flex flex-col items-center">
-        <div className="flex flex-wrap justify-center gap-2.5 max-w-80 mb-8">
+      <form
+        onSubmit={handleStep2Submit}
+        className="max-w-94 w-full flex flex-col items-center"
+      >
+        <div className="flex flex-wrap justify-center gap-2.5 max-w-94 mb-8">
           {interestList.map((interest) => (
             <CategoryButton
               key={interest.id}
@@ -203,8 +212,8 @@ export default function SignupPage() {
   );
 
   const renderStep3 = () => (
-    <div className="text-sm bg-white min-h-screen flex justify-center">
-      <div className="text-center flex flex-col justify-center max-w-80 w-full">
+    <div className="text-base bg-white min-h-screen flex justify-center">
+      <div className="text-center flex flex-col justify-center max-w-94 w-full">
         <div className="w-[120px] mb-7 mx-auto">
           <Logo />
         </div>
@@ -217,36 +226,36 @@ export default function SignupPage() {
         </p>
 
         <form onSubmit={handleStep3Submit} className="flex flex-col gap-5">
-          <div className="flex gap-2.5 items-stretch">
+          <div className="flex gap-2.5 h-15 items-stretch">
             <input
               type="email"
               placeholder="이메일"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="flex-1 p-4 border border-solid text-gray-1 border-gray-2 placeholder:text-gray-3 placeholder:font-medium rounded-xl text-sm outline-none focus:border-main-1"
+              className="flex-1 p-4 border border-solid text-gray-1 border-gray-2 placeholder:text-gray-3 placeholder:font-medium rounded-xl outline-none focus:border-main-1"
             />
             <button
               type="button"
-              className="p-4 bg-main-1 text-white text-sm border-none rounded-xl cursor-pointer transition-all duration-300 font-semibold whitespace-nowrap min-w-[90px] hover:bg-[#7a9fe6] outline-none"
+              className="p-4 bg-main-1 text-white border-none rounded-xl cursor-pointer transition-all duration-300 font-semibold whitespace-nowrap min-w-[90px] hover:bg-[#7a9fe6] outline-none"
             >
               번호 발송
             </button>
           </div>
 
-          <div className="flex gap-2.5 items-stretch">
+          <div className="flex gap-2.5 h-15 items-stretch">
             <input
               type="text"
               placeholder="인증번호"
               value={code}
               onChange={(e) => setCode(e.target.value)}
               required
-              className="flex-1 p-4 border border-solid text-gray-1 placeholder:font-medium border-gray-2 placeholder:text-gray-3 rounded-xl text-sm outline-none focus:border-main-1"
+              className="flex-1 p-4 border border-solid text-gray-1 placeholder:font-medium border-gray-2 placeholder:text-gray-3 rounded-xl outline-none focus:border-main-1"
             />
 
             <button
               type="button"
-              className="p-4 bg-main-1 text-white text-sm border-none rounded-xl cursor-pointer transition-all duration-300 font-semibold whitespace-nowrap min-w-[90px] hover:bg-[#7a9fe6] outline-none"
+              className="p-4 bg-main-1 text-white border-none rounded-xl cursor-pointer transition-all duration-300 font-semibold whitespace-nowrap min-w-[90px] hover:bg-[#7a9fe6] outline-none"
             >
               인증하기
             </button>
@@ -261,17 +270,15 @@ export default function SignupPage() {
             onChange={(e) => setConfirmPw(e.target.value)}
           />
 
-          <div className="p-4 flex flex-col gap-3 text-left">
-            <label className="bg-[#F9F9F9] rounded-lg p-4 flex items-center gap-2 cursor-pointer">
+          <div className="flex flex-col gap-5 mt-5 mb-5 text-left">
+            <label className="bg-[#F9F9F9] h-15 rounded-lg p-4 flex items-center gap-2 cursor-pointer">
               <input
                 type="checkbox"
                 checked={agreeAll}
                 onChange={(e) => handleAgreeAll(e.target.checked)}
                 className="w-4 h-4"
               />
-              <span className="text-sm font-medium text-gray-3">
-                전체 약관 동의
-              </span>
+              <span className="font-medium text-gray-3">전체 약관 동의</span>
             </label>
 
             <div className="flex justify-between ml-2 items-center">
@@ -282,16 +289,14 @@ export default function SignupPage() {
                   onChange={(e) => handleAgreeItem('service', e.target.checked)}
                   className="w-4 h-4"
                 />
-                <span className="text-sm text-gray-1">
-                  [필수] GAMI 이용 약관 동의
-                </span>
+                <span className="text-gray-1">[필수] GAMI 이용 약관 동의</span>
               </label>
               <button
                 type="button"
                 onClick={handleToSClick}
                 className="cursor-pointer"
               >
-                <Arrow className="w-4 h-4 text-gray-3" />
+                <Arrow className="w-6 h-6 text-gray-3" />
               </button>
             </div>
 
@@ -303,23 +308,32 @@ export default function SignupPage() {
                   onChange={(e) => handleAgreeItem('privacy', e.target.checked)}
                   className="w-4 h-4"
                 />
-                <span className="text-sm text-gray-1">
+                <span className="text-gray-1">
                   [필수] 개인정보 수집 및 이용 동의
                 </span>
               </label>
-              <Arrow className="w-4 h-4 text-gray-3" />
+              <button
+                type="button"
+                onClick={handlePrivacyClick}
+                className="cursor-pointer"
+              >
+                <Arrow className="w-6 h-6 text-gray-3" />
+              </button>
             </div>
           </div>
 
           <button
             type="submit"
-            className="p-4 bg-main-2 text-white text-base border-none rounded-xl cursor-pointer font-bold transition-all hover:bg-main-2-hover outline-none"
+            className="h-16 p-4 bg-main-2 text-white border-none text-xl rounded-xl cursor-pointer font-bold transition-all hover:bg-main-2-hover outline-none"
           >
             회원가입
           </button>
         </form>
       </div>
-      {isModalOpen && <ToSModal onClose={() => setIsModalOpen(false)} />}
+      {isToSModalOpen && <ToSModal onClose={() => setIsToSModalOpen(false)} />}
+      {isPrivacyModalOpen && (
+        <PrivacyModal onClose={() => setIsPrivacyModalOpen(false)} />
+      )}
     </div>
   );
 
