@@ -1,4 +1,7 @@
+import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
+import axios from 'axios';
 import Logo from '@/assets/svg/logo/Logo';
 import HomeIcon from '@/assets/svg/sidebar/HomeIcon';
 import MentoringIcon from '@/assets/svg/sidebar/MentoringIcon';
@@ -6,6 +9,7 @@ import ChatIcon from '@/assets/svg/sidebar/ChatIcon';
 import PostIcon from '@/assets/svg/sidebar/PostIcon';
 import ProfileIcon from '@/assets/svg/sidebar/ProfileIcon';
 import LogoutIcon from '@/assets/svg/sidebar/LogoutIcon';
+import LogoutModal from '@/assets/components/modal/LogoutModal';
 
 interface MenuItem {
   path: string;
@@ -17,10 +21,30 @@ interface MenuItem {
 export default function Sidebar() {
   const location = useLocation();
   const navigate = useNavigate();
+  const { logout } = useAuth();
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    navigate('/signin');
+  const handleLogoutClick = () => {
+    setIsLogoutModalOpen(true);
+  };
+
+  const handleLogout = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (token) {
+        await axios.delete('/api/auth/signout', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+      }
+    } catch (error) {
+      console.error('로그아웃 실패:', error);
+    } finally {
+      localStorage.removeItem('token');
+      logout();
+      navigate('/signin');
+    }
   };
 
   const menuItems: MenuItem[] = [
@@ -31,7 +55,12 @@ export default function Sidebar() {
       icon: MentoringIcon,
       subPaths: ['/mentoring', '/mentoring-random'],
     },
-    { path: '/chat', label: '채팅', icon: ChatIcon },
+    {
+      path: '/chat',
+      label: '채팅',
+      icon: ChatIcon,
+      subPaths: ['/chat', '/chat-apply'],
+    },
     {
       path: '/post',
       label: '익명 게시판',
@@ -87,7 +116,7 @@ export default function Sidebar() {
         })}
 
         <button
-          onClick={handleLogout}
+          onClick={handleLogoutClick}
           className="flex items-center gap-5.5 px-2.5 py-2.5 rounded-xl
                      text-base font-semibold text-gray-1 hover:bg-[#F5F5F5]
                      transition-colors bg-transparent border-0 cursor-pointer
@@ -97,6 +126,12 @@ export default function Sidebar() {
           <span>로그아웃</span>
         </button>
       </nav>
+      {isLogoutModalOpen && (
+        <LogoutModal
+          onClose={() => setIsLogoutModalOpen(false)}
+          onLogout={handleLogout}
+        />
+      )}
     </div>
   );
 }

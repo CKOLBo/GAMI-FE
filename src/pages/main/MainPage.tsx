@@ -34,7 +34,7 @@ export default function MainPage() {
     <div className="flex">
       <Sidebar />
       <div className="flex-1 p-12 2xl:p-25 ml-45 2xl:ml-55">
-        <h1 className="text-3xl 2xl:text-4xl font-bold text-gray-1 mb-8 2xl:mb-16">
+        <h1 className="text-3xl 2xl:text-[40px] font-bold text-gray-1 mb-8 2xl:mb-16">
           홈
         </h1>
 

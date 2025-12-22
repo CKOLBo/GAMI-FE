@@ -4,7 +4,8 @@ import SearchIcon from '@/assets/svg/main/SearchIcon';
 import Divider from '@/assets/svg/Divider';
 import axios from 'axios';
 import { useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import NotFoundImage from '@/assets/svg/mentor/NotFound.png';
 
 interface MentorData {
   id: number;
@@ -17,6 +18,7 @@ interface MentorData {
 export default function MentoringPage() {
   const [allMentors, setAllMentors] = useState<MentorData[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const navigate = useNavigate();
 
   useEffect(() => {
     axios
@@ -80,9 +82,9 @@ export default function MentoringPage() {
         </div>
 
         <div className="px-25 pt-[220px] pb-25">
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-12">
-            {mentors.length > 0 ? (
-              mentors.map((mentor) => (
+          {mentors.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-12">
+              {mentors.map((mentor) => (
                 <Mentor
                   key={mentor.id}
                   name={mentor.name}
@@ -92,15 +94,40 @@ export default function MentoringPage() {
                     console.log(`${mentor.name} 멘토 신청`);
                   }}
                 />
-              ))
-            ) : (
-              <div className="col-span-full text-center py-20">
-                <p className="text-[32px] text-gray-3 font-bold">
-                  검색 결과가 없습니다.
-                </p>
+              ))}
+            </div>
+          ) : searchQuery.trim() !== '' ? (
+            <div className="flex flex-col items-center justify-center min-h-[60vh] mt-[20px]">
+              <div className="mb-12 flex items-center justify-center">
+                <div className="w-64 h-64 2xl:w-80 2xl:h-80 flex items-center justify-center overflow-hidden">
+                  <img
+                    src={NotFoundImage}
+                    alt="멘토 일러스트"
+                    className="w-full h-full object-contain"
+                  />
+                </div>
               </div>
-            )}
-          </div>
+
+              <p className="text-[16px] 2xl:text-[20px] font-bold text-gray-1 text-center mb-16">
+                일치하는 멘토를 찾지 못했어요.
+                <br />
+                랜덤 멘토링을 해볼까요?
+              </p>
+
+              <button
+                onClick={() => navigate('/mentoring-random')}
+                className="w-[152px] h-[64px] bg-main-1 text-white text-[24px] rounded-[10px] 2xl:rounded-[12px] transition-all duration-300 font-bold hover:bg-main-1-hover border-0 cursor-pointer"
+              >
+                랜덤 멘토링
+              </button>
+            </div>
+          ) : (
+            <div className="col-span-full text-center py-20">
+              <p className="text-[32px] text-gray-3 font-bold">
+                등록된 멘토가 없습니다.
+              </p>
+            </div>
+          )}
         </div>
       </main>
     </div>
