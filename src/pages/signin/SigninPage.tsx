@@ -54,8 +54,7 @@ export default function SigninPage() {
     <div className="bg-white h-screen flex justify-center items-center p-5 overflow-hidden">
       <div className="text-center max-w-xs w-full">
         <div className="w-60 mb-6 2xl:mb-10 mx-auto flex justify-center">
-          <Logo size="md" className="block 2xl:hidden" />
-          <Logo size="lg" className="hidden 2xl:block" />
+          <Logo size="md" />
         </div>
         <p className="text-sm 2xl:text-base text-gray-1 mb-8 2xl:mb-11">
           <span className="font-medium">GAMI가 처음이라면?</span>{' '}
