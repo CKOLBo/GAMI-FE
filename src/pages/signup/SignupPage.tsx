@@ -102,14 +102,21 @@ export default function SignupPage() {
 
       setIsCodeSent(true);
       alert('인증 코드가 발송되었습니다. 이메일을 확인해주세요.');
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('인증 코드 발송 실패:', error);
-      if (error.code === 'ECONNABORTED') {
+      if ((error as { code?: string }).code === 'ECONNABORTED') {
         alert('요청 시간이 초과되었습니다. 잠시 후 다시 시도해주세요.');
-      } else if (error.response?.status === 429) {
+      } else if (
+        (error as { response?: { status?: number } }).response?.status === 429
+      ) {
         alert('요청 횟수를 초과했습니다. 잠시 후 다시 시도해주세요.');
-      } else if (error.response?.status === 400) {
-        alert(error.response?.data?.message || '입력값에 오류가 있습니다.');
+      } else if (
+        (error as { response?: { status?: number } }).response?.status === 400
+      ) {
+        alert(
+          (error as { response?: { data?: { message?: string } } }).response
+            ?.data?.message || '입력값에 오류가 있습니다.'
+        );
       } else {
         alert('인증 코드 발송에 실패했습니다. 다시 시도해주세요.');
       }
@@ -133,11 +140,15 @@ export default function SignupPage() {
 
       setIsCodeVerified(true);
       alert('이메일 인증이 완료되었습니다.');
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('인증 코드 검증 실패:', error);
-      if (error.response?.status === 400) {
+      if (
+        (error as { response?: { status?: number } }).response?.status === 400
+      ) {
         alert('잘못된 인증 코드입니다. 다시 확인해주세요.');
-      } else if (error.response?.status === 429) {
+      } else if (
+        (error as { response?: { status?: number } }).response?.status === 429
+      ) {
         alert('요청 횟수를 초과했습니다. 잠시 후 다시 시도해주세요.');
       } else {
         alert('인증 코드 검증에 실패했습니다. 다시 시도해주세요.');
@@ -203,9 +214,11 @@ export default function SignupPage() {
 
       alert('회원가입이 완료되었습니다!');
       navigate('/signin');
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('회원가입 실패:', error);
-      if (error.response?.status === 400) {
+      if (
+        (error as { response?: { status?: number } }).response?.status === 400
+      ) {
         alert('입력값에 오류가 있습니다. 다시 확인해주세요.');
       } else {
         alert('회원가입에 실패했습니다. 다시 시도해주세요.');
