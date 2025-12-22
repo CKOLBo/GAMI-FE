@@ -6,6 +6,7 @@ import SearchIcon from '@/assets/svg/main/SearchIcon';
 import Divider from '@/assets/svg/Divider';
 import MentorRequestModal from '@/assets/components/modal/MentorRequestModal';
 import { useState } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 
@@ -42,6 +43,7 @@ interface ChatMessagesResponse {
 }
 
 export default function ChatPage() {
+  const { user } = useAuth();
   const [selectedRoomId, setSelectedRoomId] = useState<number | null>(null);
   const [roomDetail, setRoomDetail] = useState<ChatRoomDetail | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -49,7 +51,7 @@ export default function ChatPage() {
   const [messageInput, setMessageInput] = useState('');
   const [isMentorRequestModalOpen, setIsMentorRequestModalOpen] =
     useState(false);
-  const currentUserId = 1;
+  const currentUserId = user?.id ?? null;
 
   const mentorRequests = [
     { id: 1, name: '양은준' },
