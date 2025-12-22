@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import axios from 'axios';
 import { useAuth } from '@/contexts/AuthContext';
 import { instance } from '@/assets/shared/lib/axios';
 import { setCookie } from '@/assets/shared/lib/cookie';
@@ -8,7 +9,6 @@ interface LoginResponse {
   refreshToken: string;
   accessTokenExpiresIn: string;
   refreshTokenExpiresIn: string;
-  userId?: number;
 }
 
 interface UserInfo {
@@ -39,39 +39,32 @@ export function useLogin(): UseLoginReturn {
         {
           email: credentials.email,
           password: credentials.password,
-        },
-        {
-          validateStatus: (status) => status === 200 || status === 401,
         }
       );
 
-      if (response.status === 401) {
-        throw new Error('이메일 또는 비밀번호가 일치하지 않습니다.');
-      }
-
-      const { accessToken, refreshToken, userId } = response.data;
+      const { accessToken, refreshToken } = response.data;
 
       setCookie('accessToken', accessToken);
       setCookie('refreshToken', refreshToken);
 
-      let userInfo: UserInfo;
+      const userResponse = await instance.get<UserInfo>('/api/member', {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
 
-      if (userId) {
-        userInfo = {
-          id: userId,
-          email: credentials.email,
-        };
-      } else {
-        try {
-          const userResponse = await instance.get<UserInfo>('/api/user/me');
-          userInfo = userResponse.data;
-        } catch {
+      setAuthUser(userResponse.data, accessToken);
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        const status = error.response?.status;
+        if (status === 401 || status === 403) {
+          throw new Error('이메일 또는 비밀번호가 일치하지 않습니다.');
+        }
+        if (status === 404) {
           throw new Error('사용자 정보를 가져오는데 실패했습니다.');
         }
+        throw new Error(error.response?.data?.message || '로그인 중 오류가 발생했습니다.');
       }
-
-      setAuthUser(userInfo, accessToken);
-    } catch (error) {
       if (error instanceof Error) {
         throw error;
       }

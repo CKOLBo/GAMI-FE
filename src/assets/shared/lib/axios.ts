@@ -23,9 +23,15 @@ export const instance = axios.create({
 });
 
 instance.interceptors.request.use((config) => {
-  const accessToken = getCookie('accessToken');
-  if (accessToken) {
-    config.headers.Authorization = `Bearer ${accessToken}`;
+  const isAuthEndpoint =
+    config.url?.includes('/auth/signin') ||
+    config.url?.includes('/auth/signup');
+
+  if (!isAuthEndpoint) {
+    const accessToken = getCookie('accessToken');
+    if (accessToken) {
+      config.headers.Authorization = `Bearer ${accessToken}`;
+    }
   }
   return config;
 });
