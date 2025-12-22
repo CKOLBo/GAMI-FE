@@ -201,7 +201,7 @@ export default function ChatPage() {
                 <div
                   key={chat.id}
                   onClick={() => handleChatClick(chat.id)}
-                  className={`mb-mx-2 px-4 2xl:px-6 py-4 2xl:py-5 rounded-lg hover:bg-white-1 cursor-pointer transition-colors ${
+                  className={`mb-2 px-4 2xl:px-6 py-4 2xl:py-5 rounded-lg hover:bg-white-1 cursor-pointer transition-colors ${
                     selectedRoomId === chat.id ? 'bg-white-1' : ''
                   }`}
                 >
