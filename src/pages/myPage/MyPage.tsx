@@ -43,9 +43,18 @@ export default function MyPage() {
 
         setMemberData(data);
 
-        const interestId = majorToInterestMap[data.major] || 'FE';
-        setSelectedInterest(interestId);
-        setTempSelectedInterest(interestId);
+        const interestId = majorToInterestMap[data.major];
+        if (interestId) {
+          setSelectedInterest(interestId);
+          setTempSelectedInterest(interestId);
+        } else {
+          const DEFAULT_INTEREST = 'FE';
+          console.warn(
+            `'${data.major}'에 해당하는 전공을 찾을 수 없어 기본값 '${DEFAULT_INTEREST}'로 설정합니다.`
+          );
+          setSelectedInterest(DEFAULT_INTEREST);
+          setTempSelectedInterest(DEFAULT_INTEREST);
+        }
       } catch (err) {
         if (err instanceof TokenRefreshError) {
           toast.error('로그인이 만료되었습니다. 다시 로그인해주세요.');
