@@ -43,7 +43,7 @@ export default function MyPage() {
   return (
     <div className="flex">
       <Sidebar />
-      <div className="flex-1 flex flex-col justify-center items-center">
+      <div className="flex-1 ml-45 xl:ml-55 min-h-screen flex flex-col items-center justify-center">
         <div className="flex flex-col items-center mb-8 w-full max-w-2xl">
           <div className="mb-6 2xl:mb-8">
             <ProfileIcon className="w-40 h-40" />
