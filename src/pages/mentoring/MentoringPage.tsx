@@ -81,7 +81,7 @@ export default function MentoringPage() {
           <div className="h-16 bg-[linear-gradient(180deg,#FFF_0%,rgba(255,255,255,0)_100%)]"></div>
         </div>
 
-        <div className="px-7 2xl:px-12 pt-[120px] pb-12">
+        <div className="px-7 2xl:px-12 pt-[120px] 2xl:pt-[220px] pb-12">
           {mentors.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-12 justify-items-center">
               {mentors.map((mentor) => (
