@@ -1,5 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
+import { toast } from 'react-toastify';
 import Logo from '@/assets/svg/logo/Logo';
 import NextButton from '@/assets/components/Button/NextButton';
 import GenderButton from '@/assets/components/Button/GenderButton';
@@ -81,15 +82,16 @@ export default function SignupPage() {
   const toggleInterest = (id: string) => {
     setInterests((prev) => (prev.includes(id) ? [] : [id]));
   };
+
   const handleSendCode = async () => {
     if (!email) {
-      alert('이메일을 입력해주세요.');
+      toast.error('이메일을 입력해주세요.');
       return;
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      alert('올바른 이메일 형식이 아닙니다.');
+      toast.error('올바른 이메일 형식이 아닙니다.');
       return;
     }
 
@@ -101,24 +103,24 @@ export default function SignupPage() {
       });
 
       setIsCodeSent(true);
-      alert('인증 코드가 발송되었습니다. 이메일을 확인해주세요.');
+      toast.success('인증 코드가 발송되었습니다. 이메일을 확인해주세요.');
     } catch (error: unknown) {
       console.error('인증 코드 발송 실패:', error);
       if ((error as { code?: string }).code === 'ECONNABORTED') {
-        alert('요청 시간이 초과되었습니다. 잠시 후 다시 시도해주세요.');
+        toast.error('요청 시간이 초과되었습니다. 잠시 후 다시 시도해주세요.');
       } else if (
         (error as { response?: { status?: number } }).response?.status === 429
       ) {
-        alert('요청 횟수를 초과했습니다. 잠시 후 다시 시도해주세요.');
+        toast.error('요청 횟수를 초과했습니다. 잠시 후 다시 시도해주세요.');
       } else if (
         (error as { response?: { status?: number } }).response?.status === 400
       ) {
-        alert(
+        toast.error(
           (error as { response?: { data?: { message?: string } } }).response
             ?.data?.message || '입력값에 오류가 있습니다.'
         );
       } else {
-        alert('인증 코드 발송에 실패했습니다. 다시 시도해주세요.');
+        toast.error('인증 코드 발송에 실패했습니다. 다시 시도해주세요.');
       }
     } finally {
       setIsLoading(false);
@@ -127,7 +129,7 @@ export default function SignupPage() {
 
   const handleVerifyCode = async () => {
     if (!code) {
-      alert('인증 코드를 입력해주세요.');
+      toast.error('인증 코드를 입력해주세요.');
       return;
     }
 
@@ -139,19 +141,19 @@ export default function SignupPage() {
       });
 
       setIsCodeVerified(true);
-      alert('이메일 인증이 완료되었습니다.');
+      toast.success('이메일 인증이 완료되었습니다.');
     } catch (error: unknown) {
       console.error('인증 코드 검증 실패:', error);
       if (
         (error as { response?: { status?: number } }).response?.status === 400
       ) {
-        alert('잘못된 인증 코드입니다. 다시 확인해주세요.');
+        toast.error('잘못된 인증 코드입니다. 다시 확인해주세요.');
       } else if (
         (error as { response?: { status?: number } }).response?.status === 429
       ) {
-        alert('요청 횟수를 초과했습니다. 잠시 후 다시 시도해주세요.');
+        toast.error('요청 횟수를 초과했습니다. 잠시 후 다시 시도해주세요.');
       } else {
-        alert('인증 코드 검증에 실패했습니다. 다시 시도해주세요.');
+        toast.error('인증 코드 검증에 실패했습니다. 다시 시도해주세요.');
       }
     } finally {
       setIsLoading(false);
@@ -161,7 +163,7 @@ export default function SignupPage() {
   const handleStep1Submit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!name || !gender || !generation) {
-      alert('모든 항목을 입력해주세요.');
+      toast.error('모든 항목을 입력해주세요.');
       return;
     }
     setStep(2);
@@ -170,7 +172,7 @@ export default function SignupPage() {
   const handleStep2Submit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (interests.length === 0) {
-      alert('최소 1개 이상의 전공을 선택해주세요.');
+      toast.error('최소 1개 이상의 전공을 선택해주세요.');
       return;
     }
     setStep(3);
@@ -180,22 +182,22 @@ export default function SignupPage() {
     e.preventDefault();
 
     if (!agreeService || !agreePrivacy) {
-      alert('필수 약관에 모두 동의해주세요.');
+      toast.error('필수 약관에 모두 동의해주세요.');
       return;
     }
 
     if (!isCodeVerified) {
-      alert('이메일 인증을 완료해주세요.');
+      toast.error('이메일 인증을 완료해주세요.');
       return;
     }
 
     if (password !== confirmPw) {
-      alert('비밀번호가 일치하지 않습니다.');
+      toast.error('비밀번호가 일치하지 않습니다.');
       return;
     }
 
     if (password.length < 8) {
-      alert('비밀번호는 최소 8자 이상이어야 합니다.');
+      toast.error('비밀번호는 최소 8자 이상이어야 합니다.');
       return;
     }
 
@@ -212,16 +214,16 @@ export default function SignupPage() {
         major: interests[0],
       });
 
-      alert('회원가입이 완료되었습니다!');
+      toast.success('회원가입이 완료되었습니다!');
       navigate('/signin');
     } catch (error: unknown) {
       console.error('회원가입 실패:', error);
       if (
         (error as { response?: { status?: number } }).response?.status === 400
       ) {
-        alert('입력값에 오류가 있습니다. 다시 확인해주세요.');
+        toast.error('입력값에 오류가 있습니다. 다시 확인해주세요.');
       } else {
-        alert('회원가입에 실패했습니다. 다시 시도해주세요.');
+        toast.error('회원가입에 실패했습니다. 다시 시도해주세요.');
       }
     } finally {
       setIsLoading(false);
