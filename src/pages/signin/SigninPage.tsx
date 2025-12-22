@@ -1,19 +1,15 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
-import { useAuth } from '@/contexts/AuthContext';
+import { useLogin } from '@/hooks/useLogin';
 import Logo from '@/assets/svg/logo/Logo';
 import Show from '@/assets/svg/password/show';
 import Hide from '@/assets/svg/password/hide';
-import { instance } from '@/assets/shared/lib/axios';
-import { setCookie } from '@/assets/shared/lib/cookie';
-import { AxiosError } from 'axios';
 
 export default function SigninPage() {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, isLoading } = useLogin();
   const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -36,51 +32,15 @@ export default function SigninPage() {
       return;
     }
 
-    setIsLoading(true);
     try {
-      const response = await instance.post<{
-        accessToken: string;
-        refreshToken: string;
-        accessTokenExpiresIn: string;
-        refreshTokenExpiresIn: string;
-      }>(
-        '/api/auth/signin',
-        {
-          email,
-          password,
-        },
-        {
-          validateStatus: (status) => status === 200 || status === 401,
-        }
-      );
-
-      if (response.status === 401) {
-        toast.error('이메일 또는 비밀번호가 일치하지 않습니다.');
-        setIsLoading(false);
-        return;
-      }
-
-      const { accessToken, refreshToken } = response.data;
-
-      setCookie('accessToken', accessToken);
-      setCookie('refreshToken', refreshToken);
-
-      login(
-        {
-          id: 0,
-          email: email,
-        },
-        accessToken
-      );
+      await login({ email, password });
       navigate('/main');
     } catch (error) {
-      if (error instanceof AxiosError && error.response?.status === 401) {
-        toast.error('이메일 또는 비밀번호가 일치하지 않습니다.');
+      if (error instanceof Error) {
+        toast.error(error.message);
       } else {
         toast.error('로그인 중 오류가 발생했습니다. 다시 시도해주세요.');
       }
-    } finally {
-      setIsLoading(false);
     }
   };
 
