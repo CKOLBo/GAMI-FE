@@ -33,8 +33,8 @@ export default function MainPage() {
   return (
     <div className="flex">
       <Sidebar />
-      <div className="flex-1 p-12 2xl:p-25 ml-45 2xl:ml-55">
-        <h1 className="text-3xl 2xl:text-[40px] font-bold text-gray-1 mb-8 2xl:mb-16">
+      <div className="flex-1 p-6 2xl:p-12 ml-45 2xl:ml-55">
+        <h1 className="text-3xl 2xl:text-[40px] font-bold text-gray-1 mb-8">
           홈
         </h1>
 
@@ -77,7 +77,7 @@ export default function MainPage() {
                   className="h-full object-contain"
                 />
               </div>
-              <p className="text-lg 2xl:text-2xl text-gray-1 mb-1 2xl:mb-9 font-bold">
+              <p className="text-lg 2xl:text-2xl text-gray-1 mb-1 2xl:mb-3 font-bold">
                 나에게 어울리는{' '}
                 <span className="text-main-1 font-bold">멘토</span>를
                 찾아볼까요?
