@@ -122,18 +122,10 @@ export default function MentoringPage() {
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-12">
-              {allMentors.map((mentor) => (
-                <Mentor
-                  key={mentor.id}
-                  name={mentor.name}
-                  generation={mentor.generation}
-                  major={mentor.major}
-                  onApply={() => {
-                    console.log(`${mentor.name} 멘토 신청`);
-                  }}
-                />
-              ))}
+            <div className="col-span-full text-center py-20">
+              <p className="text-[32px] text-gray-3 font-bold">
+                등록된 멘토가 없습니다.
+              </p>
             </div>
           )}
         </div>
