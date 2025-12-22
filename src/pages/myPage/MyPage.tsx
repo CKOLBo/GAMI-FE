@@ -68,7 +68,7 @@ export default function MyPage() {
           </div>
         </div>
 
-        <div className="max-w-[368px] mt-12 2xl:mt-6">
+        <div className="max-w-[376px] mt-12 2xl:mt-6">
           <div className="flex flex-wrap justify-center gap-2.5 2xl:gap-3 mb-7">
             {interestList.map((interest) => (
               <CategoryButton
