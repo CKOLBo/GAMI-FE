@@ -78,7 +78,6 @@ export default function ChatApplyPage() {
     useState(false);
 
   useEffect(() => {
-
     const fetchSentRequests = async () => {
       setLoading(true);
       try {
