@@ -17,7 +17,6 @@ export default defineConfig({
           'https://port-0-gami-server-mj0rdvda8d11523e.sel3.cloudtype.app',
         changeOrigin: true,
         secure: false,
-        rewrite: (path) => path.replace(/^\/api/, '/api'),
       },
     },
   },
