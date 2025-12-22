@@ -79,11 +79,8 @@ export default function SignupPage() {
   ];
 
   const toggleInterest = (id: string) => {
-    setInterests((prev) =>
-      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
-    );
+    setInterests((prev) => (prev.includes(id) ? [] : [id]));
   };
-
   const handleSendCode = async () => {
     if (!email) {
       alert('이메일을 입력해주세요.');
