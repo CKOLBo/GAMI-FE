@@ -49,7 +49,7 @@ export default function MentoringPage() {
 
       <main className="flex-1 ml-45 2xl:ml-55">
         <div className="fixed top-0 left-45 2xl:left-55 right-0 z-40">
-          <div className="px-25 pt-25 bg-white">
+          <div className="px-6 2xl:px-12 pt-6 2xl:pt-12 bg-white">
             <div className="flex items-center">
               <h1 className="flex items-center gap-4 text-[40px] font-bold text-gray-1">
                 <span className="text-[40px] text-gray-1 font-bold">
@@ -81,9 +81,9 @@ export default function MentoringPage() {
           <div className="h-16 bg-[linear-gradient(180deg,#FFF_0%,rgba(255,255,255,0)_100%)]"></div>
         </div>
 
-        <div className="px-25 pt-[220px] pb-25">
+        <div className="px-12 pt-[220px] pb-12">
           {mentors.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-12">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-12 justify-items-center">
               {mentors.map((mentor) => (
                 <Mentor
                   key={mentor.id}
