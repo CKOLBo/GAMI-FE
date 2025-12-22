@@ -64,8 +64,8 @@ export default function MentoringPage() {
                 </Link>
               </h1>
 
-              <div className="ml-25 relative w-150">
-                <div className="absolute left-5 top-1/2 -translate-y-1/2 z-10">
+              <div className="ml-10 2xl:ml-25 relative w-100 2xl:w-150">
+                <div className="absolute left-3 2xl:left-5 top-1/2 -translate-y-1/2 z-10">
                   <SearchIcon />
                 </div>
                 <input
@@ -73,7 +73,7 @@ export default function MentoringPage() {
                   placeholder="전공 또는 멘토의 이름을 입력해주세요."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full h-16 rounded-full bg-white-1 border border-gray-4 pl-16 pr-4 py-2 text-[24px] text-gray-1 placeholder:text-gray-3 focus:outline-main-1 font-bold"
+                  className="w-full h-12 2xl:h-16 rounded-full bg-white-1 border border-gray-4 pl-12 pr-4 py-1 text-xl 2xl:text-[24px] text-gray-1 placeholder:text-gray-3 focus:outline-main-1 font-bold"
                 />
               </div>
             </div>
