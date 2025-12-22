@@ -68,7 +68,7 @@ instance.interceptors.response.use(
 
         originalRequest.headers.Authorization = `Bearer ${accessToken}`;
         return instance(originalRequest);
-      } catch (e) {
+      } catch {
         deleteCookie('accessToken');
         deleteCookie('refreshToken');
         throw new TokenRefreshError(
