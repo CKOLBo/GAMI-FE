@@ -17,7 +17,7 @@ import ChatPage from '@/pages/chat/ChatPage';
 import ChatApplyPage from '@/pages/chat/ChatApplyPage';
 import Admin from './pages/admin/AdminPage';
 import NotFound from './pages/404/NotFoundPage';
-import ProtectedRoute from '@/components/ProtectedRoute';
+import ProtectedRoute from '@/assets/components/ProtectedRoute';
 
 function App() {
   return (
