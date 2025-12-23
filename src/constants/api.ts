@@ -3,4 +3,3 @@ export const API_PATHS = {
   VERIFY_CODE: '/api/auth/email/verification-code',
   RESET_PASSWORD: '/api/auth/password',
 };
-
