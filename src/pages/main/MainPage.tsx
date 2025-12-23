@@ -101,39 +101,33 @@ export default function MainPage() {
             게시글
           </h2>
           <div className="grid grid-cols-3 gap-8 2xl:gap-12">
-            {isLoading ? (
-              Array.from({ length: 3 }).map((_, index) => (
-                <Post
-                  key={`loading-${index}`}
-                  title=""
-                  content=""
-                  commentCount={0}
-                  likeCount={0}
-                  postId={0}
-                />
-              ))
-            ) : error ? (
-              <div className="col-span-3 flex items-center justify-center py-12">
-                <p className="text-lg 2xl:text-xl text-gray-3">{error}</p>
-              </div>
-            ) : posts.length > 0 ? (
-              posts.map((post) => (
-                <Post
-                  key={post.id}
-                  title={post.title}
-                  content={post.content}
-                  commentCount={post.commentCount}
-                  likeCount={post.likeCount}
-                  postId={post.id}
-                />
-              ))
-            ) : (
-              <div className="col-span-3 flex items-center justify-center py-12">
-                <p className="text-lg 2xl:text-xl text-gray-3">
+            {isLoading
+              ? Array.from({ length: 3 }).map((_, index) => (
+                  <div
+                    key={`skeleton-${index}`}
+                    className="bg-gray-100 animate-pulse rounded-2xl h-60 2xl:h-80"
+                  />
+                ))
+              : error
+              ? (
+                <p className="col-span-3 text-center text-gray-3">{error}</p>
+              )
+              : posts.length > 0
+              ? posts.map((post) => (
+                  <Post
+                    key={post.id}
+                    title={post.title}
+                    content={post.content}
+                    commentCount={post.commentCount}
+                    likeCount={post.likeCount}
+                    postId={post.id}
+                  />
+                ))
+              : (
+                <p className="col-span-3 text-center text-gray-3">
                   게시글이 없습니다.
                 </p>
-              </div>
-            )}
+              )}
           </div>
         </div>
       </div>
