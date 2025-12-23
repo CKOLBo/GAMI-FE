@@ -10,6 +10,9 @@ import Gemini from '@/assets/svg/post/Gemini.png';
 import Arrow from '@/assets/svg/Arrow';
 import { instance } from '@/assets/shared/lib/axios';
 
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+
 interface PostDetailType {
   id: number;
   title: string;
@@ -25,7 +28,6 @@ interface PostDetailType {
 export default function PostContent() {
   const { postId } = useParams<{ postId: string }>();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [heartClick, setHeartClick] = useState(false);
   const [postData, setPostData] = useState<PostDetailType | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [comment, setComment] = useState('');
@@ -49,10 +51,9 @@ export default function PostContent() {
 
       setIsLoading(true);
       try {
-        const response = await instance.get(`/api/post/${postId}`);
-        setPostData(response.data);
-      } catch (error) {
-        console.error('게시글 조회 실패:', error);
+        const res = await instance.get(`/api/post/${postId}`);
+        setPostData(res.data);
+      } catch {
         alert('게시글을 불러오는데 실패했습니다.');
       } finally {
         setIsLoading(false);
@@ -62,77 +63,27 @@ export default function PostContent() {
     fetchPostDetail();
   }, [postId]);
 
-  const handleLikeClick = async () => {
-    if (!postId) return;
-
-    try {
-      await instance.post(`/api/post/${postId}/like`);
-      setHeartClick(!heartClick);
-
-      if (postData) {
-        setPostData({
-          ...postData,
-          likeCount: heartClick
-            ? postData.likeCount - 1
-            : postData.likeCount + 1,
-        });
-      }
-    } catch (error) {
-      console.error('좋아요 처리 실패:', error);
-      alert('좋아요 처리에 실패했습니다.');
-    }
-  };
-
   const handleCommentSubmit = async () => {
-    if (!comment.trim()) {
-      alert('댓글 내용을 입력해주세요.');
-      return;
-    }
-
-    if (!postId) return;
+    if (!comment.trim() || !postId) return;
 
     try {
       await instance.post(`/api/post/${postId}/comment`, {
         content: comment.trim(),
       });
-
-      alert('댓글이 등록되었습니다.');
       setComment('');
-
-      if (postData) {
-        setPostData({
-          ...postData,
-          commentCount: postData.commentCount + 1,
-        });
-      }
-    } catch (error) {
-      console.error('댓글 등록 실패:', error);
-      alert('댓글 등록에 실패했습니다.');
+      setPostData((prev) =>
+        prev ? { ...prev, commentCount: prev.commentCount + 1 } : prev
+      );
+    } catch {
+      alert('댓글 등록 실패');
     }
   };
 
-  if (isLoading) {
+  if (isLoading || !postData) {
     return (
       <>
         <Sidebar />
-        <div className="w-full ml-28 flex justify-center">
-          <div className="w-full max-w-[1500px] mt-25">
-            <p className="text-xl text-gray-3">로딩 중...</p>
-          </div>
-        </div>
-      </>
-    );
-  }
-
-  if (!postData) {
-    return (
-      <>
-        <Sidebar />
-        <div className="w-full ml-28 flex justify-center">
-          <div className="w-full max-w-[1500px] mt-25">
-            <p className="text-xl text-gray-3">게시글을 찾을 수 없습니다.</p>
-          </div>
-        </div>
+        <div className="ml-28 mt-25 text-xl text-gray-3">로딩 중...</div>
       </>
     );
   }
@@ -142,33 +93,40 @@ export default function PostContent() {
       <Sidebar />
       <div className="w-full ml-28 flex justify-center">
         <div className="w-full max-w-[1500px] mt-25">
-          <div className="mb-8">
-            <h1 className="text-[40px] font-bold text-gray-1">
-              {postData.title}
-            </h1>
-          </div>
+          <h1 className="text-[40px] font-bold text-gray-1 mb-8">
+            {postData.title}
+          </h1>
 
-          <div className="flex items-center gap-4 mb-6 pb-6 border-b-2 border-gray-2">
+          <div className="flex gap-4 mb-10 pb-6 border-b-2 border-gray-2">
             <span className="text-xl font-bold text-gray-1">익명</span>
             <span className="text-xl font-bold text-gray-3">
               {calculateTimeAgo(postData.createdAt)}
             </span>
           </div>
 
-          <div className="mb-34 mt-18">
-            <div className="text-xl leading-relaxed font-bold text-gray-3 whitespace-pre-wrap">
+          <div className="prose max-w-none text-xl text-gray-3 font-bold leading-relaxed mb-20">
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>
               {postData.content}
-            </div>
+            </ReactMarkdown>
           </div>
 
-          {postData.images && postData.images.length > 0 && (
-            <div className="mb-34">
-              {postData.images.map((image, index) => (
+          {postData.images?.length > 0 && (
+            <div className="flex flex-col gap-6 mb-28">
+              {postData.images.map((img, idx) => (
                 <img
-                  key={index}
-                  src={image}
-                  alt={`게시글 이미지 ${index + 1}`}
-                  className="max-w-full h-auto rounded-lg mb-4"
+                  key={idx}
+                  src={img}
+                  alt={`post-image-${idx}`}
+                  className="
+                    max-w-[720px]
+                    max-h-[480px]
+                    w-auto
+                    h-auto
+                    object-contain
+                    rounded-xl
+                    border
+                    border-gray-2
+                  "
                 />
               ))}
             </div>
@@ -187,70 +145,47 @@ export default function PostContent() {
                 <h2 className="text-gray-1 font-bold text-2xl">
                   AI로 요약하기
                 </h2>
-                <div className="flex items-center">
-                  <Arrow className="w-7 h-7" />
-                </div>
+                <Arrow className="w-7 h-7" />
               </div>
             </div>
           </div>
 
-          <div className="flex justify-between gap-11 mb-10 pb-14 border-b-2 border-gray-2">
-            <div className="flex items-center gap-3 mb-6">
+          <div className="flex justify-between mb-14 pb-14 border-b-2 border-gray-2">
+            <div className="flex items-center gap-3">
               <Comment width="32px" height="32px" color="#333D48" />
-              <h2 className="text-[32px] font-bold text-gray-1">
+              <h2 className="text-[32px] font-bold">
                 댓글 {postData.commentCount}개
               </h2>
             </div>
-            <div className="flex flex-row gap-18">
-              <button
-                className="flex items-center cursor-pointer gap-4"
-                onClick={handleLikeClick}
-              >
-                <Heart isSelect={heartClick} />
-                <span className="text-[32px] font-normal text-gray-1">
-                  {postData.likeCount}
-                </span>
-              </button>
-              <button
-                className="flex items-center gap-4 cursor-pointer"
-                onClick={() => setIsModalOpen(true)}
-              >
+
+            <div className="flex gap-18">
+              <div className="flex items-center gap-4 cursor-default">
+                <Heart isSelect={false} />
+                <span className="text-[32px]">{postData.likeCount}</span>
+              </div>
+
+              <button onClick={() => setIsModalOpen(true)}>
                 <Report />
               </button>
             </div>
           </div>
 
-          <div className="mb-10">
-            <div className="flex items-center gap-4 mb-4 ml-9">
-              <span className="text-gray-1 text-xl font-bold">익명</span>
-              <span className="text-gray-3 text-xl font-bold">1시간 전</span>
-            </div>
-            <div className="ml-9">
-              <p className="text-gray-3 font-bold text-xl">하윙</p>
-            </div>
-          </div>
-
-          <div className="mb-8">
-            <div className="relative">
-              <textarea
-                placeholder="댓글 입력하기"
-                value={comment}
-                onChange={(e) => setComment(e.target.value)}
-                className="w-full h-32 p-7 border-2 placeholder:text-xl placeholder:font-bold border-gray-2 rounded-lg resize-none outline-none text-xl"
-              />
-            </div>
-            <div className="flex justify-end mt-12">
-              <Button text="등록하기" onClick={handleCommentSubmit} />
-            </div>
+          <textarea
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
+            placeholder="댓글 입력하기"
+            className="w-full h-32 p-7 border-2 border-gray-2 rounded-lg resize-none text-xl"
+          />
+          <div className="flex justify-end mt-12 mb-8">
+            <Button text="등록하기" onClick={handleCommentSubmit} />
           </div>
         </div>
       </div>
+
       {isModalOpen && (
         <PostModal
           onClose={() => setIsModalOpen(false)}
-          onReport={() => {
-            setIsModalOpen(false);
-          }}
+          onReport={() => setIsModalOpen(false)}
         />
       )}
     </>
