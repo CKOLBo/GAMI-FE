@@ -125,7 +125,11 @@ export default function PostPage() {
           </div>
 
           <div className="flex justify-center gap-6 py-10 text-2xl font-bold">
-            <button disabled={page === 0} onClick={() => setPage((p) => p - 1)}>
+            <button
+              disabled={page === 0}
+              onClick={() => setPage((p) => p - 1)}
+              className="cursor-pointer"
+            >
               이전
             </button>
 
@@ -136,6 +140,7 @@ export default function PostPage() {
             <button
               disabled={page + 1 >= totalPages}
               onClick={() => setPage((p) => p + 1)}
+              className="cursor-pointer"
             >
               다음
             </button>
