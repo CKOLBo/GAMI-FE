@@ -1,4 +1,8 @@
-export default function X() {
+interface XProps {
+  color?: string;
+}
+
+export default function X({ color = '#6D6F79' }: XProps) {
   return (
     <svg
       width="29"
@@ -9,8 +13,8 @@ export default function X() {
     >
       <path
         d="M21.75 6.04175L7.25 20.5417M7.25 6.04175L21.75 20.5417"
-        stroke="#6D6F79"
-        strokeWidth="2"
+        stroke={color}
+        strokeWidth="3"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
