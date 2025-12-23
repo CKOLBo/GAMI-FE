@@ -7,6 +7,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import NotFoundImage from '@/assets/svg/mentor/NotFound.png';
 import { toast } from 'react-toastify';
 import { instance } from '@/assets/shared/lib/axios';
+import { useMentorApply } from '@/hooks/useMentorApply';
 
 interface MentorData {
   memberId: number;
@@ -38,6 +39,7 @@ export default function MentoringPage() {
   const [currentMemberId, setCurrentMemberId] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
+  const { apply: applyMentor } = useMentorApply();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -87,61 +89,7 @@ export default function MentoringPage() {
   }, [searchQuery, allMentors, currentMemberId]);
 
   const handleMentorApply = async (mentor: MentorData) => {
-    const appliedMentors = JSON.parse(
-      localStorage.getItem('appliedMentors') || '[]'
-    );
-
-    const recentApplication = appliedMentors.find(
-      (applied: { mentorId: number; timestamp: number }) => {
-        const timeDiff = Date.now() - applied.timestamp;
-        const fiveMinutes = 5 * 60 * 1000;
-        return applied.mentorId === mentor.memberId && timeDiff < fiveMinutes;
-      }
-    );
-
-    if (recentApplication) {
-      toast.error('이미 신청했어요');
-      return;
-    }
-
-    try {
-      await instance.post(`/api/mentoring/apply/${mentor.memberId}`);
-      toast.success('신청을 했어요');
-
-      const updatedAppliedMentors = appliedMentors.filter(
-        (applied: { mentorId: number; timestamp: number }) => {
-          const timeDiff = Date.now() - applied.timestamp;
-          const fiveMinutes = 5 * 60 * 1000;
-          return (
-            applied.mentorId !== mentor.memberId || timeDiff >= fiveMinutes
-          );
-        }
-      );
-
-      updatedAppliedMentors.push({
-        mentorId: mentor.memberId,
-        timestamp: Date.now(),
-      });
-
-      localStorage.setItem(
-        'appliedMentors',
-        JSON.stringify(updatedAppliedMentors)
-      );
-    } catch (err: unknown) {
-      if (
-        err &&
-        typeof err === 'object' &&
-        'response' in err &&
-        err.response &&
-        typeof err.response === 'object' &&
-        'status' in err.response &&
-        err.response.status === 404
-      ) {
-        toast.error('멘토를 찾을 수 없습니다.');
-      } else {
-        toast.error('신청에 실패했습니다.');
-      }
-    }
+    await applyMentor(mentor);
   };
 
   return (
