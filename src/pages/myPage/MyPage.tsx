@@ -71,7 +71,7 @@ export default function MyPage() {
     };
 
     fetchProfile();
-  }, []);
+  }, [navigate]);
 
   const toggleInterest = (id: string) => {
     if (!isEditingCategory) {

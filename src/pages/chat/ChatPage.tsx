@@ -62,14 +62,12 @@ interface ChatMessagesResponse {
   currentMemberLeft: boolean;
 }
 
-const mentorRequests = [
-  { applyId: 1, name: '양은준', applyStatus: 'PENDING' },
-  { applyId: 2, name: '한국', applyStatus: 'PENDING' },
-  { applyId: 3, name: '양은준', applyStatus: 'PENDING' },
-  { applyId: 4, name: '한국', applyStatus: 'PENDING' },
-  { applyId: 5, name: '양은준', applyStatus: 'PENDING' },
-  { applyId: 6, name: '한국', applyStatus: 'PENDING' },
-];
+interface MentorRequest {
+  applyId: number;
+  menteeId?: number;
+  name: string;
+  applyStatus: string;
+}
 
 
 export default function ChatPage() {
@@ -88,6 +86,7 @@ export default function ChatPage() {
   const [hasMore, setHasMore] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
+  const [mentorRequests, setMentorRequests] = useState<MentorRequest[]>([]);
   const currentUserId = user?.id ?? null;
 
   useEffect(() => {

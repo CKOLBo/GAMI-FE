@@ -43,7 +43,7 @@ export default function MainPage() {
     };
 
     fetchPosts();
-  }, []);
+  }, [navigate]);
 
   return (
     <div className="flex">

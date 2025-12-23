@@ -8,6 +8,7 @@ import ModalWrapper from '@/assets/shared/Modal';
 import { toast } from 'react-toastify';
 import Profile from '@/assets/svg/profile/Profile';
 import X from '@/assets/svg/X';
+import { useMentorApply } from '@/hooks/useMentorApply';
 
 interface RandomMentorResponse {
   memberId: number;
@@ -27,6 +28,7 @@ export default function RandomMentoring() {
   const isCancelledRef = useRef(false);
   const retryTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const retryCountRef = useRef(0);
+  const { apply: applyMentor } = useMentorApply();
 
   const handleRandomSearch = async (isRetry = false) => {
     if (!isRetry) {
@@ -36,11 +38,12 @@ export default function RandomMentoring() {
     }
 
     try {
+      const timestamp = new Date().getTime();
       const response = await instance.get<RandomMentorResponse>(
         '/api/mentoring/random',
         {
           params: {
-            _t: Date.now(),
+            _t: timestamp,
           },
         }
       );
@@ -53,7 +56,7 @@ export default function RandomMentoring() {
 
       if (recommendedMentorIds.includes(mentorId)) {
         retryCountRef.current += 1;
-        
+
         if (retryCountRef.current > 10) {
           setRecommendedMentorIds([]);
           retryCountRef.current = 0;
@@ -62,7 +65,7 @@ export default function RandomMentoring() {
         if (isCancelledRef.current) {
           return;
         }
-        
+
         retryTimeoutRef.current = setTimeout(() => {
           if (!isCancelledRef.current) {
             handleRandomSearch(true);
@@ -78,12 +81,20 @@ export default function RandomMentoring() {
       setRecommendedMentorIds((prev) => [...prev, mentorId]);
       setIsMatchingModalOpen(false);
       setMatchedMentor(response.data);
-    } catch (err: any) {
+    } catch (err: unknown) {
       if (isCancelledRef.current) {
         return;
       }
       setIsMatchingModalOpen(false);
-      if (err.response?.status === 401) {
+      if (
+        err &&
+        typeof err === 'object' &&
+        'response' in err &&
+        err.response &&
+        typeof err.response === 'object' &&
+        'status' in err.response &&
+        err.response.status === 401
+      ) {
         toast.error('인증이 필요합니다.');
       } else {
         toast.error('멘토를 찾는데 실패했습니다.');
@@ -105,11 +116,6 @@ export default function RandomMentoring() {
   };
 
   const handleRetry = () => {
-    if (matchedMentor) {
-      setRecommendedMentorIds((prev) =>
-        prev.filter((id) => id !== matchedMentor.memberId)
-      );
-    }
     setMatchedMentor(null);
     if (retryTimeoutRef.current) {
       clearTimeout(retryTimeoutRef.current);
@@ -122,55 +128,9 @@ export default function RandomMentoring() {
 
   const handleMentorApply = async () => {
     if (!matchedMentor) return;
-
-    const appliedMentors = JSON.parse(
-      localStorage.getItem('appliedMentors') || '[]'
-    );
-
-    const recentApplication = appliedMentors.find(
-      (applied: { mentorId: number; timestamp: number }) => {
-        const timeDiff = Date.now() - applied.timestamp;
-        const fiveMinutes = 5 * 60 * 1000;
-        return (
-          applied.mentorId === matchedMentor.memberId && timeDiff < fiveMinutes
-        );
-      }
-    );
-
-    if (recentApplication) {
-      toast.error('이미 신청했어요');
-      return;
-    }
-
-    try {
-      await instance.post(`/api/mentoring/apply/${matchedMentor.memberId}`);
-      toast.success('신청을 했어요');
-
-      const updatedAppliedMentors = appliedMentors.filter(
-        (applied: { mentorId: number; timestamp: number }) => {
-          const timeDiff = Date.now() - applied.timestamp;
-          const fiveMinutes = 5 * 60 * 1000;
-          return (
-            applied.mentorId !== matchedMentor.memberId ||
-            timeDiff >= fiveMinutes
-          );
-        }
-      );
-
-      updatedAppliedMentors.push({
-        mentorId: matchedMentor.memberId,
-        timestamp: Date.now(),
-      });
-
-      localStorage.setItem('appliedMentors', JSON.stringify(updatedAppliedMentors));
+    await applyMentor(matchedMentor, () => {
       setMatchedMentor(null);
-    } catch (err: any) {
-      if (err.response?.status === 404) {
-        toast.error('멘토를 찾을 수 없습니다.');
-      } else {
-        toast.error('신청에 실패했습니다.');
-      }
-    }
+    });
   };
 
   return (
@@ -230,9 +190,7 @@ export default function RandomMentoring() {
       {isMatchingModalOpen && (
         <ModalWrapper className="w-[542px] px-10 py-10">
           <div className="flex flex-col">
-            <h2 className="text-2xl font-bold text-gray-1 mb-6">
-              매칭중...
-            </h2>
+            <h2 className="text-2xl font-bold text-gray-1 mb-6">매칭중...</h2>
             <p className="text-2xl text-gray-1 mb-14 font-semibold">
               당신과 잘 맞는 멘토를 찾는 중이에요.
               <br />
@@ -262,9 +220,7 @@ export default function RandomMentoring() {
               <X />
             </button>
 
-            <h2 className="text-2xl font-bold text-gray-1 mb-8">
-              매칭 성공
-            </h2>
+            <h2 className="text-2xl font-bold text-gray-1 mb-8">매칭 성공</h2>
 
             <div className="flex flex-col items-center mb-10">
               <div className="mb-6">

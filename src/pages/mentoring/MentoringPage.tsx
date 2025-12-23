@@ -71,7 +71,7 @@ export default function MentoringPage() {
           instance.get<MemberInfo>('/api/member'),
           instance.get<SentApply[]>(API_PATHS.MENTORING_APPLY_SENT).catch(() => ({ data: [] })),
         ]);
-        
+
         setAllMentors(mentorsResponse.data.content);
         setCurrentMemberId(memberResponse.data.memberId);
         if (Array.isArray(sentAppliesResponse.data)) {
@@ -109,13 +109,13 @@ export default function MentoringPage() {
 
   const mentors = useMemo(() => {
     let filteredMentors = allMentors;
-    
+
     if (currentMemberId !== null) {
       filteredMentors = filteredMentors.filter(
         (mentor) => mentor.memberId !== currentMemberId
       );
     }
-    
+
     const trimmedQuery = searchQuery.trim().toLowerCase();
     if (trimmedQuery === '') {
       return filteredMentors;
