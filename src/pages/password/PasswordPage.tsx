@@ -4,6 +4,7 @@ import { toast } from 'react-toastify';
 import Logo from '@/assets/svg/logo/Logo';
 import InputPassword from '@/assets/components/Input/InputPassword';
 import { instance, TokenRefreshError } from '@/assets/shared/lib/axios';
+import { API_PATHS } from '@/constants/api';
 
 export default function PasswordPage() {
   const navigate = useNavigate();
@@ -31,7 +32,7 @@ export default function PasswordPage() {
 
     setIsLoading(true);
     try {
-      await instance.post('/api/auth/email/send-code', {
+      await instance.post(API_PATHS.SEND_CODE, {
         email,
         verificationType: 'RESET_PASSWORD',
       });
@@ -90,7 +91,7 @@ export default function PasswordPage() {
 
     setIsLoading(true);
     try {
-      await instance.post('/api/auth/email/verification-code', {
+      await instance.post(API_PATHS.VERIFY_CODE, {
         email,
         code,
       });
@@ -145,7 +146,7 @@ export default function PasswordPage() {
 
     setIsLoading(true);
     try {
-      await instance.patch('/api/auth/password', {
+      await instance.patch(API_PATHS.RESET_PASSWORD, {
         email,
         newPassword: password,
       });
