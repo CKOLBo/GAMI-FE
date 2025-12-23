@@ -139,14 +139,23 @@ export default function PostContent() {
 
     try {
       await instance.post(`/api/post/${postId}/comment`, {
-        content: comment.trim(),
+        comment: comment.trim(),
       });
+
+      toast.success('댓글이 등록되었습니다.');
       setComment('');
+
       setPostData((prev) =>
         prev ? { ...prev, commentCount: prev.commentCount + 1 } : prev
       );
-    } catch {
-      toast.error('댓글 등록 실패');
+    } catch (error: any) {
+      if (error.response?.status === 401) {
+        toast.error('로그인이 필요합니다.');
+      } else if (error.response?.status === 404) {
+        toast.error('게시글을 찾을 수 없습니다.');
+      } else {
+        toast.error('댓글 등록에 실패했습니다.');
+      }
     }
   };
 
