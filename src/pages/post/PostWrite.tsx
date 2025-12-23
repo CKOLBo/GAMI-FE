@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Picture from '@/assets/svg/postWrite/Picture';
 import Button from '@/assets/components/Button/Button';
@@ -14,6 +14,7 @@ interface UploadedImage {
 
 export default function PostWrite() {
   const navigate = useNavigate();
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
@@ -32,23 +33,22 @@ export default function PostWrite() {
         '/api/post/images',
         formData,
         {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
+          headers: { 'Content-Type': 'multipart/form-data' },
         }
       );
 
       setImages((prev) => [
         ...prev,
-        {
-          imageUrl: res.data.imageUrl,
-          sequence: prev.length,
-        },
+        { imageUrl: res.data.imageUrl, sequence: prev.length },
       ]);
 
       toast.success('이미지 업로드 성공');
     } catch {
       toast.error('이미지 업로드 실패');
+    } finally {
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
     }
   };
 
@@ -65,22 +65,18 @@ export default function PostWrite() {
       );
 
       toast.success('이미지 삭제 완료');
+
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
     } catch {
       toast.error('이미지 삭제 실패');
     }
   };
 
   const handleSubmit = async () => {
-    if (!title.trim()) {
-      toast.error('제목을 입력해주세요.');
-      return;
-    }
-
-    if (!content.trim()) {
-      toast.error('내용을 입력해주세요.');
-      return;
-    }
-
+    if (!title.trim()) return toast.error('제목을 입력해주세요.');
+    if (!content.trim()) return toast.error('내용을 입력해주세요.');
     if (isSubmitting) return;
 
     setIsSubmitting(true);
@@ -106,27 +102,22 @@ export default function PostWrite() {
       <Sidebar />
 
       <div className="w-full max-w-[1500px]">
-        <div className="mb-20">
-          <h1 className="text-gray-1 text-2xl sm:text-3xl lg:text-4xl font-bold">
-            익명 게시판
-          </h1>
-        </div>
+        <h1 className="mb-20 text-gray-1 text-4xl font-bold">익명 게시판</h1>
 
-        <div className="mb-13">
-          <input
-            type="text"
-            placeholder="제목을 입력해주세요."
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            className="w-full p-5 placeholder:text-gray-3 text-xl font-bold placeholder:font-bold rounded-lg outline-none border border-gray-2"
-          />
-        </div>
+        <input
+          type="text"
+          placeholder="제목을 입력해주세요."
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          className="w-full mb-13 p-5 text-xl font-bold border border-gray-2 rounded-lg"
+        />
 
         <div className="border h-[420px] border-gray-2 rounded-lg overflow-hidden">
-          <div className="flex items-center gap-4 p-4 bg-white border-b border-gray-2">
-            <label className="p-1 cursor-pointer">
+          <div className="p-4 border-b border-gray-2">
+            <label className="cursor-pointer">
               <Picture />
               <input
+                ref={fileInputRef}
                 type="file"
                 accept="image/*"
                 onChange={handleImageUpload}
@@ -139,7 +130,7 @@ export default function PostWrite() {
             placeholder="내용을 자유롭게 작성해주세요."
             value={content}
             onChange={(e) => setContent(e.target.value)}
-            className="w-full h-full p-6 placeholder:text-gray-3 text-xl font-semibold placeholder:text-xl placeholder:font-bold outline-none resize-none"
+            className="w-full h-full p-6 text-xl resize-none outline-none"
           />
         </div>
 
@@ -154,7 +145,7 @@ export default function PostWrite() {
                 />
                 <button
                   onClick={() => handleImageDelete(img.imageUrl)}
-                  className="absolute top-1 right-1 bg-black/60 text-white rounded-full w-7 h-7 text-sm"
+                  className="absolute top-1 right-1 bg-black/60 rounded-full w-7 h-7 flex items-center justify-center cursor-pointer"
                 >
                   <X color="#ffffff" />
                 </button>
