@@ -77,11 +77,7 @@ export default function PostPage() {
                 내가 쓴 글
               </Link>
             </h1>
-            <PostHead>
-              <div className="flex pl-[410px]">
-                <Button text="글 쓰기" to="/post-write" />
-              </div>
-            </PostHead>
+            <PostHead />
           </div>
 
           <div className="border-t-2 border-gray-2">
