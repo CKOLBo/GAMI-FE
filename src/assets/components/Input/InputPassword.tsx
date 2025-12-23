@@ -7,6 +7,7 @@ interface InputPasswordProps {
   name?: string;
   value?: string;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  disabled?: boolean;
 }
 
 export default function InputPassword({
@@ -14,6 +15,7 @@ export default function InputPassword({
   name = 'password',
   value,
   onChange,
+  disabled = false,
 }: InputPasswordProps) {
   const [showPassword, setShowPassword] = useState(false);
 
@@ -26,7 +28,8 @@ export default function InputPassword({
         value={value}
         onChange={onChange}
         required
-        className="w-full h-13 2xl:h-15 px-5 pr-12 2xl:pr-14 border placeholder:font-medium border-gray-2 rounded-xl text-sm text-gray-1 placeholder:text-gray-3 focus:outline-none focus:border-main-1"
+        disabled={disabled}
+        className="w-full h-13 2xl:h-15 px-5 pr-12 2xl:pr-14 border placeholder:font-medium border-gray-2 rounded-xl text-sm text-gray-1 placeholder:text-gray-3 focus:outline-none focus:border-main-1 disabled:bg-gray-100 disabled:cursor-not-allowed"
       />
       <button
         type="button"
