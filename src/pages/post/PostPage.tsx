@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { Link } from 'react-router-dom';
 
 import Button from '@/assets/components/Button/Button';
 import Post from '@/assets/components/post/Post';
@@ -10,6 +11,7 @@ import Sidebar from '@/assets/components/Sidebar';
 
 import Report from '@/assets/svg/post/Report';
 import { instance } from '@/assets/shared/lib/axios';
+import Divider from '@/assets/svg/Divider';
 
 interface PostType {
   id: number;
@@ -62,12 +64,25 @@ export default function PostPage() {
 
       <div className="w-full flex-1">
         <div className="max-w-[1500px] px-4 ml-80 lg:px-6">
-          <PostHead>
-            <div className="flex flex-wrap gap-3 sm:gap-4 lg:gap-6">
-              <Button text="글 쓰기" to="/post-write" />
-              <Button text="내가 쓴 글" to="/my-post" />
-            </div>
-          </PostHead>
+          <div className="flex">
+            <h1 className="flex items-center gap-4 text-[40px] font-bold text-gray-1 pr-25">
+              <span className="text-3xl 2xl:text-[40px] text-gray-1 font-bold">
+                익명 게시판
+              </span>
+              <Divider className="shrink-0" />
+              <Link
+                to="/my-post"
+                className="text-3xl 2xl:text-[40px] text-gray-2 font-bold hover:text-gray-1 transition-colors cursor-pointer"
+              >
+                내가 쓴 글
+              </Link>
+            </h1>
+            <PostHead>
+              <div className="flex pl-[410px]">
+                <Button text="글 쓰기" to="/post-write" />
+              </div>
+            </PostHead>
+          </div>
 
           <div className="border-t-2 border-gray-2">
             {postData.map((post) => (
@@ -89,7 +104,6 @@ export default function PostPage() {
               />
             ))}
           </div>
-
           <div className="flex justify-center gap-4 py-6 text-2xl text-gray-1 font-bold">
             <button
               disabled={page === 0}
