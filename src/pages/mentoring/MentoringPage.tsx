@@ -127,8 +127,16 @@ export default function MentoringPage() {
         'appliedMentors',
         JSON.stringify(updatedAppliedMentors)
       );
-    } catch (err: any) {
-      if (err.response?.status === 404) {
+    } catch (err: unknown) {
+      if (
+        err &&
+        typeof err === 'object' &&
+        'response' in err &&
+        err.response &&
+        typeof err.response === 'object' &&
+        'status' in err.response &&
+        err.response.status === 404
+      ) {
         toast.error('멘토를 찾을 수 없습니다.');
       } else {
         toast.error('신청에 실패했습니다.');

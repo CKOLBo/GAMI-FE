@@ -36,11 +36,12 @@ export default function RandomMentoring() {
     }
 
     try {
+      const timestamp = Date.now();
       const response = await instance.get<RandomMentorResponse>(
         '/api/mentoring/random',
         {
           params: {
-            _t: Date.now(),
+            _t: timestamp,
           },
         }
       );
@@ -78,12 +79,20 @@ export default function RandomMentoring() {
       setRecommendedMentorIds((prev) => [...prev, mentorId]);
       setIsMatchingModalOpen(false);
       setMatchedMentor(response.data);
-    } catch (err: any) {
+    } catch (err: unknown) {
       if (isCancelledRef.current) {
         return;
       }
       setIsMatchingModalOpen(false);
-      if (err.response?.status === 401) {
+      if (
+        err &&
+        typeof err === 'object' &&
+        'response' in err &&
+        err.response &&
+        typeof err.response === 'object' &&
+        'status' in err.response &&
+        err.response.status === 401
+      ) {
         toast.error('인증이 필요합니다.');
       } else {
         toast.error('멘토를 찾는데 실패했습니다.');
@@ -167,8 +176,16 @@ export default function RandomMentoring() {
         JSON.stringify(updatedAppliedMentors)
       );
       setMatchedMentor(null);
-    } catch (err: any) {
-      if (err.response?.status === 404) {
+    } catch (err: unknown) {
+      if (
+        err &&
+        typeof err === 'object' &&
+        'response' in err &&
+        err.response &&
+        typeof err.response === 'object' &&
+        'status' in err.response &&
+        err.response.status === 404
+      ) {
         toast.error('멘토를 찾을 수 없습니다.');
       } else {
         toast.error('신청에 실패했습니다.');
