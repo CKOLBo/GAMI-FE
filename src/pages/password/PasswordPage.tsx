@@ -45,23 +45,36 @@ export default function PasswordPage() {
         return;
       }
       console.error('인증 코드 발송 실패:', error);
-      const status = (error as { response?: { status?: number } }).response?.status;
-      const errorMessage = (error as { response?: { data?: { message?: string } } }).response?.data?.message;
+      const status = (error as { response?: { status?: number } }).response
+        ?.status;
+      const errorMessage = (
+        error as { response?: { data?: { message?: string } } }
+      ).response?.data?.message;
 
       if ((error as { code?: string }).code === 'ECONNABORTED') {
         toast.error('요청 시간이 초과되었습니다. 잠시 후 다시 시도해주세요.');
       } else if (status === 400) {
-        toast.error(errorMessage || '잘못된 요청입니다. 이메일 형식을 확인해주세요.');
+        toast.error(
+          errorMessage || '잘못된 요청입니다. 이메일 형식을 확인해주세요.'
+        );
       } else if (status === 404) {
         toast.error('해당 이메일로 등록된 사용자가 존재하지 않습니다.');
       } else if (status === 409) {
-        toast.error('이미 유효한 인증번호가 전송된 상태입니다. 잠시 후 다시 시도해주세요.');
+        toast.error(
+          '이미 유효한 인증번호가 전송된 상태입니다. 잠시 후 다시 시도해주세요.'
+        );
       } else if (status === 429) {
-        toast.error('인증번호 전송 요청 횟수 제한을 초과했습니다. 잠시 후 다시 시도해주세요.');
+        toast.error(
+          '인증번호 전송 요청 횟수 제한을 초과했습니다. 잠시 후 다시 시도해주세요.'
+        );
       } else if (status === 500) {
-        toast.error('서버 에러로 인해 이메일 전송에 실패했습니다. 잠시 후 다시 시도해주세요.');
+        toast.error(
+          '서버 에러로 인해 이메일 전송에 실패했습니다. 잠시 후 다시 시도해주세요.'
+        );
       } else {
-        toast.error(errorMessage || '인증 코드 발송에 실패했습니다. 다시 시도해주세요.');
+        toast.error(
+          errorMessage || '인증 코드 발송에 실패했습니다. 다시 시도해주세요.'
+        );
       }
     } finally {
       setIsLoading(false);
@@ -88,15 +101,22 @@ export default function PasswordPage() {
         return;
       }
       console.error('인증 코드 검증 실패:', error);
-      const status = (error as { response?: { status?: number } }).response?.status;
-      const errorMessage = (error as { response?: { data?: { message?: string } } }).response?.data?.message;
+      const status = (error as { response?: { status?: number } }).response
+        ?.status;
+      const errorMessage = (
+        error as { response?: { data?: { message?: string } } }
+      ).response?.data?.message;
 
       if (status === 400) {
-        toast.error(errorMessage || '잘못된 인증 코드입니다. 다시 확인해주세요.');
+        toast.error(
+          errorMessage || '잘못된 인증 코드입니다. 다시 확인해주세요.'
+        );
       } else if (status === 429) {
         toast.error('요청 횟수를 초과했습니다. 잠시 후 다시 시도해주세요.');
       } else {
-        toast.error(errorMessage || '인증 코드 검증에 실패했습니다. 다시 시도해주세요.');
+        toast.error(
+          errorMessage || '인증 코드 검증에 실패했습니다. 다시 시도해주세요.'
+        );
       }
     } finally {
       setIsLoading(false);
@@ -135,15 +155,22 @@ export default function PasswordPage() {
         return;
       }
       console.error('비밀번호 변경 실패:', error);
-      const status = (error as { response?: { status?: number } }).response?.status;
-      const errorMessage = (error as { response?: { data?: { message?: string } } }).response?.data?.message;
+      const status = (error as { response?: { status?: number } }).response
+        ?.status;
+      const errorMessage = (
+        error as { response?: { data?: { message?: string } } }
+      ).response?.data?.message;
 
       if (status === 401) {
         toast.error('인증이 필요합니다. 다시 시도해주세요.');
       } else if (status === 400) {
-        toast.error(errorMessage || '입력값에 오류가 있습니다. 다시 확인해주세요.');
+        toast.error(
+          errorMessage || '입력값에 오류가 있습니다. 다시 확인해주세요.'
+        );
       } else {
-        toast.error(errorMessage || '비밀번호 변경에 실패했습니다. 다시 시도해주세요.');
+        toast.error(
+          errorMessage || '비밀번호 변경에 실패했습니다. 다시 시도해주세요.'
+        );
       }
     } finally {
       setIsLoading(false);
