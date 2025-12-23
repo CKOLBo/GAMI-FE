@@ -8,13 +8,69 @@ import Sidebar from '@/assets/components/Sidebar';
 import { instance } from '@/assets/shared/lib/axios';
 import { toast } from 'react-toastify';
 
+interface UploadedImage {
+  imageUrl: string;
+  sequence: number;
+}
+
 export default function PostWrite() {
   const navigate = useNavigate();
 
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
-  const [fontSize, setFontSize] = useState(16);
+  const [fontSize, setFontSize] = useState(12);
+  const [images, setImages] = useState<UploadedImage[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append('image', file);
+
+    try {
+      const res = await instance.post<{ imageUrl: string }>(
+        '/api/post/images',
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
+
+      setImages((prev) => [
+        ...prev,
+        {
+          imageUrl: res.data.imageUrl,
+          sequence: prev.length,
+        },
+      ]);
+
+      toast.success('이미지 업로드 성공');
+    } catch {
+      toast.error('이미지 업로드 실패');
+    }
+  };
+
+  const handleImageDelete = async (imageUrl: string) => {
+    try {
+      await instance.delete('/api/post/images', {
+        params: { imageUrl },
+      });
+
+      setImages((prev) =>
+        prev
+          .filter((img) => img.imageUrl !== imageUrl)
+          .map((img, idx) => ({ ...img, sequence: idx }))
+      );
+
+      toast.success('이미지 삭제 완료');
+    } catch {
+      toast.error('이미지 삭제 실패');
+    }
+  };
 
   const handleSubmit = async () => {
     if (!title.trim()) {
@@ -27,19 +83,21 @@ export default function PostWrite() {
       return;
     }
 
-    try {
-      setIsSubmitting(true);
+    if (isSubmitting) return;
 
+    setIsSubmitting(true);
+
+    try {
       await instance.post('/api/post', {
         title,
         content,
-        images: [],
+        images,
       });
 
       toast.success('게시글이 등록되었습니다.');
       navigate('/post');
-    } catch (error) {
-      toast.error('게시글 등록에 실패했습니다.');
+    } catch {
+      toast.error('게시글 등록 실패');
     } finally {
       setIsSubmitting(false);
     }
@@ -68,27 +126,33 @@ export default function PostWrite() {
 
         <div className="border h-[420px] border-gray-2 rounded-lg overflow-hidden">
           <div className="flex items-center gap-4 p-4 bg-white border-b border-gray-2">
-            <button className="p-1 opacity-40 cursor-not-allowed">
+            <button className="p-1 cursor-pointer">
               <Bold />
             </button>
-            <button className="p-1 opacity-40 cursor-not-allowed">
+            <button className="p-1 cursor-pointer">
               <LinkIcon />
             </button>
-            <button className="p-1 opacity-40 cursor-not-allowed">
+
+            <label className="p-1 cursor-pointer">
               <Picture />
-            </button>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+                className="hidden"
+              />
+            </label>
 
             <select
               value={fontSize}
               onChange={(e) => setFontSize(Number(e.target.value))}
               className="ml-4 px-3 py-1 border border-gray-2 rounded outline-none cursor-pointer"
             >
-              <option value={12}>12</option>
-              <option value={14}>14</option>
-              <option value={16}>16</option>
-              <option value={18}>18</option>
-              <option value={20}>20</option>
-              <option value={24}>24</option>
+              {[12, 14, 16, 18, 20, 24].map((size) => (
+                <option key={size} value={size}>
+                  {size}
+                </option>
+              ))}
             </select>
           </div>
 
@@ -101,10 +165,29 @@ export default function PostWrite() {
           />
         </div>
 
+        {images.length > 0 && (
+          <div className="flex gap-4 mt-6 flex-wrap">
+            {images.map((img) => (
+              <div key={img.imageUrl} className="relative">
+                <img
+                  src={img.imageUrl}
+                  alt="업로드 이미지"
+                  className="w-32 h-32 object-cover rounded"
+                />
+                <button
+                  onClick={() => handleImageDelete(img.imageUrl)}
+                  className="absolute top-1 right-1 bg-black/60 text-white rounded-full w-6 h-6 text-sm"
+                >
+                  ✕
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+
         <div className="flex justify-end mt-13">
           <Button
             text={isSubmitting ? '등록 중...' : '등록하기'}
-            disabled={isSubmitting}
             onClick={handleSubmit}
           />
         </div>
