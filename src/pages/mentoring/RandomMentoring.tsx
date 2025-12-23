@@ -36,7 +36,7 @@ export default function RandomMentoring() {
     }
 
     try {
-      const timestamp = Date.now();
+      const timestamp = new Date().getTime();
       const response = await instance.get<RandomMentorResponse>(
         '/api/mentoring/random',
         {
