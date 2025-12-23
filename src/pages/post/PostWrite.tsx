@@ -1,12 +1,11 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Bold from '@/assets/svg/postWrite/Bold';
-import LinkIcon from '@/assets/svg/postWrite/Link';
 import Picture from '@/assets/svg/postWrite/Picture';
 import Button from '@/assets/components/Button/Button';
 import Sidebar from '@/assets/components/Sidebar';
 import { instance } from '@/assets/shared/lib/axios';
 import { toast } from 'react-toastify';
+import X from '@/assets/svg/X';
 
 interface UploadedImage {
   imageUrl: string;
@@ -18,7 +17,6 @@ export default function PostWrite() {
 
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
-  const [fontSize, setFontSize] = useState(12);
   const [images, setImages] = useState<UploadedImage[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -120,19 +118,12 @@ export default function PostWrite() {
             placeholder="제목을 입력해주세요."
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="w-full p-5 placeholder:text-gray-3 text-xl font-normal placeholder:font-bold rounded-lg outline-none border border-gray-2"
+            className="w-full p-5 placeholder:text-gray-3 text-xl font-bold placeholder:font-bold rounded-lg outline-none border border-gray-2"
           />
         </div>
 
         <div className="border h-[420px] border-gray-2 rounded-lg overflow-hidden">
           <div className="flex items-center gap-4 p-4 bg-white border-b border-gray-2">
-            <button className="p-1 cursor-pointer">
-              <Bold />
-            </button>
-            <button className="p-1 cursor-pointer">
-              <LinkIcon />
-            </button>
-
             <label className="p-1 cursor-pointer">
               <Picture />
               <input
@@ -142,26 +133,13 @@ export default function PostWrite() {
                 className="hidden"
               />
             </label>
-
-            <select
-              value={fontSize}
-              onChange={(e) => setFontSize(Number(e.target.value))}
-              className="ml-4 px-3 py-1 border border-gray-2 rounded outline-none cursor-pointer"
-            >
-              {[12, 14, 16, 18, 20, 24].map((size) => (
-                <option key={size} value={size}>
-                  {size}
-                </option>
-              ))}
-            </select>
           </div>
 
           <textarea
             placeholder="내용을 자유롭게 작성해주세요."
             value={content}
             onChange={(e) => setContent(e.target.value)}
-            className="w-full h-full p-6 placeholder:text-gray-3 placeholder:font-bold outline-none resize-none"
-            style={{ fontSize }}
+            className="w-full h-full p-6 placeholder:text-gray-3 text-xl font-semibold placeholder:text-xl placeholder:font-bold outline-none resize-none"
           />
         </div>
 
@@ -176,16 +154,16 @@ export default function PostWrite() {
                 />
                 <button
                   onClick={() => handleImageDelete(img.imageUrl)}
-                  className="absolute top-1 right-1 bg-black/60 text-white rounded-full w-6 h-6 text-sm"
+                  className="absolute top-1 right-1 bg-black/60 text-white rounded-full w-7 h-7 text-sm"
                 >
-                  ✕
+                  <X color="#ffffff" />
                 </button>
               </div>
             ))}
           </div>
         )}
 
-        <div className="flex justify-end mt-13">
+        <div className="flex justify-end mt-13 mb-8">
           <Button
             text={isSubmitting ? '등록 중...' : '등록하기'}
             onClick={handleSubmit}
