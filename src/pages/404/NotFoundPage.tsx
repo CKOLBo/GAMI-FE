@@ -1,5 +1,4 @@
 import { Link, useNavigate } from 'react-router-dom';
-import Logo from '@/assets/svg/logo/Logo';
 import NotFound from '@/assets/svg/404/404';
 
 export default function NotFoundPage() {
@@ -12,10 +11,6 @@ export default function NotFoundPage() {
   return (
     <div className="bg-white h-screen flex justify-center items-center p-5">
       <div className="text-center max-w-md w-full">
-        <div className="w-60 mb-6 mx-auto flex justify-center">
-          <Logo size="md" />
-        </div>
-
         <div className="flex items-center justify-center mb-4">
           <NotFound />
         </div>

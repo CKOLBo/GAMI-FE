@@ -57,45 +57,49 @@ export default function SigninPage() {
           </Link>
         </p>
 
-        <form className="flex flex-col" onSubmit={handleSubmit}>
-          <input
-            type="text"
-            name="email"
-            placeholder="이메일"
-            className="w-full h-13 2xl:h-15 px-5 border border-gray-2 rounded-xl text-sm text-gray-1 placeholder:text-gray-3 placeholder:font-medium focus:outline-none focus:border-main-1 mb-4 2xl:mb-5"
-          />
-          <div className="relative">
+        <div className="flex flex-col w-full 2xl:items-center">
+          <form
+            className="flex flex-col w-full 2xl:items-center"
+            onSubmit={handleSubmit}
+          >
             <input
-              type={showPassword ? 'text' : 'password'}
-              name="password"
-              placeholder="비밀번호"
-              className="w-full h-13 2xl:h-15 px-5 border border-gray-2 rounded-xl text-sm text-gray-1 placeholder:text-gray-3 placeholder:font-medium focus:outline-none focus:border-main-1 pr-12 2xl:pr-14 "
+              type="text"
+              name="email"
+              placeholder="이메일"
+              className="w-full 2xl:w-[376px] h-13 2xl:h-15 px-5 border border-gray-2 rounded-xl text-sm text-gray-1 placeholder:text-gray-3 placeholder:font-medium focus:outline-none focus:border-main-1 mb-4 2xl:mb-5"
             />
+            <div className="relative w-full 2xl:w-[376px]">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                name="password"
+                placeholder="비밀번호"
+                className="w-full h-13 2xl:h-15 px-5 border border-gray-2 rounded-xl text-sm text-gray-1 placeholder:text-gray-3 placeholder:font-medium focus:outline-none focus:border-main-1 pr-12 2xl:pr-14 "
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center justify-center p-0 bg-transparent border-0 cursor-pointer"
+              >
+                {showPassword ? <Show /> : <Hide />}
+              </button>
+            </div>
+            <div className="h-6 mb-3 2xl:mb-4"></div>
             <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center justify-center p-0 bg-transparent border-0 cursor-pointer"
+              type="submit"
+              disabled={isLoading}
+              className="w-full 2xl:w-[376px] h-13 2xl:h-15 bg-main-2 text-white text-base rounded-[10px] 2xl:rounded-[12px] transition-all duration-300 font-bold hover:bg-main-2-hover border-0 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {showPassword ? <Show /> : <Hide />}
+              {isLoading ? '로그인' : '로그인'}
             </button>
+          </form>
+          <div className="mt-2 2xl:mt-3 w-full 2xl:w-[376px] text-right">
+            <Link
+              to="/password"
+              className="font-medium text-sm text-gray-1 no-underline"
+            >
+              비밀번호 찾기
+            </Link>
           </div>
-          <div className="h-6 mb-3 2xl:mb-4"></div>
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="w-full h-13 2xl:h-15 bg-main-2 text-white text-base rounded-[10px] 2xl:rounded-[12px] transition-all duration-300 font-bold hover:bg-main-2-hover border-0 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isLoading ? '로그인' : '로그인'}
-          </button>
-        </form>
-
-        <div className="mt-2 2xl:mt-3 text-right">
-          <Link
-            to="/password"
-            className="font-medium text-sm text-gray-1 no-underline"
-          >
-            비밀번호 찾기
-          </Link>
         </div>
       </div>
     </div>

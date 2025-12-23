@@ -35,7 +35,7 @@ export default function MainPost({
           {title}
         </h2>
 
-        <p className="font-bold line-clamp-3 break-all">
+        <p className="font-bold text-gray-3 line-clamp-3 break-all">
           {content}
         </p>
       </div>

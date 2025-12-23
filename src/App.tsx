@@ -33,13 +33,13 @@ function App() {
           <Route path="/" element={<Signin />} />
           <Route path="/signin" element={<Signin />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path="/password" element={<Password />} />
           <Route element={<ProtectedLayout />}>
             <Route path="/main" element={<Main />} />
             <Route path="/post" element={<Post />} />
             <Route path="/post-content" element={<PostContent />} />
             <Route path="/post-write" element={<PostWrite />} />
             <Route path="/my-post" element={<MyPost />} />
-            <Route path="/password" element={<Password />} />
             <Route path="/mentoring" element={<Mentoring />} />
             <Route path="/mentoring-random" element={<RandomMentoring />} />
             <Route path="/my-page" element={<MyPage />} />
