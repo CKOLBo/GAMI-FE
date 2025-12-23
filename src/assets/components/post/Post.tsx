@@ -94,7 +94,7 @@ export default function Post({
           </button>
 
           <button
-            className="flex items-center gap-4"
+            className="flex items-center gap-4 cursor-pointer"
             onClick={handleCommentClick}
           >
             <Comment width="32px" height="32px" color="#333D48" />
@@ -104,7 +104,7 @@ export default function Post({
           {actions.map((action, index) => (
             <button
               key={index}
-              className="flex items-center gap-4"
+              className="flex items-center gap-4 cursor-pointer"
               onClick={(e) => {
                 e.stopPropagation();
                 action.onClick();
