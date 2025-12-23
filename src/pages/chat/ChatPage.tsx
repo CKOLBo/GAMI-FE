@@ -9,7 +9,6 @@ import { useState, useEffect, useRef, useMemo } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { instance } from '@/assets/shared/lib/axios';
 import { Link } from 'react-router-dom';
-import { instance } from '@/assets/shared/lib/axios';
 
 interface ChatItem {
   id: number;
