@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom';
 import HeartIcon from '@/assets/svg/main/HeartIcon';
-import HeartFilledIcon from '@/assets/svg/main/HeartFilledIcon';
 import CommentIcon from '@/assets/svg/main/CommentIcon';
 
 interface MainPostProps {
@@ -9,7 +8,6 @@ interface MainPostProps {
   content: string;
   likeCount?: number;
   commentCount: number;
-  isLiked?: boolean;
 }
 
 export default function MainPost({
@@ -18,13 +16,7 @@ export default function MainPost({
   content,
   likeCount = 0,
   commentCount,
-  isLiked = false,
 }: MainPostProps) {
-  const handleLikeToggle = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-  };
-
   return (
     <Link
       to={`/post/${postId}`}
@@ -41,14 +33,10 @@ export default function MainPost({
       </div>
 
       <div className="flex items-center gap-4">
-        <button
-          onClick={handleLikeToggle}
-          className="flex items-center gap-2"
-          aria-label="좋아요"
-        >
-          {isLiked ? <HeartFilledIcon /> : <HeartIcon />}
+        <div className="flex items-center gap-2">
+          <HeartIcon />
           <span className="text-lg text-gray-1">{likeCount}</span>
-        </button>
+        </div>
 
         <div className="flex items-center gap-2">
           <CommentIcon />
