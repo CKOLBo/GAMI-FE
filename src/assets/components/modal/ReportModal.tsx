@@ -59,8 +59,13 @@ export default function ReportModal({
 
       toast.success('신고가 접수되었습니다.');
       onReport();
-    } catch (error: any) {
-      if (error.response?.status === 401) {
+    } catch (error: unknown) {
+      if (
+        typeof error === 'object' &&
+        error !== null &&
+        'response' in error &&
+        (error as { response?: { status?: number } }).response?.status === 401
+      ) {
         toast.error('로그인이 필요합니다.');
       } else {
         toast.error('신고 처리 중 오류가 발생했습니다.');
