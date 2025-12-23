@@ -6,6 +6,7 @@ import axios from 'axios';
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import NotFoundImage from '@/assets/svg/mentor/NotFound.png';
+import { toast } from 'react-toastify';
 
 interface MentorData {
   id: number;
@@ -43,6 +44,55 @@ export default function MentoringPage() {
     );
   }, [searchQuery, allMentors]);
 
+  const handleMentorApply = (mentor: MentorData) => {
+    const appliedMentors = JSON.parse(
+      localStorage.getItem('appliedMentors') || '[]'
+    );
+    
+    const recentApplication = appliedMentors.find(
+      (applied: { mentorId: number; timestamp: number }) => {
+        const timeDiff = Date.now() - applied.timestamp;
+        const fiveMinutes = 5 * 60 * 1000;
+        return applied.mentorId === mentor.id && timeDiff < fiveMinutes;
+      }
+    );
+    
+    if (recentApplication) {
+      toast.error('이미 신청했어요');
+      return;
+    }
+    
+    toast.success('신청을 했어요');
+    
+    const mentorRequests = JSON.parse(
+      localStorage.getItem('mentorRequests') || '[]'
+    );
+    
+    const newRequest = {
+      id: Date.now(),
+      name: mentor.name,
+      mentorId: mentor.id,
+    };
+    
+    mentorRequests.push(newRequest);
+    localStorage.setItem('mentorRequests', JSON.stringify(mentorRequests));
+    
+    const updatedAppliedMentors = appliedMentors.filter(
+      (applied: { mentorId: number; timestamp: number }) => {
+        const timeDiff = Date.now() - applied.timestamp;
+        const fiveMinutes = 5 * 60 * 1000;
+        return applied.mentorId !== mentor.id || timeDiff >= fiveMinutes;
+      }
+    );
+    
+    updatedAppliedMentors.push({
+      mentorId: mentor.id,
+      timestamp: Date.now(),
+    });
+    
+    localStorage.setItem('appliedMentors', JSON.stringify(updatedAppliedMentors));
+  };
+
   return (
     <div className="flex min-h-screen bg-white">
       <Sidebar />
@@ -60,7 +110,7 @@ export default function MentoringPage() {
                   to="/mentoring-random"
                   className="text-3xl 2xl:text-[40px] text-gray-2 font-bold hover:text-gray-1 transition-colors cursor-pointer"
                 >
-                  랜덤 검색
+                  랜덤 멘토링
                 </Link>
               </h1>
 
@@ -90,9 +140,7 @@ export default function MentoringPage() {
                   name={mentor.name}
                   generation={mentor.generation}
                   major={mentor.major}
-                  onApply={() => {
-                    console.log(`${mentor.name} 멘토 신청`);
-                  }}
+                  onApply={() => handleMentorApply(mentor)}
                 />
               ))}
             </div>
