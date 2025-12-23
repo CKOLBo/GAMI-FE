@@ -89,7 +89,9 @@ export default function ChatPage() {
   const [messageInput, setMessageInput] = useState('');
   const [isMentorRequestModalOpen, setIsMentorRequestModalOpen] =
     useState(false);
-  const [mentorRequests, setMentorRequests] = useState<MentorRequestForModal[]>([]);
+  const [mentorRequests, setMentorRequests] = useState<MentorRequestForModal[]>(
+    []
+  );
   const currentUserId = user?.id ?? null;
 
   useEffect(() => {

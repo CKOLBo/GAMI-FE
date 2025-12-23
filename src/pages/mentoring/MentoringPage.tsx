@@ -52,7 +52,7 @@ export default function MentoringPage() {
           }),
           instance.get<MemberInfo>('/api/member'),
         ]);
-        
+
         setAllMentors(mentorsResponse.data.content);
         setCurrentMemberId(memberResponse.data.memberId);
       } catch (err) {
@@ -68,13 +68,13 @@ export default function MentoringPage() {
 
   const mentors = useMemo(() => {
     let filteredMentors = allMentors;
-    
+
     if (currentMemberId !== null) {
       filteredMentors = filteredMentors.filter(
         (mentor) => mentor.memberId !== currentMemberId
       );
     }
-    
+
     const trimmedQuery = searchQuery.trim().toLowerCase();
     if (trimmedQuery === '') {
       return filteredMentors;
@@ -90,7 +90,7 @@ export default function MentoringPage() {
     const appliedMentors = JSON.parse(
       localStorage.getItem('appliedMentors') || '[]'
     );
-    
+
     const recentApplication = appliedMentors.find(
       (applied: { mentorId: number; timestamp: number }) => {
         const timeDiff = Date.now() - applied.timestamp;
@@ -98,30 +98,35 @@ export default function MentoringPage() {
         return applied.mentorId === mentor.memberId && timeDiff < fiveMinutes;
       }
     );
-    
+
     if (recentApplication) {
       toast.error('이미 신청했어요');
       return;
     }
-    
+
     try {
       await instance.post(`/api/mentoring/apply/${mentor.memberId}`);
       toast.success('신청을 했어요');
-      
+
       const updatedAppliedMentors = appliedMentors.filter(
         (applied: { mentorId: number; timestamp: number }) => {
           const timeDiff = Date.now() - applied.timestamp;
           const fiveMinutes = 5 * 60 * 1000;
-          return applied.mentorId !== mentor.memberId || timeDiff >= fiveMinutes;
+          return (
+            applied.mentorId !== mentor.memberId || timeDiff >= fiveMinutes
+          );
         }
       );
-      
+
       updatedAppliedMentors.push({
         mentorId: mentor.memberId,
         timestamp: Date.now(),
       });
-      
-      localStorage.setItem('appliedMentors', JSON.stringify(updatedAppliedMentors));
+
+      localStorage.setItem(
+        'appliedMentors',
+        JSON.stringify(updatedAppliedMentors)
+      );
     } catch (err: any) {
       if (err.response?.status === 404) {
         toast.error('멘토를 찾을 수 없습니다.');

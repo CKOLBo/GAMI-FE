@@ -53,7 +53,7 @@ export default function RandomMentoring() {
 
       if (recommendedMentorIds.includes(mentorId)) {
         retryCountRef.current += 1;
-        
+
         if (retryCountRef.current > 10) {
           setRecommendedMentorIds([]);
           retryCountRef.current = 0;
@@ -62,7 +62,7 @@ export default function RandomMentoring() {
         if (isCancelledRef.current) {
           return;
         }
-        
+
         retryTimeoutRef.current = setTimeout(() => {
           if (!isCancelledRef.current) {
             handleRandomSearch(true);
@@ -162,7 +162,10 @@ export default function RandomMentoring() {
         timestamp: Date.now(),
       });
 
-      localStorage.setItem('appliedMentors', JSON.stringify(updatedAppliedMentors));
+      localStorage.setItem(
+        'appliedMentors',
+        JSON.stringify(updatedAppliedMentors)
+      );
       setMatchedMentor(null);
     } catch (err: any) {
       if (err.response?.status === 404) {
@@ -230,9 +233,7 @@ export default function RandomMentoring() {
       {isMatchingModalOpen && (
         <ModalWrapper className="w-[542px] px-10 py-10">
           <div className="flex flex-col">
-            <h2 className="text-2xl font-bold text-gray-1 mb-6">
-              매칭중...
-            </h2>
+            <h2 className="text-2xl font-bold text-gray-1 mb-6">매칭중...</h2>
             <p className="text-2xl text-gray-1 mb-14 font-semibold">
               당신과 잘 맞는 멘토를 찾는 중이에요.
               <br />
@@ -262,9 +263,7 @@ export default function RandomMentoring() {
               <X />
             </button>
 
-            <h2 className="text-2xl font-bold text-gray-1 mb-8">
-              매칭 성공
-            </h2>
+            <h2 className="text-2xl font-bold text-gray-1 mb-8">매칭 성공</h2>
 
             <div className="flex flex-col items-center mb-10">
               <div className="mb-6">
