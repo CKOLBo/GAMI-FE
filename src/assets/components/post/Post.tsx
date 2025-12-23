@@ -68,7 +68,7 @@ export default function Post({
           <p className="text-gray-1 font-bold text-xl sm:text-2xl lg:text-3xl xl:text-[32px] mt-6 sm:mt-8 lg:mt-9 xl:mt-11 mb-2 lg:mb-3">
             {title}
           </p>
-          <p className="text-gray-3 text-base sm:text-lg lg:text-xl xl:text-2xl font-bold mb-4 sm:mb-6 lg:mb-7 xl:mb-9 line-clamp-1">
+          <p className="text-gray-3 w-[600px] text-base sm:text-lg lg:text-xl xl:text-2xl font-bold mb-4 sm:mb-6 lg:mb-7 xl:mb-9 line-clamp-1">
             {content}
           </p>
         </div>
