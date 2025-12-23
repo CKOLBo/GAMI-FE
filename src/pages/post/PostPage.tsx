@@ -97,7 +97,7 @@ export default function PostPage() {
               />
             ))}
           </div>
-          <div className="flex justify-center gap-4 py-6 text-2xl text-gray-1 font-bold">
+          <div className="flex justify-center gap-4 py-10 text-2xl text-gray-1 font-bold">
             <button
               disabled={page === 0}
               onClick={() => setPage((prev) => prev - 1)}
