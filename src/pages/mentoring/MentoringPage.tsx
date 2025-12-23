@@ -2,16 +2,32 @@ import Sidebar from '@/assets/components/Sidebar';
 import Mentor from '@/assets/components/mentor/Mentor';
 import SearchIcon from '@/assets/svg/main/SearchIcon';
 import Divider from '@/assets/svg/Divider';
-import axios from 'axios';
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import NotFoundImage from '@/assets/svg/mentor/NotFound.png';
 import { toast } from 'react-toastify';
+import { instance } from '@/assets/shared/lib/axios';
 
 interface MentorData {
-  id: number;
+  memberId: number;
   name: string;
-  gender: string;
+  gender: 'MALE' | 'FEMALE';
+  generation: number;
+  major: string;
+}
+
+interface MentorListResponse {
+  content: MentorData[];
+  totalElements: number;
+  totalPages: number;
+  size: number;
+  number: number;
+}
+
+interface MemberInfo {
+  memberId: number;
+  name: string;
+  gender: 'MALE' | 'FEMALE';
   generation: number;
   major: string;
 }
@@ -19,32 +35,54 @@ interface MentorData {
 export default function MentoringPage() {
   const [allMentors, setAllMentors] = useState<MentorData[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [currentMemberId, setCurrentMemberId] = useState<number | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    axios
-      .get('/data/mockMentors.json')
-      .then((res) => {
-        setAllMentors(res.data);
-      })
-      .catch((err) => {
-        console.error(err);
-      });
+    const fetchData = async () => {
+      try {
+        const [mentorsResponse, memberResponse] = await Promise.all([
+          instance.get<MentorListResponse>('/api/mentoring/mentor/all', {
+            params: {
+              page: 0,
+              size: 100,
+            },
+          }),
+          instance.get<MemberInfo>('/api/member'),
+        ]);
+        
+        setAllMentors(mentorsResponse.data.content);
+        setCurrentMemberId(memberResponse.data.memberId);
+      } catch (err) {
+        console.error('데이터 조회 실패:', err);
+        toast.error('데이터를 불러오는데 실패했습니다.');
+      }
+    };
+
+    fetchData();
   }, []);
 
   const mentors = useMemo(() => {
+    let filteredMentors = allMentors;
+    
+    if (currentMemberId !== null) {
+      filteredMentors = filteredMentors.filter(
+        (mentor) => mentor.memberId !== currentMemberId
+      );
+    }
+    
     const trimmedQuery = searchQuery.trim().toLowerCase();
     if (trimmedQuery === '') {
-      return allMentors;
+      return filteredMentors;
     }
-    return allMentors.filter(
+    return filteredMentors.filter(
       (mentor) =>
         mentor.name.toLowerCase().includes(trimmedQuery) ||
         mentor.major.toLowerCase().includes(trimmedQuery)
     );
-  }, [searchQuery, allMentors]);
+  }, [searchQuery, allMentors, currentMemberId]);
 
-  const handleMentorApply = (mentor: MentorData) => {
+  const handleMentorApply = async (mentor: MentorData) => {
     const appliedMentors = JSON.parse(
       localStorage.getItem('appliedMentors') || '[]'
     );
@@ -53,7 +91,7 @@ export default function MentoringPage() {
       (applied: { mentorId: number; timestamp: number }) => {
         const timeDiff = Date.now() - applied.timestamp;
         const fiveMinutes = 5 * 60 * 1000;
-        return applied.mentorId === mentor.id && timeDiff < fiveMinutes;
+        return applied.mentorId === mentor.memberId && timeDiff < fiveMinutes;
       }
     );
     
@@ -62,35 +100,31 @@ export default function MentoringPage() {
       return;
     }
     
-    toast.success('신청을 했어요');
-    
-    const mentorRequests = JSON.parse(
-      localStorage.getItem('mentorRequests') || '[]'
-    );
-    
-    const newRequest = {
-      id: Date.now(),
-      name: mentor.name,
-      mentorId: mentor.id,
-    };
-    
-    mentorRequests.push(newRequest);
-    localStorage.setItem('mentorRequests', JSON.stringify(mentorRequests));
-    
-    const updatedAppliedMentors = appliedMentors.filter(
-      (applied: { mentorId: number; timestamp: number }) => {
-        const timeDiff = Date.now() - applied.timestamp;
-        const fiveMinutes = 5 * 60 * 1000;
-        return applied.mentorId !== mentor.id || timeDiff >= fiveMinutes;
+    try {
+      await instance.post(`/api/mentoring/apply/${mentor.memberId}`);
+      toast.success('신청을 했어요');
+      
+      const updatedAppliedMentors = appliedMentors.filter(
+        (applied: { mentorId: number; timestamp: number }) => {
+          const timeDiff = Date.now() - applied.timestamp;
+          const fiveMinutes = 5 * 60 * 1000;
+          return applied.mentorId !== mentor.memberId || timeDiff >= fiveMinutes;
+        }
+      );
+      
+      updatedAppliedMentors.push({
+        mentorId: mentor.memberId,
+        timestamp: Date.now(),
+      });
+      
+      localStorage.setItem('appliedMentors', JSON.stringify(updatedAppliedMentors));
+    } catch (err: any) {
+      if (err.response?.status === 404) {
+        toast.error('멘토를 찾을 수 없습니다.');
+      } else {
+        toast.error('신청에 실패했습니다.');
       }
-    );
-    
-    updatedAppliedMentors.push({
-      mentorId: mentor.id,
-      timestamp: Date.now(),
-    });
-    
-    localStorage.setItem('appliedMentors', JSON.stringify(updatedAppliedMentors));
+    }
   };
 
   return (
@@ -110,7 +144,7 @@ export default function MentoringPage() {
                   to="/mentoring-random"
                   className="text-3xl 2xl:text-[40px] text-gray-2 font-bold hover:text-gray-1 transition-colors cursor-pointer"
                 >
-                  랜덤 멘토링
+                  랜덤 검색
                 </Link>
               </h1>
 
@@ -136,7 +170,7 @@ export default function MentoringPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-12 justify-items-center">
               {mentors.map((mentor) => (
                 <Mentor
-                  key={mentor.id}
+                  key={mentor.memberId}
                   name={mentor.name}
                   generation={mentor.generation}
                   major={mentor.major}

@@ -9,6 +9,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
+import { instance } from '@/assets/shared/lib/axios';
 
 interface ChatItem {
   id: number;
@@ -42,10 +43,17 @@ interface ChatMessagesResponse {
   currentMemberLeft: boolean;
 }
 
-interface MentorRequest {
+interface ReceivedMentorRequest {
+  applyId: number;
+  menteeId: number;
+  name: string;
+  applyStatus: 'PENDING' | 'ACCEPTED' | 'REJECTED';
+  createdAt: string;
+}
+
+interface MentorRequestForModal {
   id: number;
   name: string;
-  mentorId?: number;
 }
 
 const chatList: ChatItem[] = [
@@ -81,14 +89,28 @@ export default function ChatPage() {
   const [messageInput, setMessageInput] = useState('');
   const [isMentorRequestModalOpen, setIsMentorRequestModalOpen] =
     useState(false);
-  const [mentorRequests, setMentorRequests] = useState<MentorRequest[]>([]);
+  const [mentorRequests, setMentorRequests] = useState<MentorRequestForModal[]>([]);
   const currentUserId = user?.id ?? null;
 
   useEffect(() => {
-    const storedRequests = localStorage.getItem('mentorRequests');
-    if (storedRequests) {
-      setMentorRequests(JSON.parse(storedRequests));
-    }
+    const fetchReceivedRequests = async () => {
+      try {
+        const response = await instance.get<ReceivedMentorRequest[]>(
+          '/api/mentoring/apply/received'
+        );
+        const pendingRequests = response.data
+          .filter((req) => req.applyStatus === 'PENDING')
+          .map((req) => ({
+            id: req.applyId,
+            name: req.name,
+          }));
+        setMentorRequests(pendingRequests);
+      } catch (err) {
+        console.error('받은 멘토링 신청 목록 조회 실패:', err);
+      }
+    };
+
+    fetchReceivedRequests();
   }, []);
 
   const handleChatClick = async (roomId: number) => {
@@ -158,7 +180,6 @@ export default function ChatPage() {
   const handleAcceptMentor = (id: number) => {
     const updatedRequests = mentorRequests.filter((req) => req.id !== id);
     setMentorRequests(updatedRequests);
-    localStorage.setItem('mentorRequests', JSON.stringify(updatedRequests));
   };
 
   const handleBellClick = () => {
