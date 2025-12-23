@@ -60,7 +60,7 @@ export default function MentoringPage() {
                   to="/mentoring-random"
                   className="text-3xl 2xl:text-[40px] text-gray-2 font-bold hover:text-gray-1 transition-colors cursor-pointer"
                 >
-                  랜덤 멘토링
+                  랜덤 검색
                 </Link>
               </h1>
 

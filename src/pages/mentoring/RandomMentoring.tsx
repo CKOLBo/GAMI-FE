@@ -25,7 +25,7 @@ export default function RandomMentoring() {
                 </Link>
                 <Divider className="flex-shrink-0" />
                 <span className="text-3xl 2xl:text-[40px] text-gray-1 font-bold">
-                  랜덤 멘토링
+                  랜덤 검색
                 </span>
               </h1>
             </div>
