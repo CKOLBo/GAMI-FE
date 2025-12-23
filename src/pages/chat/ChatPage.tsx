@@ -6,10 +6,13 @@ import Divider from '@/assets/svg/Divider';
 import MentorRequestModal from '@/assets/components/modal/MentorRequestModal';
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { instance } from '@/assets/shared/lib/axios';
+import { instance, baseURL } from '@/assets/shared/lib/axios';
+import { getCookie } from '@/assets/shared/lib/cookie';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import { API_PATHS } from '@/constants/api';
+import SockJS from 'sockjs-client';
+import { Client, type IMessage } from '@stomp/stompjs';
 
 type MajorType =
   | 'FRONTEND'
@@ -89,9 +92,17 @@ export default function ChatPage() {
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const [mentorRequests, setMentorRequests] = useState<MentorRequest[]>([]);
   const currentUserId = user?.id ?? null;
+  const stompClientRef = useRef<Client | null>(null);
+  const roomSubscriptionRef = useRef<any>(null);
+  const isSubscribedRef = useRef<boolean>(false);
 
   useEffect(() => {
     fetchChatRooms();
+    connectWebSocket();
+
+    return () => {
+      disconnectWebSocket();
+    };
   }, []);
 
   const fetchMentorRequests = async () => {
@@ -143,6 +154,161 @@ export default function ChatPage() {
     );
   }, [searchQuery, chatList]);
 
+  const connectWebSocket = () => {
+    const token = getCookie('accessToken');
+    if (!token) {
+      console.warn('토큰이 없어 WebSocket 연결을 건너뜁니다.');
+      return;
+    }
+
+    const backendUrl = import.meta.env.DEV
+      ? 'https://port-0-gami-server-mj0rdvda8d11523e.sel3.cloudtype.app'
+      : baseURL;
+    const wsUrl = `${backendUrl}/ws`;
+    const socket = new SockJS(wsUrl, null, {
+      transports: ['websocket', 'xhr-streaming', 'xhr-polling'],
+    });
+    const client = new Client({
+      webSocketFactory: () => socket as any,
+      connectHeaders: {
+        Authorization: `Bearer ${token}`,
+      },
+      reconnectDelay: 5000,
+      heartbeatIncoming: 4000,
+      heartbeatOutgoing: 4000,
+      connectionTimeout: 10000,
+      logRawCommunication: true,
+      debug: (str) => {
+        console.log('STOMP:', str);
+      },
+      onDisconnect: () => {
+        console.log('STOMP 연결 해제됨');
+        isSubscribedRef.current = false;
+      },
+      onConnect: (frame) => {
+        console.log('✅ WebSocket 연결 성공', frame);
+        
+        if (selectedRoomId) {
+          setTimeout(() => {
+            subscribeToRoom(selectedRoomId);
+          }, 100);
+        }
+      },
+      onWebSocketError: (event) => {
+        console.error('WebSocket 오류:', event);
+      },
+      onStompError: (frame) => {
+        console.error('❌ STOMP 오류:', frame);
+        const errorMessage = frame.headers['message'] || frame.headers['error'] || '알 수 없는 오류';
+        console.error('오류 메시지:', errorMessage);
+        
+        if (errorMessage.includes('Failed to send message')) {
+          console.warn('서버 연결 문제가 발생했습니다.');
+          isSubscribedRef.current = false;
+          
+          if (selectedRoomId && stompClientRef.current) {
+            setTimeout(() => {
+              if (stompClientRef.current?.connected) {
+                console.log('구독 재시도 중...');
+                subscribeToRoom(selectedRoomId);
+              }
+            }, 1000);
+          }
+        }
+      },
+      onWebSocketClose: () => {
+        console.log('WebSocket 연결 종료');
+        isSubscribedRef.current = false;
+        
+        if (selectedRoomId) {
+          setTimeout(() => {
+            console.log('WebSocket 재연결 시도...');
+            connectWebSocket();
+          }, 2000);
+        }
+      },
+    });
+
+    client.activate();
+    stompClientRef.current = client;
+  };
+
+  const disconnectWebSocket = () => {
+    if (roomSubscriptionRef.current) {
+      try {
+        roomSubscriptionRef.current.unsubscribe();
+      } catch (e) {
+        console.warn('구독 해제 오류:', e);
+      }
+      roomSubscriptionRef.current = null;
+    }
+
+    if (stompClientRef.current) {
+      try {
+        stompClientRef.current.deactivate();
+      } catch (e) {
+        console.warn('WebSocket 연결 해제 오류:', e);
+      }
+      stompClientRef.current = null;
+    }
+  };
+
+  const subscribeToRoom = (roomId: number, retryCount = 0) => {
+    if (!stompClientRef.current) {
+      console.warn('WebSocket 클라이언트가 없습니다.');
+      if (retryCount < 5) {
+        setTimeout(() => subscribeToRoom(roomId, retryCount + 1), 500);
+      }
+      return;
+    }
+
+    if (!stompClientRef.current.connected) {
+      console.warn('WebSocket이 연결되지 않았습니다. 재시도 중...');
+      if (retryCount < 5) {
+        setTimeout(() => subscribeToRoom(roomId, retryCount + 1), 500);
+      }
+      return;
+    }
+
+    if (roomSubscriptionRef.current) {
+      try {
+        roomSubscriptionRef.current.unsubscribe();
+      } catch (e) {
+        console.warn('이전 구독 해제 오류:', e);
+      }
+      roomSubscriptionRef.current = null;
+    }
+
+    isSubscribedRef.current = false;
+
+    const topic = `/topic/room/${roomId}`;
+    console.log('🔔 구독 시도:', topic);
+
+    try {
+      roomSubscriptionRef.current = stompClientRef.current.subscribe(
+        topic,
+        (message: IMessage) => {
+          try {
+            const msg = JSON.parse(message.body) as ChatMessage;
+            console.log('📨 메시지 수신:', msg);
+            setMessages((prev) => [...prev, msg]);
+            setTimeout(() => {
+              messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+            }, 100);
+          } catch (e) {
+            console.error('메시지 파싱 오류:', e);
+          }
+        }
+      );
+
+      isSubscribedRef.current = true;
+      console.log('✅ 구독 완료:', topic, '구독 ID:', roomSubscriptionRef.current?.id);
+    } catch (e) {
+      console.error('구독 실패:', e);
+      isSubscribedRef.current = false;
+    }
+  };
+
   const handleChatClick = async (roomId: number) => {
     setSelectedRoomId(roomId);
     setLoading(true);
@@ -151,8 +317,8 @@ export default function ChatPage() {
 
     try {
       const [roomResponse, messagesResponse] = await Promise.all([
-        instance.get<ChatRoomDetail>(`/api/chat/${roomId}`),
-        instance.get<ChatMessagesResponse>(`/api/chat/${roomId}/messages`),
+        instance.get<ChatRoomDetail>(`/api/chat/rooms/${roomId}`),
+        instance.get<ChatMessagesResponse>(`/api/chat/rooms/${roomId}/messages`),
       ]);
 
       setRoomDetail(roomResponse.data);
@@ -166,6 +332,8 @@ export default function ChatPage() {
       } else {
         setMessages([]);
       }
+
+      subscribeToRoom(roomId);
     } catch (error) {
       console.error('채팅방 정보 로드 실패:', error);
       if (axios.isAxiosError(error)) {
@@ -187,7 +355,7 @@ export default function ChatPage() {
     setLoading(true);
     try {
       const response = await instance.get<ChatMessagesResponse>(
-        `/api/chat/${selectedRoomId}/messages`,
+        `/api/chat/rooms/${selectedRoomId}/messages`,
         {
           params: { cursor: nextCursor },
         }
@@ -234,46 +402,92 @@ export default function ChatPage() {
     });
   };
 
-  const handleSendMessage = async () => {
-    if (!messageInput.trim() || !selectedRoomId) return;
+  const handleSendMessage = () => {
+    const message = messageInput.trim();
+    if (!message || !selectedRoomId) {
+      return;
+    }
+
+    if (!stompClientRef.current) {
+      alert('WebSocket이 연결되지 않았습니다.');
+      return;
+    }
+
+    if (!stompClientRef.current.connected) {
+      alert('WebSocket이 연결되지 않았습니다. 잠시 후 다시 시도해주세요.');
+      return;
+    }
+
+    if (!isSubscribedRef.current || !roomSubscriptionRef.current) {
+      console.warn('구독 상태 확인:', {
+        isSubscribed: isSubscribedRef.current,
+        subscription: roomSubscriptionRef.current ? '있음' : '없음'
+      });
+      
+      if (selectedRoomId) {
+        console.log('구독 재시도 중...');
+        subscribeToRoom(selectedRoomId);
+      }
+      
+      alert('채팅방 구독이 완료되지 않았습니다. 잠시 후 다시 시도해주세요.');
+      return;
+    }
+
+    const token = getCookie('accessToken');
+    if (!token) {
+      alert('인증 토큰이 없습니다. 다시 로그인해주세요.');
+      return;
+    }
+
+    const destination = `/app/rooms/${selectedRoomId}/send`;
+    const payload = JSON.stringify({
+      message: message,
+    });
+
+    console.log('📤 메시지 전송:', { 
+      destination, 
+      message, 
+      token: token ? '있음' : '없음',
+      subscribed: isSubscribedRef.current,
+      subscriptionId: roomSubscriptionRef.current?.id
+    });
 
     try {
-      await instance.post(`/api/chat/${selectedRoomId}/messages`, {
-        message: messageInput,
+      if (!stompClientRef.current.connected) {
+        alert('WebSocket 연결이 끊어졌습니다. 잠시 후 다시 시도해주세요.');
+        return;
+      }
+
+      stompClientRef.current.publish({
+        destination,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: payload,
+        skipContentLengthHeader: true,
       });
+
+      console.log('✅ 메시지 전송 완료');
       setMessageInput('');
-
-      const messagesResponse = await instance.get<ChatMessagesResponse>(
-        `/api/chat/${selectedRoomId}/messages`
-      );
-      if (
-        messagesResponse.data &&
-        Array.isArray(messagesResponse.data.messages)
-      ) {
-        setMessages(messagesResponse.data.messages);
-        setNextCursor(messagesResponse.data.nextCursor);
-        setHasMore(messagesResponse.data.hasMore);
-      }
-
-      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     } catch (error) {
-      console.error('메시지 전송 실패:', error);
-      if (axios.isAxiosError(error)) {
-        if (error.response?.status === 401) {
-          alert('인증이 필요합니다. 다시 로그인해주세요.');
-        } else if (error.response?.status === 404) {
-          alert('채팅방을 찾을 수 없습니다.');
-        } else {
-          alert('메시지 전송에 실패했습니다. 다시 시도해주세요.');
-        }
-      } else {
-        alert('메시지 전송에 실패했습니다. 다시 시도해주세요.');
-      }
+      console.error('❌ 메시지 전송 오류:', error);
+      alert('메시지 전송에 실패했습니다. 다시 시도해주세요.');
     }
   };
 
   const handleExit = async () => {
     if (!selectedRoomId) return;
+
+    if (roomSubscriptionRef.current) {
+      try {
+        roomSubscriptionRef.current.unsubscribe();
+      } catch (e) {
+        console.warn('구독 해제 오류:', e);
+      }
+      roomSubscriptionRef.current = null;
+    }
+
+    isSubscribedRef.current = false;
 
     try {
       await instance.delete(`/api/chat/rooms/${selectedRoomId}/leave`);
