@@ -2,13 +2,10 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { Link } from 'react-router-dom';
-
-import Button from '@/assets/components/Button/Button';
 import Post from '@/assets/components/post/Post';
 import PostHead from '@/assets/components/post/PostHead';
 import PostModal from '@/assets/components/modal/ReportModal';
 import Sidebar from '@/assets/components/Sidebar';
-
 import Report from '@/assets/svg/post/Report';
 import { instance } from '@/assets/shared/lib/axios';
 import Divider from '@/assets/svg/Divider';
