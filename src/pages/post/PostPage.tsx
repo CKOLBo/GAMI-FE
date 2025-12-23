@@ -69,11 +69,6 @@ export default function PostPage() {
     setPage(0);
   };
 
-  const handleReport = () => {
-    setIsModalOpen(false);
-    toast.success('신고가 접수되었습니다.');
-  };
-
   return (
     <div className="flex">
       <Sidebar />
