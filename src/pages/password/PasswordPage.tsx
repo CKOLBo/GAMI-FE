@@ -57,7 +57,7 @@ export default function PasswordPage() {
           409: '이미 유효한 인증번호가 전송된 상태입니다. 잠시 후 다시 시도해주세요.',
           429: '인증번호 전송 요청 횟수 제한을 초과했습니다. 잠시 후 다시 시도해주세요.',
           500: '서버 에러로 인해 이메일 전송에 실패했습니다. 잠시 후 다시 시도해주세요.',
-        },
+        }
       );
     } finally {
       setIsLoading(false);
@@ -91,7 +91,7 @@ export default function PasswordPage() {
         {
           400: '잘못된 인증 코드입니다. 다시 확인해주세요.',
           429: '요청 횟수를 초과했습니다. 잠시 후 다시 시도해주세요.',
-        },
+        }
       );
     } finally {
       setIsLoading(false);
@@ -137,7 +137,7 @@ export default function PasswordPage() {
         {
           401: '인증이 필요합니다. 다시 시도해주세요.',
           400: '입력값에 오류가 있습니다. 다시 확인해주세요.',
-        },
+        }
       );
     } finally {
       setIsLoading(false);
