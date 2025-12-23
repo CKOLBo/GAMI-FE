@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { toast } from 'react-toastify';
-import { instance } from '@/assets/shared/lib/axios';
+import { instance, TokenRefreshError } from '@/assets/shared/lib/axios';
 import ModalWrapper from '@/assets/shared/Modal';
 import X from '@/assets/svg/X';
 import InputPassword from '../Input/InputPassword';
@@ -46,6 +46,9 @@ export default function EditPassword({ onClose }: EditPasswordProps) {
       toast.success('비밀번호가 변경되었습니다.');
       onClose();
     } catch (err: unknown) {
+      if (err instanceof TokenRefreshError) {
+        return;
+      }
       if (err && typeof err === 'object' && 'response' in err) {
         const error = err as {
           response?: { status?: number; data?: { message?: string } };

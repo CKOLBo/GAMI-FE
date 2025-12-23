@@ -6,7 +6,7 @@ import RightIcon from '@/assets/svg/main/RightIcon';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useState, useEffect } from 'react';
-import { instance } from '@/assets/shared/lib/axios';
+import { instance, TokenRefreshError } from '@/assets/shared/lib/axios';
 import type { Post as PostType } from '@/assets/shared/types';
 
 export default function MainPage() {
@@ -30,6 +30,9 @@ export default function MainPage() {
         });
         setPosts(response.data.content);
       } catch (err) {
+        if (err instanceof TokenRefreshError) {
+          return;
+        }
         console.error('게시글 조회 실패:', err);
         setError('게시글을 불러오는 중 오류가 발생했습니다.');
       } finally {
