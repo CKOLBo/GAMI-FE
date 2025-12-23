@@ -28,7 +28,7 @@ export default function MentorRequestModal({
 
   return (
     <ModalWrapper className="px-10 py-10">
-      <div className="relative w-[600px] max-h-[600px]">
+      <div className="relative w-[460px] max-h-[600px]">
         <button
           type="button"
           onClick={onClose}

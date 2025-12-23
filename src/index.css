@@ -124,3 +124,34 @@ input::-webkit-validation-bubble-message {
 .Toastify__toast-body {
   font-size: 13px;
 }
+
+/* 커스텀 스크롤바 스타일 - 기본 숨김, hover 시 표시 */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: white;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 4px;
+}
+
+.custom-scrollbar:hover::-webkit-scrollbar-thumb {
+  background: #d6d6d7;
+}
+
+.custom-scrollbar:hover::-webkit-scrollbar-thumb:hover {
+  background: #b7bcc8;
+}
+
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: transparent white;
+}
+
+.custom-scrollbar:hover {
+  scrollbar-color: #d6d6d7 white;
+}

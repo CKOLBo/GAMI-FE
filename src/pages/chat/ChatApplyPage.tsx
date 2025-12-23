@@ -110,8 +110,8 @@ export default function ChatApplyPage() {
     <div className="flex min-h-screen">
       <Sidebar />
       <div className="flex-1 ml-45 2xl:ml-55 flex min-h-screen">
-        <div className="w-96 2xl:w-[480px] border-r border-gray-2 bg-white flex flex-col min-h-screen">
-          <div className="px-7 2xl:px-15 pt-7 2xl:pt-15 pb-4 2xl:pb-5">
+        <div className="w-96 2xl:w-[480px] border-r border-gray-2 bg-white flex flex-col h-screen">
+          <div className="px-7 2xl:px-15 pt-7 2xl:pt-15 pb-4 2xl:pb-5 flex-shrink-0">
             <div className="flex items-center justify-between">
               <h1 className="flex items-center gap-4 text-[40px] font-bold">
                 <Link
@@ -133,7 +133,7 @@ export default function ChatApplyPage() {
             </div>
           </div>
 
-          <div className="flex-1 overflow-y-auto">
+          <div className="flex-1 overflow-y-auto min-h-0 custom-scrollbar">
             {loading ? (
               <div className="flex items-center justify-center h-full">
                 <p className="text-base 2xl:text-lg text-gray-3">로딩 중...</p>
