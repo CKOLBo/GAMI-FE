@@ -80,29 +80,9 @@ export default function PostContent() {
       try {
         const res = await instance.get<PostDetailType>(`/api/post/${postId}`);
         setPostData(res.data);
-
-        setLiked(Boolean(res.data.liked));
-      } catch {
-        toast.error('게시글을 불러오는데 실패했습니다.');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchPostDetail();
-  }, [postId]);
-
-  useEffect(() => {
-    const fetchPostDetail = async () => {
-      if (!postId) return;
-
-      setIsLoading(true);
-      try {
-        const res = await instance.get<PostDetailType>(`/api/post/${postId}`);
-        setPostData(res.data);
         setLiked(Boolean(res.data.liked));
 
-        fetchComments();
+        await fetchComments();
       } catch {
         toast.error('게시글을 불러오는데 실패했습니다.');
       } finally {
