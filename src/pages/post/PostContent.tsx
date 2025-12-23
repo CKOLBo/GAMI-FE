@@ -34,6 +34,12 @@ interface SummaryResponse {
   summary: string;
 }
 
+interface CommentType {
+  commentId: number;
+  comment: string;
+  createdAt: string;
+}
+
 export default function PostContent() {
   const { postId } = useParams<{ postId: string }>();
 
@@ -49,6 +55,9 @@ export default function PostContent() {
 
   const [liked, setLiked] = useState(false);
   const [isLikeLoading, setIsLikeLoading] = useState(false);
+
+  const [comments, setComments] = useState<CommentType[]>([]);
+  const [isCommentLoading, setIsCommentLoading] = useState(false);
 
   const calculateTimeAgo = (createdAt: string) => {
     const now = new Date();
@@ -73,6 +82,27 @@ export default function PostContent() {
         setPostData(res.data);
 
         setLiked(Boolean(res.data.liked));
+      } catch {
+        toast.error('게시글을 불러오는데 실패했습니다.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchPostDetail();
+  }, [postId]);
+
+  useEffect(() => {
+    const fetchPostDetail = async () => {
+      if (!postId) return;
+
+      setIsLoading(true);
+      try {
+        const res = await instance.get<PostDetailType>(`/api/post/${postId}`);
+        setPostData(res.data);
+        setLiked(Boolean(res.data.liked));
+
+        fetchComments();
       } catch {
         toast.error('게시글을 불러오는데 실패했습니다.');
       } finally {
@@ -148,14 +178,34 @@ export default function PostContent() {
       setPostData((prev) =>
         prev ? { ...prev, commentCount: prev.commentCount + 1 } : prev
       );
+
+      fetchComments();
     } catch (error: any) {
       if (error.response?.status === 401) {
         toast.error('로그인이 필요합니다.');
-      } else if (error.response?.status === 404) {
-        toast.error('게시글을 찾을 수 없습니다.');
       } else {
         toast.error('댓글 등록에 실패했습니다.');
       }
+    }
+  };
+
+  const fetchComments = async () => {
+    if (!postId) return;
+
+    setIsCommentLoading(true);
+    try {
+      const res = await instance.get<CommentType[]>(
+        `/api/post/${postId}/comment`
+      );
+      setComments(res.data);
+    } catch (error: any) {
+      if (error.response?.status === 401) {
+        toast.error('로그인이 필요합니다.');
+      } else {
+        toast.error('댓글을 불러오는데 실패했습니다.');
+      }
+    } finally {
+      setIsCommentLoading(false);
     }
   };
 
@@ -228,7 +278,7 @@ export default function PostContent() {
             )}
           </div>
 
-          <div className="flex justify-between mb-14 pb-14 border-b-2 border-gray-2">
+          <div className="flex justify-between mb-10 pb-14 border-b-2 border-gray-2">
             <div className="flex items-center gap-3">
               <Comment width="32px" height="32px" color="#333D48" />
               <h2 className="text-[32px] font-bold">
@@ -257,13 +307,36 @@ export default function PostContent() {
             </div>
           </div>
 
+          <div className="flex flex-col gap-10 mb-10">
+            {isCommentLoading ? (
+              <p className="text-gray-3 text-lg">댓글 불러오는 중...</p>
+            ) : comments.length === 0 ? (
+              <p className="text-gray-3 text-lg">첫 댓글을 작성해보세요.</p>
+            ) : (
+              comments.map((item) => (
+                <div key={item.commentId}>
+                  <div className="flex gap-4 mb-2">
+                    <span className="font-bold text-gray-1 text-xl">익명</span>
+                    <span className="text-gray-3 font-bold text-xl">
+                      {calculateTimeAgo(item.createdAt)}
+                    </span>
+                  </div>
+
+                  <p className="text-xl text-gray-3 font-bold whitespace-pre-wrap">
+                    {item.comment}
+                  </p>
+                </div>
+              ))
+            )}
+          </div>
+
           <textarea
             value={comment}
             onChange={(e) => setComment(e.target.value)}
             placeholder="댓글 입력하기"
-            className="w-full h-32 p-7 border-2 border-gray-2 rounded-lg resize-none text-xl"
+            className="w-full h-32 p-7 border-2 placeholder:font-bold border-gray-2 focus:border-main-1 focus:outline-none focus:ring-0 rounded-lg resize-none text-xl"
           />
-          <div className="flex justify-end mt-12 mb-8">
+          <div className="flex justify-end mt-12 mb-12">
             <Button text="등록하기" onClick={handleCommentSubmit} />
           </div>
         </div>
