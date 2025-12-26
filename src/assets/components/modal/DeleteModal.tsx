@@ -25,7 +25,7 @@ export default function DeleteModal({ onClose, onDelete }: DeleteModalProps) {
           >
             취소
           </button>
-          <Button text="삭제하기" onClick={onDelete} />
+          <Button text="삭제하기" color="bg-main-3" onClick={onDelete} />
         </div>
       </div>
     </ModalWrapper>
