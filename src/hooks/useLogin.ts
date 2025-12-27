@@ -89,7 +89,7 @@ export function useLogin(): UseLoginReturn {
       ];
       const roleFromToken = tokenRoleKeys
         .map((key) => decodedToken?.[key])
-        .find((r) => r);
+        .find((r) => r) as string | string[] | undefined;
 
       const apiRoleKeys = [
         'role',
@@ -101,10 +101,10 @@ export function useLogin(): UseLoginReturn {
         'memberRole',
       ];
       const roleFromAPI = apiRoleKeys
-        .map((key) => (userData as any)[key])
-        .find((r) => r);
+        .map((key) => (userData as unknown as Record<string, unknown>)[key])
+        .find((r) => r) as string | string[] | undefined;
 
-      const role = roleFromToken || roleFromAPI;
+      const role: string | string[] | undefined = roleFromToken || roleFromAPI;
 
       const finalUserData = {
         ...userData,
