@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import axios from 'axios';
+import { jwtDecode } from 'jwt-decode';
 import { useAuth } from '@/contexts/AuthContext';
 import { instance } from '@/assets/shared/lib/axios';
 import { setCookie } from '@/assets/shared/lib/cookie';
@@ -12,9 +13,30 @@ interface LoginResponse {
 }
 
 interface UserInfo {
-  id: number;
+  id?: number;
+  memberId?: number;
   email: string;
   name?: string;
+  role?: string | string[];
+  roles?: string | string[];
+  authorities?: string | string[];
+  Role?: string | string[];
+  ROLE?: string | string[];
+  userRole?: string | string[];
+  memberRole?: string | string[];
+}
+
+interface JWTPayload {
+  auth?: string | string[];
+  role?: string | string[];
+  roles?: string | string[];
+  authorities?: string | string[];
+  authority?: string | string[];
+  Role?: string | string[];
+  ROLE?: string | string[];
+  userRole?: string | string[];
+  memberRole?: string | string[];
+  [key: string]: unknown;
 }
 
 interface LoginCredentials {
@@ -41,6 +63,8 @@ export function useLogin(): UseLoginReturn {
 
       const { accessToken, refreshToken } = response.data;
 
+      const decodedToken = jwtDecode<JWTPayload>(accessToken);
+
       setCookie('accessToken', accessToken);
       setCookie('refreshToken', refreshToken);
 
@@ -50,7 +74,45 @@ export function useLogin(): UseLoginReturn {
         },
       });
 
-      setAuthUser(userResponse.data, accessToken);
+      const userData = userResponse.data;
+
+      const tokenRoleKeys = [
+        'auth',
+        'role',
+        'roles',
+        'authorities',
+        'authority',
+        'Role',
+        'ROLE',
+        'userRole',
+        'memberRole',
+      ];
+      const roleFromToken = tokenRoleKeys
+        .map((key) => decodedToken?.[key])
+        .find((r) => r) as string | string[] | undefined;
+
+      const apiRoleKeys = [
+        'role',
+        'roles',
+        'authorities',
+        'Role',
+        'ROLE',
+        'userRole',
+        'memberRole',
+      ];
+      const roleFromAPI = apiRoleKeys
+        .map((key) => (userData as unknown as Record<string, unknown>)[key])
+        .find((r) => r) as string | string[] | undefined;
+
+      const role: string | string[] | undefined = roleFromToken || roleFromAPI;
+
+      const finalUserData = {
+        ...userData,
+        id: userData.id || userData.memberId || 0,
+        role: role,
+      };
+
+      setAuthUser(finalUserData, accessToken);
     } catch (error) {
       if (axios.isAxiosError(error)) {
         const status = error.response?.status;

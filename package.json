@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "axios": "^1.13.2",
+    "jwt-decode": "^4.0.0",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
     "react-markdown": "^10.1.0",
