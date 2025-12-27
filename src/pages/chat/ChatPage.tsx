@@ -895,11 +895,11 @@ export default function ChatPage() {
 
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex h-screen overflow-hidden">
       <Sidebar />
-      <div className="flex-1 ml-45 2xl:ml-55 flex min-h-screen">
+      <div className="flex-1 ml-45 2xl:ml-55 flex h-screen overflow-hidden">
         {/* 왼쪽: 채팅방 목록 */}
-        <div className="w-96 2xl:w-[480px] border-r border-gray-2 bg-white flex flex-col min-h-screen">
+        <div className="w-96 2xl:w-[480px] border-r border-gray-2 bg-white flex flex-col h-full overflow-hidden">
           {/* 채팅방 목록 헤더 (제목, 검색) */}
           <div className="px-7 2xl:px-15 pt-7 2xl:pt-15 pb-4 2xl:pb-5">
             <div className="flex items-center justify-between mb-4 2xl:mb-5">
@@ -1015,7 +1015,7 @@ export default function ChatPage() {
                   </div>
                   <button
                     onClick={handleExit}
-                    className="bg-main-3 px-4 py-2 text-white font-semibold rounded-lg transition-colors w-[120px] h-[52px] text-[20px]"
+                    className="bg-white border border-main-3 px-4 py-2 text-main-3 font-semibold rounded-lg transition-colors w-[120px] h-[52px] text-[20px] hover:bg-red-50"
                   >
                     나가기
                   </button>
@@ -1031,7 +1031,7 @@ export default function ChatPage() {
                   </p>
                 </div>
               ) : Array.isArray(messages) && messages.length > 0 ? (
-                <div className="space-y-4">
+                <div className="space-y-1">
                   {hasMore && (
                     <div className="flex justify-center">
                       <button
@@ -1064,14 +1064,30 @@ export default function ChatPage() {
                     }
                     
                     const prevMessage = index > 0 ? messages[index - 1] : null;
+                    const nextMessage = index < messages.length - 1 ? messages[index + 1] : null;
                     const currentDate = formatMessageDate(message.createdAt);
                     const prevDate = prevMessage
                       ? formatMessageDate(prevMessage.createdAt)
                       : null;
                     const showDate = currentDate !== prevDate;
 
+                    // 시간 비교 함수 (같은 분 단위면 같은 시간으로 간주)
+                    const getTimeKey = (dateString: string) => {
+                      const date = new Date(dateString);
+                      return `${date.getHours()}:${date.getMinutes()}`;
+                    };
+
+                    const currentTime = getTimeKey(message.createdAt);
+                    const nextTime = nextMessage ? getTimeKey(nextMessage.createdAt) : null;
+                    const nextSenderId = nextMessage ? (nextMessage.senderId != null ? Number(nextMessage.senderId) : null) : null;
+                    const isNextSameSender = nextMessage && senderId !== null && nextSenderId !== null && senderId === nextSenderId;
+                    const isNextSameTime = nextTime === currentTime;
+                    
+                    // 다음 메시지가 있고, 같은 발신자이고, 같은 시간이면 시간 숨김 (마지막 메시지만 시간 표시)
+                    const showTime = !(isNextSameSender && isNextSameTime);
+
                     return (
-                      <div key={message.messageId}>
+                      <div key={message.messageId} className="mb-1">
                         {showDate && (
                           <div className="flex justify-center my-4">
                             <span className="text-sm text-gray-3">
@@ -1087,23 +1103,32 @@ export default function ChatPage() {
                               isMyMessage ? 'items-end' : 'items-start'
                             }`}
                           >
-                            {!isMyMessage && (
-                              <span className="text-sm font-semibold text-gray-1 mb-1">
-                                {message.senderName}
+                          {!isMyMessage && (
+                            <span className="text-sm font-semibold text-gray-1 mb-1">
+                              {message.senderName}
+                            </span>
+                          )}
+                          <div className="flex items-end gap-2">
+                            {isMyMessage && showTime && (
+                              <span className="text-xs text-gray-3 whitespace-nowrap">
+                                {formatMessageTime(message.createdAt)}
                               </span>
                             )}
                             <div
-                              className={`px-4 py-2 rounded-lg ${
+                              className={`px-4 py-2 rounded-full break-words ${
                                 isMyMessage
                                   ? 'bg-main-1 text-white'
                                   : 'bg-white-1 text-gray-1'
                               }`}
                             >
-                              <p className="text-base">{message.message}</p>
+                              <p className="text-base whitespace-normal break-words">{message.message}</p>
                             </div>
-                            <span className="text-xs text-gray-3 mt-1">
-                              {formatMessageTime(message.createdAt)}
-                            </span>
+                            {!isMyMessage && showTime && (
+                              <span className="text-xs text-gray-3 whitespace-nowrap">
+                                {formatMessageTime(message.createdAt)}
+                              </span>
+                            )}
+                          </div>
                           </div>
                         </div>
                       </div>
