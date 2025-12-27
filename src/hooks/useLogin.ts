@@ -76,24 +76,30 @@ export function useLogin(): UseLoginReturn {
 
       const userData = userResponse.data;
 
-      const roleFromToken =
-        decodedToken?.auth ||
-        decodedToken?.role ||
-        decodedToken?.roles ||
-        decodedToken?.authorities ||
-        decodedToken?.authority ||
-        decodedToken?.Role ||
-        decodedToken?.ROLE ||
-        decodedToken?.userRole ||
-        decodedToken?.memberRole;
-      const roleFromAPI =
-        userData.role ||
-        userData.roles ||
-        userData.authorities ||
-        userData.Role ||
-        userData.ROLE ||
-        userData.userRole ||
-        userData.memberRole;
+      const tokenRoleKeys = [
+        'auth',
+        'role',
+        'roles',
+        'authorities',
+        'authority',
+        'Role',
+        'ROLE',
+        'userRole',
+        'memberRole',
+      ];
+      const roleFromToken = tokenRoleKeys.map((key) => decodedToken?.[key]).find((r) => r);
+
+      const apiRoleKeys = [
+        'role',
+        'roles',
+        'authorities',
+        'Role',
+        'ROLE',
+        'userRole',
+        'memberRole',
+      ];
+      const roleFromAPI = apiRoleKeys.map((key) => (userData as any)[key]).find((r) => r);
+
       const role = roleFromToken || roleFromAPI;
 
       const finalUserData = {
