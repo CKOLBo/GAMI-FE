@@ -9,10 +9,10 @@ import { useAuth } from '@/contexts/AuthContext';
 import { instance, baseURL } from '@/assets/shared/lib/axios';
 import { getCookie } from '@/assets/shared/lib/cookie';
 import axios from 'axios';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { API_PATHS } from '@/constants/api';
 import SockJS from 'sockjs-client';
-import { Client, type IMessage } from '@stomp/stompjs';
+import { Client, type IMessage, type IFrame } from '@stomp/stompjs';
 
 type MajorType =
   | 'FRONTEND'
@@ -39,6 +39,8 @@ interface ChatItem {
   lastMessage: string;
   major: MajorType;
   generation: number;
+  lastMessageTime?: string;
+  updatedAt?: string;
 }
 
 interface ChatRoomDetail {
@@ -76,9 +78,13 @@ interface MentorRequest {
 
 export default function ChatPage() {
   const { user } = useAuth();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [chatList, setChatList] = useState<ChatItem[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedRoomId, setSelectedRoomId] = useState<number | null>(null);
+  const [selectedRoomId, setSelectedRoomId] = useState<number | null>(() => {
+    const roomIdParam = searchParams.get('roomId');
+    return roomIdParam ? Number(roomIdParam) : null;
+  });
   const [roomDetail, setRoomDetail] = useState<ChatRoomDetail | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [loading, setLoading] = useState(false);
@@ -92,6 +98,22 @@ export default function ChatPage() {
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const [mentorRequests, setMentorRequests] = useState<MentorRequest[]>([]);
   const currentUserId = user?.id ?? null;
+  
+  // 토큰에서 사용자 ID 추출 (currentUserId가 null일 때 사용)
+  const actualUserId = useMemo(() => {
+    if (currentUserId) return currentUserId;
+    const token = getCookie('accessToken');
+    if (token) {
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        return payload.sub || payload.userId || payload.id || null;
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }, [currentUserId]);
+  
   const stompClientRef = useRef<Client | null>(null);
   const roomSubscriptionRef = useRef<any>(null);
   const isSubscribedRef = useRef<boolean>(false);
@@ -105,6 +127,18 @@ export default function ChatPage() {
       disconnectWebSocket();
     };
   }, []);
+
+  useEffect(() => {
+    const roomIdParam = searchParams.get('roomId');
+    if (roomIdParam && chatList.length > 0) {
+      const roomId = Number(roomIdParam);
+      if (!isNaN(roomId)) {
+        if (roomId !== selectedRoomId || (roomId === selectedRoomId && !roomDetail)) {
+          handleChatClick(roomId);
+        }
+      }
+    }
+  }, [chatList.length, searchParams]);
 
   const fetchMentorRequests = async () => {
     try {
@@ -125,11 +159,26 @@ export default function ChatPage() {
     }
   }, [isMentorRequestModalOpen]);
 
+  // 채팅방을 목록 상단으로 이동 (메시지 전송/수신 시)
+  const moveChatToTop = (roomId: number) => {
+    setChatList((prevList) => {
+      const roomIndex = prevList.findIndex((chat) => chat.id === roomId);
+      if (roomIndex === -1 || roomIndex === 0) {
+        return prevList;
+      }
+      const newList = [...prevList];
+      const [room] = newList.splice(roomIndex, 1);
+      newList.unshift(room);
+      return newList;
+    });
+  };
+
   const fetchChatRooms = async () => {
     setRoomsLoading(true);
     try {
       const response = await instance.get<ChatItem[]>('/api/chat/rooms');
       if (Array.isArray(response.data)) {
+        // 백엔드가 보내는 순서대로 유지 (정렬하지 않음)
         setChatList(response.data);
       }
     } catch (error) {
@@ -213,7 +262,7 @@ export default function ChatPage() {
       // 성공적인 연결은 로그 없이 처리
     };
     
-    socket.onerror = (error) => {
+    socket.onerror = (error: Event) => {
       console.error('❌ SockJS 오류:', error);
       isConnectingRef.current = false;
       if (connectionTimeoutId) {
@@ -221,7 +270,7 @@ export default function ChatPage() {
       }
     };
     
-    socket.onclose = (event) => {
+    socket.onclose = (event: CloseEvent) => {
       if (isDev) {
         console.log('🔌 SockJS 연결 종료:', event.code, event.reason);
       }
@@ -242,7 +291,7 @@ export default function ChatPage() {
       connectionTimeout: 10000,
       logRawCommunication: false,
       debug: isDev
-        ? (str) => {
+        ? (str: string) => {
             // 성공적인 연결 과정 로그는 숨김
             const successMessages = [
               'Opening Web Socket',
@@ -300,11 +349,11 @@ export default function ChatPage() {
           }, 100);
         }
       },
-      onWebSocketError: (event) => {
+      onWebSocketError: (event: Event) => {
         console.error('WebSocket 오류:', event);
         isConnectingRef.current = false;
       },
-      onStompError: (frame) => {
+      onStompError: (frame: IFrame) => {
         console.error('❌ STOMP 오류:', frame);
         isConnectingRef.current = false;
         const errorMessage = frame.headers['message'] || frame.headers['error'] || '알 수 없는 오류';
@@ -434,6 +483,8 @@ export default function ChatPage() {
               console.log('📨 메시지 수신:', msg);
             }
             setMessages((prev) => [...prev, msg]);
+            // 메시지 수신 시 해당 채팅방을 상단으로 이동
+            moveChatToTop(roomId);
             setTimeout(() => {
               messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
             }, 100);
@@ -455,11 +506,27 @@ export default function ChatPage() {
 
   const handleChatClick = async (roomId: number) => {
     setSelectedRoomId(roomId);
+    // URL 업데이트 (이미 같은 roomId가 아니면)
+    const currentRoomId = searchParams.get('roomId');
+    if (currentRoomId !== roomId.toString()) {
+      setSearchParams({ roomId: roomId.toString() });
+    }
     setLoading(true);
     setNextCursor(null);
     setHasMore(false);
 
     const token = getCookie('accessToken');
+    
+    // 토큰에서 사용자 ID 추출 시도
+    let userIdFromToken: number | null = null;
+    if (token) {
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        userIdFromToken = payload.sub || payload.userId || payload.id || null;
+      } catch (e) {
+        // 토큰 파싱 실패
+      }
+    }
     
     // 토큰 만료 시간 확인
     const checkTokenExpiry = (token: string) => {
@@ -498,9 +565,19 @@ export default function ChatPage() {
     }
 
     try {
+      if (import.meta.env.DEV) {
+        const token = getCookie('accessToken');
+        console.log('🔍 요청 전송 전:', {
+          roomId,
+          token: token ? `${token.substring(0, 20)}...` : '없음',
+          url1: `/api/chat/${roomId}`,
+          url2: `/api/chat/${roomId}/messages`,
+        });
+      }
+      
       const [roomResponse, messagesResponse] = await Promise.all([
-        instance.get<ChatRoomDetail>(`/api/chat/rooms/${roomId}`),
-        instance.get<ChatMessagesResponse>(`/api/chat/rooms/${roomId}/messages`),
+        instance.get<ChatRoomDetail>(`/api/chat/${roomId}`),
+        instance.get<ChatMessagesResponse>(`/api/chat/${roomId}/messages`),
       ]);
 
       setRoomDetail(roomResponse.data);
@@ -516,6 +593,23 @@ export default function ChatPage() {
       }
 
       subscribeToRoom(roomId);
+      
+      if (import.meta.env.DEV) {
+        // 메시지에서 상대방 아이디 찾기
+        const otherUserId = messagesResponse.data?.messages?.find(
+          (msg) => msg.senderId !== currentUserId
+        )?.senderId || null;
+        
+        console.log('✅ 채팅방 멤버 확인: 맞음', {
+          roomId,
+          roomName: roomResponse.data?.name || '알 수 없음',
+          myUserId: currentUserId || userIdFromToken,
+          myUserInfo: user ? { id: user.id, email: user.email, name: user.name } : null,
+          userIdFromToken: userIdFromToken,
+          fullUserObject: user,
+          otherUserId: otherUserId,
+        });
+      }
     } catch (error) {
       console.error('채팅방 정보 로드 실패:', error);
       if (axios.isAxiosError(error)) {
@@ -553,12 +647,34 @@ export default function ChatPage() {
             }
           }
           
-          const detailMessage = serverMessage || '이 채팅방에 접근할 권한이 없습니다.';
           const alertMessage = tokenExpired 
             ? '토큰이 만료되었습니다. 다시 로그인해주세요.'
-            : `접근 권한이 없습니다.\n${detailMessage}`;
+            : `이 채팅방의 멤버가 아닙니다.\n채팅방에 참여한 후 다시 시도해주세요.`;
+          
+          if (import.meta.env.DEV) {
+            // 채팅방 목록에서 상대방 정보 찾기 시도
+            const chatRoom = chatList.find((room) => room.id === roomId);
+            
+            console.log('❌ 채팅방 멤버 확인: 아님', {
+              roomId,
+              myUserId: currentUserId || userIdFromToken,
+              myUserInfo: user ? { id: user.id, email: user.email, name: user.name } : null,
+              userIdFromToken: userIdFromToken,
+              fullUserObject: user,
+              otherUserId: chatRoom ? '채팅방 목록에서 확인 불가' : '알 수 없음',
+              reason: tokenExpired ? '토큰 만료' : '멤버가 아님',
+              tokenExpired,
+            });
+          }
           
           alert(alertMessage);
+          
+          // 채팅방 선택 해제
+          setSelectedRoomId(null);
+          setRoomDetail(null);
+          setMessages([]);
+          // URL에서 roomId 제거
+          setSearchParams({});
           console.error('403 오류 상세:', {
             serverResponse: responseData,
             serverMessage,
@@ -589,7 +705,7 @@ export default function ChatPage() {
     setLoading(true);
     try {
       const response = await instance.get<ChatMessagesResponse>(
-        `/api/chat/rooms/${selectedRoomId}/messages`,
+        `/api/chat/${selectedRoomId}/messages`,
         {
           params: { cursor: nextCursor },
         }
@@ -699,15 +815,16 @@ export default function ChatPage() {
       }
 
       stompClientRef.current.publish({
-        destination,
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        destination: `/app/rooms/${selectedRoomId}/send`,
+        headers: {},
         body: payload,
-        skipContentLengthHeader: true,
       });
 
       setMessageInput('');
+      // 메시지 전송 후 해당 채팅방을 상단으로 이동
+      if (selectedRoomId) {
+        moveChatToTop(selectedRoomId);
+      }
     } catch (error) {
       console.error('❌ 메시지 전송 오류:', error);
       alert('메시지 전송에 실패했습니다. 다시 시도해주세요.');
@@ -729,10 +846,12 @@ export default function ChatPage() {
     isSubscribedRef.current = false;
 
     try {
-      await instance.delete(`/api/chat/rooms/${selectedRoomId}/leave`);
+      await instance.delete(`/api/chat/${selectedRoomId}/leave`);
       setSelectedRoomId(null);
       setRoomDetail(null);
       setMessages([]);
+      // URL에서 roomId 제거
+      setSearchParams({});
       setNextCursor(null);
       setHasMore(false);
       fetchChatRooms();
@@ -779,7 +898,9 @@ export default function ChatPage() {
     <div className="flex min-h-screen">
       <Sidebar />
       <div className="flex-1 ml-45 2xl:ml-55 flex min-h-screen">
+        {/* 왼쪽: 채팅방 목록 */}
         <div className="w-96 2xl:w-[480px] border-r border-gray-2 bg-white flex flex-col min-h-screen">
+          {/* 채팅방 목록 헤더 (제목, 검색) */}
           <div className="px-7 2xl:px-15 pt-7 2xl:pt-15 pb-4 2xl:pb-5">
             <div className="flex items-center justify-between mb-4 2xl:mb-5">
               <h1 className="flex items-center gap-4 text-[40px] font-bold">
@@ -807,6 +928,7 @@ export default function ChatPage() {
             </div>
           </div>
 
+          {/* 채팅방 목록 */}
           <div className="flex-1 overflow-y-auto">
             {roomsLoading ? (
               <div className="flex items-center justify-center h-full">
@@ -854,42 +976,13 @@ export default function ChatPage() {
           </div>
         </div>
 
+        {/* 오른쪽: 채팅방 내용 */}
         {selectedRoomId && roomDetail ? (
-          <div className="flex-1 flex flex-col bg-white">
-            <div className="px-6 2xl:px-8 py-4 2xl:py-6 border-b border-gray-2">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4 2xl:gap-5">
-                  <div className="flex-shrink-0">
-                    <div className="w-12 2xl:w-14 h-12 2xl:h-14 rounded-full flex items-center justify-center">
-                      <Profile width={40} height={40} />
-                    </div>
-                  </div>
-                  <div>
-                    <h2 className="text-lg 2xl:text-xl font-bold text-gray-1 mb-1">
-                      {roomDetail.name}
-                    </h2>
-                    <div className="flex gap-2">
-                      <span className="rounded-md px-3 py-0.5 text-white text-sm font-semibold bg-main-1">
-                        {roomDetail.generation}기
-                      </span>
-                      <span className="rounded-md px-3 py-0.5 text-white text-sm font-semibold bg-main-2">
-                        {roomDetail.major}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-                <button
-                  onClick={handleExit}
-                  className="bg-main-3 px-4 py-2 text-white font-semibold rounded-lg transition-colors w-[120px] h-[52px] text-[20px]"
-                >
-                  나가기
-                </button>
-              </div>
-            </div>
-
+          <div className="flex-1 flex flex-col bg-white h-full overflow-hidden">
+            {/* 메시지 스크롤 영역 */}
             <div
               ref={messagesContainerRef}
-              className="flex-1 overflow-y-auto px-6 2xl:px-8 py-4 2xl:py-6"
+              className="flex-1 overflow-y-auto min-h-0"
               onScroll={(e) => {
                 const target = e.target as HTMLDivElement;
                 if (target.scrollTop === 0 && hasMore && !loading) {
@@ -897,6 +990,40 @@ export default function ChatPage() {
                 }
               }}
             >
+              {/* 채팅방 헤더 (이름, 전공, 나가기 버튼) - sticky로 고정 */}
+              <div className="sticky top-0 z-10 bg-white px-6 2xl:px-8 py-4 2xl:py-6 border-b border-gray-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4 2xl:gap-5">
+                    <div className="flex-shrink-0">
+                      <div className="w-12 2xl:w-14 h-12 2xl:h-14 rounded-full flex items-center justify-center">
+                        <Profile width={40} height={40} />
+                      </div>
+                    </div>
+                    <div>
+                      <h2 className="text-lg 2xl:text-xl font-bold text-gray-1 mb-1">
+                        {roomDetail.name}
+                      </h2>
+                      <div className="flex gap-2">
+                        <span className="rounded-md px-3 py-0.5 text-white text-sm font-semibold bg-main-1">
+                          {roomDetail.generation}기
+                        </span>
+                        <span className="rounded-md px-3 py-0.5 text-white text-sm font-semibold bg-main-2">
+                          {roomDetail.major}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <button
+                    onClick={handleExit}
+                    className="bg-main-3 px-4 py-2 text-white font-semibold rounded-lg transition-colors w-[120px] h-[52px] text-[20px]"
+                  >
+                    나가기
+                  </button>
+                </div>
+              </div>
+
+              {/* 메시지 목록 */}
+              <div className="px-6 2xl:px-8 py-4 2xl:py-6">
               {loading && messages.length === 0 ? (
                 <div className="flex items-center justify-center h-full">
                   <p className="text-base 2xl:text-lg text-gray-3">
@@ -917,7 +1044,25 @@ export default function ChatPage() {
                     </div>
                   )}
                   {messages.map((message, index) => {
-                    const isMyMessage = message.senderId === currentUserId;
+                    // 타입 변환하여 비교 (null 체크 포함)
+                    const senderId = message.senderId != null ? Number(message.senderId) : null;
+                    const myUserId = actualUserId != null ? Number(actualUserId) : null;
+                    const isMyMessage = senderId !== null && myUserId !== null && senderId === myUserId;
+                    
+                    if (import.meta.env.DEV && index === 0) {
+                      console.log('🔍 메시지 판단:', {
+                        messageSenderId: message.senderId,
+                        senderId,
+                        senderIdType: typeof message.senderId,
+                        actualUserId,
+                        myUserId,
+                        myUserIdType: typeof actualUserId,
+                        isMyMessage,
+                        currentUserId,
+                        comparison: `${senderId} === ${myUserId}`,
+                      });
+                    }
+                    
                     const prevMessage = index > 0 ? messages[index - 1] : null;
                     const currentDate = formatMessageDate(message.createdAt);
                     const prevDate = prevMessage
@@ -973,9 +1118,11 @@ export default function ChatPage() {
                   </p>
                 </div>
               )}
+              </div>
             </div>
 
-            <div className="px-6 2xl:px-8 py-4 2xl:py-6">
+            {/* 메시지 입력 영역 */}
+            <div className="flex-shrink-0 px-6 2xl:px-8 py-4 2xl:py-6 border-t border-gray-2">
               <div className="relative">
                 <input
                   type="text"
