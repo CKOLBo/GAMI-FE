@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import axios from 'axios';
+import { jwtDecode } from 'jwt-decode';
 import { useAuth } from '@/contexts/AuthContext';
 import { instance } from '@/assets/shared/lib/axios';
 import { setCookie } from '@/assets/shared/lib/cookie';
@@ -48,23 +49,6 @@ interface UseLoginReturn {
   isLoading: boolean;
 }
 
-const decodeJWT = (token: string): JWTPayload | null => {
-  try {
-    const base64Url = token.split('.')[1];
-    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    const jsonPayload = decodeURIComponent(
-      atob(base64)
-        .split('')
-        .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-        .join('')
-    );
-    return JSON.parse(jsonPayload);
-  } catch (error) {
-    console.error('JWT 디코딩 실패:', error);
-    return null;
-  }
-};
-
 export function useLogin(): UseLoginReturn {
   const { login: setAuthUser } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
@@ -79,7 +63,7 @@ export function useLogin(): UseLoginReturn {
 
       const { accessToken, refreshToken } = response.data;
 
-      const decodedToken = decodeJWT(accessToken);
+      const decodedToken = jwtDecode<JWTPayload>(accessToken);
 
       setCookie('accessToken', accessToken);
       setCookie('refreshToken', refreshToken);
