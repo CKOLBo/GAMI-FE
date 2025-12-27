@@ -47,6 +47,22 @@ export default function Sidebar() {
     }
   };
 
+  const isAdmin = (): boolean => {
+    if (!user?.role) return false;
+    
+    const role = user.role;
+    
+    if (Array.isArray(role)) {
+      return role.some((r) => r === 'ROLE_ADMIN' || r === 'ADMIN' || r === 'ROLE_ROLE_ADMIN');
+    }
+    
+    if (typeof role === 'string') {
+      return role === 'ROLE_ADMIN' || role === 'ADMIN' || role === 'ROLE_ROLE_ADMIN';
+    }
+    
+    return false;
+  };
+
   const menuItems: MenuItem[] = [
     { path: '/main', label: '홈', icon: HomeIcon },
     {
@@ -68,7 +84,7 @@ export default function Sidebar() {
       subPaths: ['/post', '/post-write'],
     },
     { path: '/my-page', label: '마이페이지', icon: ProfileIcon },
-    ...(user?.role === 'ROLE_ADMIN'
+    ...(isAdmin()
       ? [{ path: '/admin', label: '관리자', icon: HomeIcon }]
       : []),
   ];
