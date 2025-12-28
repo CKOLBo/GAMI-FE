@@ -76,7 +76,6 @@ interface MentorRequest {
   applyStatus: string;
 }
 
-
 export default function ChatPage() {
   const { user } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -115,8 +114,15 @@ export default function ChatPage() {
     return null;
   }, [currentUserId]);
 
-
-  const { connectWebSocket, disconnectWebSocket, subscribeToRoom, unsubscribeFromRoom, sendMessage, isConnected, isSubscribed } = useStomp({
+  const {
+    connectWebSocket,
+    disconnectWebSocket,
+    subscribeToRoom,
+    unsubscribeFromRoom,
+    sendMessage,
+    isConnected,
+    isSubscribed,
+  } = useStomp({
     enableRoomSubscription: true,
     onNotification: (notification) => {
       if (
@@ -240,7 +246,6 @@ export default function ChatPage() {
         chat.lastMessage.toLowerCase().includes(trimmedQuery)
     );
   }, [searchQuery, chatList]);
-
 
   const handleChatClick = async (roomId: number) => {
     setSelectedRoomId(roomId);

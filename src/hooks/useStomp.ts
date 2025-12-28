@@ -314,7 +314,11 @@ export function useStomp(options: UseStompOptions = {}) {
         isSubscribedRef.current = false;
         isConnectingRef.current = false;
 
-        if (autoReconnect && enableRoomSubscription && currentRoomIdRef.current) {
+        if (
+          autoReconnect &&
+          enableRoomSubscription &&
+          currentRoomIdRef.current
+        ) {
           if (!stompClientRef.current?.active) {
             setTimeout(() => {
               connectWebSocket();
@@ -375,10 +379,7 @@ export function useStomp(options: UseStompOptions = {}) {
 
     if (stompClientRef.current) {
       try {
-        if (
-          stompClientRef.current.connected ||
-          stompClientRef.current.active
-        ) {
+        if (stompClientRef.current.connected || stompClientRef.current.active) {
           stompClientRef.current.deactivate();
         }
       } catch {
@@ -389,7 +390,11 @@ export function useStomp(options: UseStompOptions = {}) {
   }, []);
 
   const sendMessage = useCallback(
-    (destination: string, body: string, headers: Record<string, string> = {}) => {
+    (
+      destination: string,
+      body: string,
+      headers: Record<string, string> = {}
+    ) => {
       if (!stompClientRef.current || !stompClientRef.current.connected) {
         throw new Error('WebSocket이 연결되지 않았습니다.');
       }
@@ -414,4 +419,3 @@ export function useStomp(options: UseStompOptions = {}) {
     getClient: () => stompClientRef.current,
   };
 }
-
