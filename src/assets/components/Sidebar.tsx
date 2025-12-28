@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import axios from 'axios';
+import { instance } from '@/assets/shared/lib/axios';
+import { deleteCookie } from '@/assets/shared/lib/cookie';
 import Logo from '@/assets/svg/logo/Logo';
 import HomeIcon from '@/assets/svg/sidebar/HomeIcon';
 import MentoringIcon from '@/assets/svg/sidebar/MentoringIcon';
@@ -9,6 +10,7 @@ import ChatIcon from '@/assets/svg/sidebar/ChatIcon';
 import PostIcon from '@/assets/svg/sidebar/PostIcon';
 import ProfileIcon from '@/assets/svg/sidebar/ProfileIcon';
 import LogoutIcon from '@/assets/svg/sidebar/LogoutIcon';
+import AdminIcon from '@/assets/svg/sidebar/AdminIcon';
 import LogoutModal from '@/assets/components/modal/LogoutModal';
 
 interface MenuItem {
@@ -21,7 +23,7 @@ interface MenuItem {
 export default function Sidebar() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
   const handleLogoutClick = () => {
@@ -30,21 +32,25 @@ export default function Sidebar() {
 
   const handleLogout = async () => {
     try {
-      const token = localStorage.getItem('token');
-      if (token) {
-        await axios.delete('/api/auth/signout', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-      }
+      await instance.delete('/api/auth/signout');
     } catch (error) {
       console.error('로그아웃 실패:', error);
     } finally {
+      deleteCookie('accessToken');
+      deleteCookie('refreshToken');
       localStorage.removeItem('token');
       logout();
       navigate('/signin');
     }
+  };
+
+  const isAdmin = (): boolean => {
+    if (!user?.role) return false;
+
+    const ADMIN_ROLES = ['ROLE_ADMIN', 'ADMIN', 'ROLE_ROLE_ADMIN'];
+    const userRoles = Array.isArray(user.role) ? user.role : [user.role];
+
+    return userRoles.some((role) => ADMIN_ROLES.includes(role));
   };
 
   const menuItems: MenuItem[] = [
@@ -68,6 +74,9 @@ export default function Sidebar() {
       subPaths: ['/post', '/post-write'],
     },
     { path: '/my-page', label: '마이페이지', icon: ProfileIcon },
+    ...(isAdmin()
+      ? [{ path: '/admin', label: '관리자', icon: AdminIcon }]
+      : []),
   ];
 
   const isMenuActive = (item: MenuItem): boolean => {

@@ -19,22 +19,27 @@ export const instance = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-  withCredentials: false,
+  withCredentials: true,
 });
 
-instance.interceptors.request.use((config) => {
-  const isAuthEndpoint =
-    config.url?.includes('/auth/signin') ||
-    config.url?.includes('/auth/signup');
+instance.interceptors.request.use(
+  (config) => {
+    const isAuthEndpoint =
+      config.url?.includes('/auth/signin') ||
+      config.url?.includes('/auth/signup');
 
-  if (!isAuthEndpoint) {
-    const accessToken = getCookie('accessToken');
-    if (accessToken) {
-      config.headers.Authorization = `Bearer ${accessToken}`;
+    if (!isAuthEndpoint) {
+      const token = getCookie('accessToken');
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
     }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
   }
-  return config;
-});
+);
 
 instance.interceptors.response.use(
   (response: AxiosResponse) => response,
@@ -51,10 +56,11 @@ instance.interceptors.response.use(
     if (error.response?.status === 401 && !originalRequest._retry) {
       const isAuthEndpoint =
         originalRequest.url?.includes('/auth/signin') ||
-        originalRequest.url?.includes('/auth/signup');
+        originalRequest.url?.includes('/auth/signup') ||
+        originalRequest.url?.includes('/auth/reissue');
 
       if (isAuthEndpoint) {
-        return Promise.resolve(error.response);
+        return Promise.reject(error);
       }
 
       originalRequest._retry = true;
@@ -93,6 +99,10 @@ instance.interceptors.response.use(
           'Token refresh failed. Please login again.'
         );
       }
+    }
+
+    if (error.response?.status === 401 || error.response?.status === 403) {
+      console.error('인증 오류:', error.response?.status);
     }
 
     return Promise.reject(error);

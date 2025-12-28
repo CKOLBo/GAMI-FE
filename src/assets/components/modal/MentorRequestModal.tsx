@@ -3,24 +3,32 @@ import X from '@/assets/svg/X';
 import Profile from '@/assets/svg/profile/Profile';
 
 interface MentorRequest {
-  id: number;
+  applyId: number;
+  menteeId?: number;
   name: string;
+  applyStatus: string;
 }
 
 interface MentorRequestModalProps {
   onClose: () => void;
-  onAccept: (id: number) => void;
+  onAccept: (applyId: number) => void;
+  onReject: (applyId: number) => void;
   requests: MentorRequest[];
 }
 
 export default function MentorRequestModal({
   onClose,
   onAccept,
+  onReject,
   requests,
 }: MentorRequestModalProps) {
+  const pendingRequests = requests.filter(
+    (request) => request.applyStatus === 'PENDING'
+  );
+
   return (
     <ModalWrapper className="px-10 py-10">
-      <div className="relative w-[600px] max-h-[600px]">
+      <div className="relative w-[460px] max-h-[600px]">
         <button
           type="button"
           onClick={onClose}
@@ -37,11 +45,11 @@ export default function MentorRequestModal({
         </p>
 
         <div className="max-h-[450px] overflow-y-auto">
-          {requests.length > 0 ? (
+          {pendingRequests.length > 0 ? (
             <div className="space-y-4">
-              {requests.map((request) => (
+              {pendingRequests.map((request) => (
                 <div
-                  key={request.id}
+                  key={request.applyId}
                   className="flex items-center justify-between py-4 border-b border-gray-2 last:border-b-0"
                 >
                   <div className="flex items-center gap-4">
@@ -50,12 +58,20 @@ export default function MentorRequestModal({
                       {request.name}님이 요청을 보냈어요.
                     </span>
                   </div>
-                  <button
-                    onClick={() => onAccept(request.id)}
-                    className="px-6 py-2 bg-main-1 text-white text-base font-semibold rounded-lg hover:bg-main-1-hover transition-colors"
-                  >
-                    수락
-                  </button>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => onReject(request.applyId)}
+                      className="px-6 py-2 bg-white text-gray-1 text-base font-semibold rounded-lg border border-gray-2 hover:bg-gray-4 transition-colors"
+                    >
+                      거절
+                    </button>
+                    <button
+                      onClick={() => onAccept(request.applyId)}
+                      className="px-6 py-2 bg-main-1 text-white text-base font-semibold rounded-lg hover:bg-main-1-hover transition-colors"
+                    >
+                      수락
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
