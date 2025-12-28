@@ -20,16 +20,18 @@ interface NotificationMessage {
   applyId?: number;
 }
 
-interface UseStompOptions {
+interface UseStompOptions<TRoomMessage = unknown> {
   onNotification?: (notification: NotificationMessage) => void;
   enableRoomSubscription?: boolean;
-  onRoomMessage?: (message: any) => void;
+  onRoomMessage?: (message: TRoomMessage) => void;
   onConnect?: () => void;
   onDisconnect?: () => void;
   autoReconnect?: boolean;
 }
 
-export function useStomp(options: UseStompOptions = {}) {
+export function useStomp<TRoomMessage = unknown>(
+  options: UseStompOptions<TRoomMessage> = {}
+) {
   const {
     onNotification,
     enableRoomSubscription = false,
@@ -88,54 +90,58 @@ export function useStomp(options: UseStompOptions = {}) {
 
   const subscribeToRoom = useCallback(
     (roomId: number, retryCount = 0) => {
-      if (!stompClientRef.current) {
-        if (retryCount < 5) {
-          setTimeout(() => subscribeToRoom(roomId, retryCount + 1), 500);
-        }
-        return;
-      }
-
-      if (!stompClientRef.current.connected) {
-        if (retryCount < 5) {
-          setTimeout(() => subscribeToRoom(roomId, retryCount + 1), 500);
-        }
-        return;
-      }
-
-      if (roomSubscriptionRef.current) {
-        try {
-          roomSubscriptionRef.current.unsubscribe();
-        } catch {
-          // 구독 해제 실패 무시
-        }
-        roomSubscriptionRef.current = null;
-      }
-
-      isSubscribedRef.current = false;
-      currentRoomIdRef.current = roomId;
-
-      const topic = `/topic/room/${roomId}`;
-
-      try {
-        roomSubscriptionRef.current = stompClientRef.current.subscribe(
-          topic,
-          (message: IMessage) => {
-            try {
-              const msg = JSON.parse(message.body);
-              if (onRoomMessage) {
-                onRoomMessage(msg);
-              }
-            } catch (e) {
-              console.error('메시지 파싱 오류:', e);
-            }
+      const attempt = (rId: number, rc = 0) => {
+        if (!stompClientRef.current) {
+          if (rc < 5) {
+            setTimeout(() => attempt(rId, rc + 1), 500);
           }
-        );
+          return;
+        }
 
-        isSubscribedRef.current = true;
-      } catch (e) {
-        console.error('구독 실패:', e);
+        if (!stompClientRef.current.connected) {
+          if (rc < 5) {
+            setTimeout(() => attempt(rId, rc + 1), 500);
+          }
+          return;
+        }
+
+        if (roomSubscriptionRef.current) {
+          try {
+            roomSubscriptionRef.current.unsubscribe();
+          } catch {
+            // 구독 해제 실패 무시
+          }
+          roomSubscriptionRef.current = null;
+        }
+
         isSubscribedRef.current = false;
-      }
+        currentRoomIdRef.current = rId;
+
+        const topic = `/topic/room/${rId}`;
+
+        try {
+          roomSubscriptionRef.current = stompClientRef.current!.subscribe(
+            topic,
+            (message: IMessage) => {
+              try {
+                const msg = JSON.parse(message.body);
+                if (onRoomMessage) {
+                  onRoomMessage(msg);
+                }
+              } catch (e) {
+                console.error('메시지 파싱 오류:', e);
+              }
+            }
+          );
+
+          isSubscribedRef.current = true;
+        } catch (e) {
+          console.error('구독 실패:', e);
+          isSubscribedRef.current = false;
+        }
+      };
+
+      attempt(roomId, retryCount);
     },
     [onRoomMessage]
   );
@@ -154,193 +160,197 @@ export function useStomp(options: UseStompOptions = {}) {
   }, []);
 
   const connectWebSocket = useCallback(() => {
-    const token = getCookie('accessToken');
-    if (!token) {
-      return;
-    }
-
-    if (isConnectingRef.current) {
-      return;
-    }
-
-    if (stompClientRef.current) {
-      if (stompClientRef.current.connected) {
-        subscribeToNotifications();
-        if (enableRoomSubscription && currentRoomIdRef.current) {
-          setTimeout(() => {
-            subscribeToRoom(currentRoomIdRef.current!);
-          }, 100);
-        }
+    const attemptConnect = () => {
+      const token = getCookie('accessToken');
+      if (!token) {
         return;
       }
 
-      if (stompClientRef.current.active) {
+      if (isConnectingRef.current) {
         return;
       }
 
-      try {
-        if (notificationSubscriptionRef.current) {
-          try {
-            notificationSubscriptionRef.current.unsubscribe();
-          } catch {
-            // 구독 해제 실패 무시
+      if (stompClientRef.current) {
+        if (stompClientRef.current.connected) {
+          subscribeToNotifications();
+          if (enableRoomSubscription && currentRoomIdRef.current) {
+            setTimeout(() => {
+              subscribeToRoom(currentRoomIdRef.current!);
+            }, 100);
           }
-          notificationSubscriptionRef.current = null;
+          return;
         }
-        if (roomSubscriptionRef.current) {
-          try {
-            roomSubscriptionRef.current.unsubscribe();
-          } catch {
-            // 구독 해제 실패 무시
+
+        if (stompClientRef.current.active) {
+          return;
+        }
+
+        try {
+          if (notificationSubscriptionRef.current) {
+            try {
+              notificationSubscriptionRef.current.unsubscribe();
+            } catch {
+              // 구독 해제 실패 무시
+            }
+            notificationSubscriptionRef.current = null;
           }
-          roomSubscriptionRef.current = null;
+          if (roomSubscriptionRef.current) {
+            try {
+              roomSubscriptionRef.current.unsubscribe();
+            } catch {
+              // 구독 해제 실패 무시
+            }
+            roomSubscriptionRef.current = null;
+          }
+          stompClientRef.current.deactivate();
+        } catch {
+          // 연결 해제 실패 무시
         }
-        stompClientRef.current.deactivate();
-      } catch {
-        // 연결 해제 실패 무시
+        stompClientRef.current = null;
       }
-      stompClientRef.current = null;
-    }
 
-    isConnectingRef.current = true;
+      isConnectingRef.current = true;
 
-    const wsUrl = `${baseURL}/ws`;
+      const wsUrl = `${baseURL}/ws`;
 
-    if (connectionTimeoutIdRef.current) {
-      clearTimeout(connectionTimeoutIdRef.current);
-      connectionTimeoutIdRef.current = null;
-    }
-
-    const socket = new SockJS(wsUrl, null, {
-      transports: ['websocket', 'xhr-streaming', 'xhr-polling'],
-    });
-
-    socket.onerror = (error: Event) => {
-      console.error('SockJS 오류:', error);
-      isConnectingRef.current = false;
       if (connectionTimeoutIdRef.current) {
         clearTimeout(connectionTimeoutIdRef.current);
         connectionTimeoutIdRef.current = null;
       }
-    };
 
-    socket.onclose = () => {
-      isConnectingRef.current = false;
-      if (connectionTimeoutIdRef.current) {
-        clearTimeout(connectionTimeoutIdRef.current);
-        connectionTimeoutIdRef.current = null;
-      }
-    };
+      const socket = new SockJS(wsUrl, null, {
+        transports: ['websocket', 'xhr-streaming', 'xhr-polling'],
+      });
 
-    const client = new Client({
-      webSocketFactory: () => socket as WebSocket,
-      connectHeaders: {
-        Authorization: `Bearer ${token}`,
-      },
-      reconnectDelay: 0,
-      heartbeatIncoming: 4000,
-      heartbeatOutgoing: 4000,
-      connectionTimeout: 10000,
-      logRawCommunication: false,
-      beforeConnect: () => {
-        if (!isConnectingRef.current || stompClientRef.current !== client) {
+      socket.onerror = (error: Event) => {
+        console.error('SockJS 오류:', error);
+        isConnectingRef.current = false;
+        if (connectionTimeoutIdRef.current) {
+          clearTimeout(connectionTimeoutIdRef.current);
+          connectionTimeoutIdRef.current = null;
+        }
+      };
+
+      socket.onclose = () => {
+        isConnectingRef.current = false;
+        if (connectionTimeoutIdRef.current) {
+          clearTimeout(connectionTimeoutIdRef.current);
+          connectionTimeoutIdRef.current = null;
+        }
+      };
+
+      const client = new Client({
+        webSocketFactory: () => socket as WebSocket,
+        connectHeaders: {
+          Authorization: `Bearer ${token}`,
+        },
+        reconnectDelay: 0,
+        heartbeatIncoming: 4000,
+        heartbeatOutgoing: 4000,
+        connectionTimeout: 10000,
+        logRawCommunication: false,
+        beforeConnect: () => {
+          if (!isConnectingRef.current || stompClientRef.current !== client) {
+            try {
+              client.deactivate();
+            } catch {
+              // 연결 해제 실패 무시
+            }
+            return;
+          }
+        },
+        onDisconnect: () => {
+          isSubscribedRef.current = false;
+          isConnectingRef.current = false;
+          if (connectionTimeoutIdRef.current) {
+            clearTimeout(connectionTimeoutIdRef.current);
+            connectionTimeoutIdRef.current = null;
+          }
+          if (onDisconnect) {
+            onDisconnect();
+          }
+        },
+        onConnect: () => {
+          isConnectingRef.current = false;
+          if (connectionTimeoutIdRef.current) {
+            clearTimeout(connectionTimeoutIdRef.current);
+            connectionTimeoutIdRef.current = null;
+          }
+
+          subscribeToNotifications();
+
+          if (enableRoomSubscription && currentRoomIdRef.current) {
+            setTimeout(() => {
+              subscribeToRoom(currentRoomIdRef.current!);
+            }, 100);
+          }
+
+          if (onConnect) {
+            onConnect();
+          }
+        },
+        onWebSocketError: (event: Event) => {
+          console.error('WebSocket 오류:', event);
+          isConnectingRef.current = false;
+        },
+        onStompError: (frame: IFrame) => {
+          console.error('STOMP 오류:', frame);
+          isConnectingRef.current = false;
+          const errorMessage =
+            frame.headers['message'] ||
+            frame.headers['error'] ||
+            '알 수 없는 오류';
+
+          if (errorMessage.includes('Failed to send message')) {
+            isSubscribedRef.current = false;
+
+            if (
+              enableRoomSubscription &&
+              currentRoomIdRef.current &&
+              stompClientRef.current
+            ) {
+              setTimeout(() => {
+                if (stompClientRef.current?.connected) {
+                  subscribeToRoom(currentRoomIdRef.current!);
+                }
+              }, 1000);
+            }
+          }
+        },
+        onWebSocketClose: () => {
+          isSubscribedRef.current = false;
+          isConnectingRef.current = false;
+
+          if (
+            autoReconnect &&
+            enableRoomSubscription &&
+            currentRoomIdRef.current
+          ) {
+            if (!stompClientRef.current?.active) {
+              setTimeout(() => {
+                attemptConnect();
+              }, 2000);
+            }
+          }
+        },
+      });
+
+      connectionTimeoutIdRef.current = setTimeout(() => {
+        if (!client.connected && isConnectingRef.current) {
+          isConnectingRef.current = false;
           try {
             client.deactivate();
           } catch {
             // 연결 해제 실패 무시
           }
-          return;
         }
-      },
-      onDisconnect: () => {
-        isSubscribedRef.current = false;
-        isConnectingRef.current = false;
-        if (connectionTimeoutIdRef.current) {
-          clearTimeout(connectionTimeoutIdRef.current);
-          connectionTimeoutIdRef.current = null;
-        }
-        if (onDisconnect) {
-          onDisconnect();
-        }
-      },
-      onConnect: () => {
-        isConnectingRef.current = false;
-        if (connectionTimeoutIdRef.current) {
-          clearTimeout(connectionTimeoutIdRef.current);
-          connectionTimeoutIdRef.current = null;
-        }
+      }, 10000);
 
-        subscribeToNotifications();
+      stompClientRef.current = client;
+      client.activate();
+    };
 
-        if (enableRoomSubscription && currentRoomIdRef.current) {
-          setTimeout(() => {
-            subscribeToRoom(currentRoomIdRef.current!);
-          }, 100);
-        }
-
-        if (onConnect) {
-          onConnect();
-        }
-      },
-      onWebSocketError: (event: Event) => {
-        console.error('WebSocket 오류:', event);
-        isConnectingRef.current = false;
-      },
-      onStompError: (frame: IFrame) => {
-        console.error('STOMP 오류:', frame);
-        isConnectingRef.current = false;
-        const errorMessage =
-          frame.headers['message'] ||
-          frame.headers['error'] ||
-          '알 수 없는 오류';
-
-        if (errorMessage.includes('Failed to send message')) {
-          isSubscribedRef.current = false;
-
-          if (
-            enableRoomSubscription &&
-            currentRoomIdRef.current &&
-            stompClientRef.current
-          ) {
-            setTimeout(() => {
-              if (stompClientRef.current?.connected) {
-                subscribeToRoom(currentRoomIdRef.current!);
-              }
-            }, 1000);
-          }
-        }
-      },
-      onWebSocketClose: () => {
-        isSubscribedRef.current = false;
-        isConnectingRef.current = false;
-
-        if (
-          autoReconnect &&
-          enableRoomSubscription &&
-          currentRoomIdRef.current
-        ) {
-          if (!stompClientRef.current?.active) {
-            setTimeout(() => {
-              connectWebSocket();
-            }, 2000);
-          }
-        }
-      },
-    });
-
-    connectionTimeoutIdRef.current = setTimeout(() => {
-      if (!client.connected && isConnectingRef.current) {
-        isConnectingRef.current = false;
-        try {
-          client.deactivate();
-        } catch {
-          // 연결 해제 실패 무시
-        }
-      }
-    }, 10000);
-
-    stompClientRef.current = client;
-    client.activate();
+    attemptConnect();
   }, [
     subscribeToNotifications,
     subscribeToRoom,
