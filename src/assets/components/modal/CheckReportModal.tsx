@@ -71,16 +71,7 @@ export default function CheckReportModal({
     try {
       setProcessing(true);
 
-      if (action === 'BLOCK') {
-        const res = await instance.delete(
-          `/api/admin/post/${reportDetail.targetId}`
-        );
-
-        if (res.status !== 204) {
-          throw new Error('게시글 삭제 실패');
-        }
-      }
-
+      // 🔥 삭제 로직 제거 (중요)
       await instance.post(`/api/admin/report/${reportId}`, {
         reportResult: reportResultMap[action],
         reportAction: 'NONE',
@@ -91,10 +82,10 @@ export default function CheckReportModal({
       toast.success('처리가 완료되었습니다.');
     } catch (err) {
       if (err instanceof AxiosError) {
-        if (err.response?.status === 404) {
-          toast.error('게시글을 찾을 수 없습니다.');
-        } else if (err.response?.status === 403) {
+        if (err.response?.status === 403) {
           toast.error('관리자 권한이 없습니다.');
+        } else if (err.response?.status === 404) {
+          toast.error('신고를 찾을 수 없습니다.');
         } else {
           toast.error('신고 처리 중 오류가 발생했습니다.');
         }
