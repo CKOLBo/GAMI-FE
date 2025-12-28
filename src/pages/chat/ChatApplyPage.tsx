@@ -87,9 +87,7 @@ export default function ChatApplyPage() {
 
     isConnectingRef.current = true;
 
-    const backendUrl = import.meta.env.DEV
-      ? 'https://port-0-gami-server-mj0rdvda8d11523e.sel3.cloudtype.app'
-      : baseURL;
+    const backendUrl = baseURL;
     const wsUrl = `${backendUrl}/ws`;
 
     const socket = new SockJS(wsUrl, null, {
