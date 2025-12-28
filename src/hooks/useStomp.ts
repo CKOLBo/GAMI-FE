@@ -59,8 +59,8 @@ export function useStomp<TRoomMessage = unknown>(
     if (notificationSubscriptionRef.current) {
       try {
         notificationSubscriptionRef.current.unsubscribe();
-      } catch {
-        // 구독 해제 실패 무시
+      } catch (e) {
+        console.error('알림 구독 해제 실패:', e);
       }
       notificationSubscriptionRef.current = null;
     }
@@ -108,8 +108,8 @@ export function useStomp<TRoomMessage = unknown>(
         if (roomSubscriptionRef.current) {
           try {
             roomSubscriptionRef.current.unsubscribe();
-          } catch {
-            // 구독 해제 실패 무시
+          } catch (e) {
+            console.error('방 구독 해제 실패:', e);
           }
           roomSubscriptionRef.current = null;
         }
@@ -253,8 +253,8 @@ export function useStomp<TRoomMessage = unknown>(
           if (!isConnectingRef.current || stompClientRef.current !== client) {
             try {
               client.deactivate();
-            } catch {
-              // 연결 해제 실패 무시
+            } catch (e) {
+              console.error('beforeConnect - client.deactivate 실패:', e);
             }
             return;
           }
@@ -336,14 +336,14 @@ export function useStomp<TRoomMessage = unknown>(
       });
 
       connectionTimeoutIdRef.current = setTimeout(() => {
-        if (!client.connected && isConnectingRef.current) {
-          isConnectingRef.current = false;
-          try {
-            client.deactivate();
-          } catch {
-            // 연결 해제 실패 무시
-          }
+          if (!client.connected && isConnectingRef.current) {
+        isConnectingRef.current = false;
+        try {
+          client.deactivate();
+        } catch (e) {
+          console.error('connection timeout - client.deactivate 실패:', e);
         }
+      }
       }, 10000);
 
       stompClientRef.current = client;
@@ -364,8 +364,8 @@ export function useStomp<TRoomMessage = unknown>(
     if (roomSubscriptionRef.current) {
       try {
         roomSubscriptionRef.current.unsubscribe();
-      } catch {
-        // 구독 해제 실패 무시
+      } catch (e) {
+        console.error('방 구독 해제 실패:', e);
       }
       roomSubscriptionRef.current = null;
     }
@@ -373,8 +373,8 @@ export function useStomp<TRoomMessage = unknown>(
     if (notificationSubscriptionRef.current) {
       try {
         notificationSubscriptionRef.current.unsubscribe();
-      } catch {
-        // 구독 해제 실패 무시
+      } catch (e) {
+        console.error('알림 구독 해제 실패:', e);
       }
       notificationSubscriptionRef.current = null;
     }
@@ -392,8 +392,8 @@ export function useStomp<TRoomMessage = unknown>(
         if (stompClientRef.current.connected || stompClientRef.current.active) {
           stompClientRef.current.deactivate();
         }
-      } catch {
-        // 연결 해제 실패 무시
+      } catch (e) {
+        console.error('stompClient deactivate 실패:', e);
       }
       stompClientRef.current = null;
     }
