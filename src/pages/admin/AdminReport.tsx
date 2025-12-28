@@ -144,9 +144,19 @@ export default function AdminReport({
     action: 'BLOCK' | 'REJECT' | 'HOLD',
     reportId: number
   ) => {
-    if (action === 'BLOCK' || action === 'REJECT') {
-      setAllReports((prev) => prev.filter((r) => r.id !== reportId));
-    }
+    const reportResultMap = {
+      BLOCK: 'APPROVED',
+      REJECT: 'REJECTED',
+      HOLD: 'PENDING',
+    } as const;
+
+    setAllReports((prev) =>
+      prev.map((report) =>
+        report.id === reportId
+          ? { ...report, reportResult: reportResultMap[action] }
+          : report
+      )
+    );
   };
 
   if (loading) {
