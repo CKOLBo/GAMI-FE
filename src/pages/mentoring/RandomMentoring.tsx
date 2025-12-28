@@ -41,17 +41,17 @@ export default function RandomMentoring() {
   }, [recommendedMentorIds]);
 
   useEffect(() => {
-    if (isMatchingModalOpen) {
-      setMatchingDots(0);
-      matchingDotsIntervalRef.current = setInterval(() => {
-        setMatchingDots((prev) => (prev + 1) % 4);
-      }, 500);
-    } else {
+    if (!isMatchingModalOpen) {
       if (matchingDotsIntervalRef.current) {
         clearInterval(matchingDotsIntervalRef.current);
         matchingDotsIntervalRef.current = null;
       }
+      return;
     }
+
+    matchingDotsIntervalRef.current = setInterval(() => {
+      setMatchingDots((prev) => (prev + 1) % 4);
+    }, 500);
 
     return () => {
       if (matchingDotsIntervalRef.current) {
@@ -63,6 +63,7 @@ export default function RandomMentoring() {
 
   const handleRandomSearch = async (isRetry = false) => {
     if (!isRetry) {
+      setMatchingDots(0);
       setIsMatchingModalOpen(true);
       isCancelledRef.current = false;
       retryCountRef.current = 0;
