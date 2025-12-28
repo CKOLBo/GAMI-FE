@@ -124,7 +124,7 @@ export default function ChatPage() {
       try {
         const payload = JSON.parse(atob(token.split('.')[1]));
         return payload.sub || payload.userId || payload.id || null;
-      } catch (e) {
+      } catch {
         return null;
       }
     }
@@ -488,7 +488,9 @@ export default function ChatPage() {
     if (roomSubscriptionRef.current) {
       try {
         roomSubscriptionRef.current.unsubscribe();
-      } catch (e) {}
+      } catch {
+        // 구독 해제 실패 무시
+      }
       roomSubscriptionRef.current = null;
     }
 
