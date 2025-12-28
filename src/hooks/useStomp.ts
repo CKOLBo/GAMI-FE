@@ -1,4 +1,4 @@
-import { useRef, useCallback, useEffect } from 'react';
+import { useRef, useCallback } from 'react';
 import { Client, type IMessage, type IFrame } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import { getCookie } from '@/assets/shared/lib/cookie';
