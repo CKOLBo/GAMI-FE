@@ -99,12 +99,18 @@ export default function AdminReport() {
 
   const getReasonText = (type: string) => {
     switch (type) {
-      case 'ETC':
-        return '게시판 목적과 맞지 않는 내용';
       case 'SPAM':
-        return '음란·불쾌한 내용';
+        return '광고·홍보·스팸';
+      case 'AVERSION':
+        return '욕설·비하·혐오 표현';
       case 'PRIVACY':
         return '개인정보 노출';
+      case 'ILLEGAL':
+        return '음란·불쾌한 내용';
+      case 'HARMFUL':
+        return '게시판 목적과 맞지 않는 내용';
+      case 'ETC':
+        return '기타';
       default:
         return type;
     }
