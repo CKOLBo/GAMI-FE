@@ -2,13 +2,14 @@ import Sidebar from '@/assets/components/Sidebar';
 import Divider from '@/assets/svg/Divider';
 import { Link } from 'react-router-dom';
 import Mentor from '@/assets/svg/mentor/Mentor.png';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { instance } from '@/assets/shared/lib/axios';
 import ModalWrapper from '@/assets/shared/Modal';
 import { toast } from 'react-toastify';
 import Profile from '@/assets/svg/profile/Profile';
 import X from '@/assets/svg/X';
 import { useMentorApply } from '@/hooks/useMentorApply';
+import axios, { type AxiosResponse } from 'axios';
 
 interface RandomMentorResponse {
   memberId: number;
@@ -25,81 +26,136 @@ export default function RandomMentoring() {
   const [recommendedMentorIds, setRecommendedMentorIds] = useState<number[]>(
     []
   );
+  const [matchingDots, setMatchingDots] = useState(0);
+  const recommendedMentorIdsRef = useRef<number[]>([]);
   const isCancelledRef = useRef(false);
   const retryTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const retryCountRef = useRef(0);
+  const matchingDotsIntervalRef = useRef<ReturnType<typeof setInterval> | null>(
+    null
+  );
   const { apply: applyMentor } = useMentorApply();
+
+  useEffect(() => {
+    recommendedMentorIdsRef.current = recommendedMentorIds;
+  }, [recommendedMentorIds]);
+
+  useEffect(() => {
+    if (!isMatchingModalOpen) {
+      if (matchingDotsIntervalRef.current) {
+        clearInterval(matchingDotsIntervalRef.current);
+        matchingDotsIntervalRef.current = null;
+      }
+      return;
+    }
+
+    matchingDotsIntervalRef.current = setInterval(() => {
+      setMatchingDots((prev) => (prev + 1) % 4);
+    }, 500);
+
+    return () => {
+      if (matchingDotsIntervalRef.current) {
+        clearInterval(matchingDotsIntervalRef.current);
+        matchingDotsIntervalRef.current = null;
+      }
+    };
+  }, [isMatchingModalOpen]);
 
   const handleRandomSearch = async (isRetry = false) => {
     if (!isRetry) {
+      setMatchingDots(0);
       setIsMatchingModalOpen(true);
       isCancelledRef.current = false;
       retryCountRef.current = 0;
     }
 
-    try {
-      const timestamp = new Date().getTime();
-      const response = await instance.get<RandomMentorResponse>(
-        '/api/mentoring/random',
-        {
-          params: {
-            _t: timestamp,
-          },
-        }
-      );
+    const minWaitTime = 1500;
+    let apiError: unknown = null;
+    let apiResponse: AxiosResponse<RandomMentorResponse> | null = null;
 
-      if (isCancelledRef.current) {
-        return;
-      }
+    const apiPromise = instance
+      .get<RandomMentorResponse>('/api/mentoring/random')
+      .then((res: AxiosResponse<RandomMentorResponse>) => {
+        apiResponse = res;
+      })
+      .catch((err: unknown) => {
+        apiError = err;
+      });
 
-      const mentorId = response.data.memberId;
+    const timerPromise = new Promise<void>((resolve) =>
+      setTimeout(resolve, minWaitTime)
+    );
 
-      if (recommendedMentorIds.includes(mentorId)) {
-        retryCountRef.current += 1;
+    await Promise.all([apiPromise, timerPromise]);
 
-        if (retryCountRef.current > 10) {
-          setRecommendedMentorIds([]);
-          retryCountRef.current = 0;
-        }
+    if (isCancelledRef.current) {
+      return;
+    }
 
-        if (isCancelledRef.current) {
-          return;
-        }
-
-        retryTimeoutRef.current = setTimeout(() => {
-          if (!isCancelledRef.current) {
-            handleRandomSearch(true);
-          }
-        }, 500);
-        return;
-      }
-
-      if (isCancelledRef.current) {
-        return;
-      }
-
-      setRecommendedMentorIds((prev) => [...prev, mentorId]);
+    if (apiError) {
       setIsMatchingModalOpen(false);
-      setMatchedMentor(response.data);
-    } catch (err: unknown) {
-      if (isCancelledRef.current) {
-        return;
-      }
-      setIsMatchingModalOpen(false);
-      if (
-        err &&
-        typeof err === 'object' &&
-        'response' in err &&
-        err.response &&
-        typeof err.response === 'object' &&
-        'status' in err.response &&
-        err.response.status === 401
-      ) {
-        toast.error('인증이 필요합니다.');
+
+      if (axios.isAxiosError(apiError)) {
+        if (apiError.response?.status === 401) {
+          toast.error('인증이 필요합니다.');
+        } else if (apiError.response?.status === 404) {
+          toast.error('멘토를 찾을 수 없습니다.');
+        } else if (
+          apiError.code === 'ECONNABORTED' ||
+          apiError.code === 'ETIMEDOUT'
+        ) {
+          toast.error('요청 시간이 초과되었습니다. 잠시 후 다시 시도해주세요.');
+        } else if (apiError.response?.status === 500) {
+          toast.error('서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+        } else if (!apiError.response) {
+          toast.error('네트워크 연결을 확인해주세요.');
+        } else {
+          toast.error('멘토를 찾는데 실패했습니다.');
+        }
       } else {
         toast.error('멘토를 찾는데 실패했습니다.');
       }
+      return;
     }
+
+    if (!apiResponse) {
+      setIsMatchingModalOpen(false);
+      toast.error('멘토를 찾는데 실패했습니다.');
+      return;
+    }
+
+    const mentorData = (apiResponse as AxiosResponse<RandomMentorResponse>)
+      .data;
+    const mentorId = mentorData.memberId;
+
+    if (recommendedMentorIdsRef.current.includes(mentorId)) {
+      retryCountRef.current += 1;
+
+      if (retryCountRef.current > 10) {
+        setRecommendedMentorIds([]);
+        recommendedMentorIdsRef.current = [];
+        retryCountRef.current = 0;
+      }
+
+      if (isCancelledRef.current) {
+        return;
+      }
+
+      retryTimeoutRef.current = setTimeout(() => {
+        if (!isCancelledRef.current) {
+          handleRandomSearch(true);
+        }
+      }, 500);
+      return;
+    }
+
+    if (isCancelledRef.current) {
+      return;
+    }
+
+    setRecommendedMentorIds((prev) => [...prev, mentorId]);
+    setIsMatchingModalOpen(false);
+    setMatchedMentor(mentorData);
   };
 
   const handleCancel = () => {
@@ -117,6 +173,8 @@ export default function RandomMentoring() {
 
   const handleRetry = () => {
     setMatchedMentor(null);
+    setRecommendedMentorIds([]);
+    recommendedMentorIdsRef.current = [];
     if (retryTimeoutRef.current) {
       clearTimeout(retryTimeoutRef.current);
       retryTimeoutRef.current = null;
@@ -125,6 +183,14 @@ export default function RandomMentoring() {
     retryCountRef.current = 0;
     handleRandomSearch(false);
   };
+
+  useEffect(() => {
+    return () => {
+      if (retryTimeoutRef.current) {
+        clearTimeout(retryTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const handleMentorApply = async () => {
     if (!matchedMentor) return;
@@ -190,7 +256,9 @@ export default function RandomMentoring() {
       {isMatchingModalOpen && (
         <ModalWrapper className="w-[542px] px-10 py-10">
           <div className="flex flex-col">
-            <h2 className="text-2xl font-bold text-gray-1 mb-6">매칭중...</h2>
+            <h2 className="text-2xl font-bold text-gray-1 mb-6">
+              매칭 중{'.'.repeat(matchingDots)}
+            </h2>
             <p className="text-2xl text-gray-1 mb-14 font-semibold">
               당신과 잘 맞는 멘토를 찾는 중이에요.
               <br />

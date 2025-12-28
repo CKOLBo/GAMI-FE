@@ -1,5 +1,6 @@
 import { toast } from 'react-toastify';
 import { instance } from '@/assets/shared/lib/axios';
+import axios from 'axios';
 
 const APPLIED_MENTORS_STORAGE_KEY = 'appliedMentors';
 const MENTOR_APPLY_COOLDOWN_MS = 5 * 60 * 1000;
@@ -67,17 +68,25 @@ export function useMentorApply(): UseMentorApplyReturn {
       if (onSuccess) {
         onSuccess();
       }
-    } catch (err: unknown) {
-      if (
-        err &&
-        typeof err === 'object' &&
-        'response' in err &&
-        err.response &&
-        typeof err.response === 'object' &&
-        'status' in err.response &&
-        err.response.status === 404
-      ) {
-        toast.error('멘토를 찾을 수 없습니다.');
+    } catch (err) {
+      if (axios.isAxiosError(err)) {
+        const status = err.response?.status;
+
+        if (status === 401) {
+          toast.error('인증이 필요합니다.');
+        } else if (status === 404) {
+          toast.error('멘토를 찾을 수 없습니다.');
+        } else if (status === 409) {
+          toast.error('이미 신청한 멘토링입니다.');
+        } else if (err.code === 'ECONNABORTED' || err.code === 'ETIMEDOUT') {
+          toast.error('요청 시간이 초과되었습니다. 잠시 후 다시 시도해주세요.');
+        } else if (status === 500) {
+          toast.error('서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+        } else if (!err.response) {
+          toast.error('네트워크 연결을 확인해주세요.');
+        } else {
+          toast.error('신청에 실패했습니다.');
+        }
       } else {
         toast.error('신청에 실패했습니다.');
       }

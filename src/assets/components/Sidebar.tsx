@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import axios from 'axios';
+import { instance } from '@/assets/shared/lib/axios';
+import { deleteCookie } from '@/assets/shared/lib/cookie';
 import Logo from '@/assets/svg/logo/Logo';
 import HomeIcon from '@/assets/svg/sidebar/HomeIcon';
 import MentoringIcon from '@/assets/svg/sidebar/MentoringIcon';
@@ -31,17 +32,12 @@ export default function Sidebar() {
 
   const handleLogout = async () => {
     try {
-      const token = localStorage.getItem('token');
-      if (token) {
-        await axios.delete('/api/auth/signout', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-      }
+      await instance.delete('/api/auth/signout');
     } catch (error) {
       console.error('로그아웃 실패:', error);
     } finally {
+      deleteCookie('accessToken');
+      deleteCookie('refreshToken');
       localStorage.removeItem('token');
       logout();
       navigate('/signin');

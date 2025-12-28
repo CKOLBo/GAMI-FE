@@ -23,7 +23,7 @@ export default function MainPost({
       className="flex flex-col justify-between bg-white shadow-GAMI rounded-2xl px-6 py-6 2xl:px-8 2xl:py-12 h-60 2xl:h-80 hover:bg-[#F0F0F0] transition-colors cursor-pointer"
     >
       <div>
-        <h2 className="text-2xl 2xl:text-4xl font-bold mb-8 2xl:mb-10 break-words">
+        <h2 className="text-2xl 2xl:text-4xl font-bold mb-8 2xl:mb-10 break-words text-gray-1">
           {title}
         </h2>
 

@@ -7,7 +7,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import NotFoundImage from '@/assets/svg/mentor/NotFound.png';
 import { toast } from 'react-toastify';
 import { instance } from '@/assets/shared/lib/axios';
-import { useMentorApply } from '@/hooks/useMentorApply';
+import { API_PATHS } from '@/constants/api';
+import axios from 'axios';
 
 interface MentorData {
   memberId: number;
@@ -33,33 +34,70 @@ interface MemberInfo {
   major: string;
 }
 
+interface MentoringApplyResponse {
+  applyId: number;
+  menteeId: number;
+  mentorId: number;
+  applyStatus: 'PENDING' | 'ACCEPTED' | 'REJECTED';
+  createdAt: string;
+}
+
+interface SentApply {
+  applyId: number;
+  mentorId: number;
+  name: string;
+  applyStatus: string;
+  createdAt: string;
+}
+
 export default function MentoringPage() {
   const [allMentors, setAllMentors] = useState<MentorData[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [currentMemberId, setCurrentMemberId] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [sentApplies, setSentApplies] = useState<SentApply[]>([]);
   const navigate = useNavigate();
-  const { apply: applyMentor } = useMentorApply();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setIsLoading(true);
-        const [mentorsResponse, memberResponse] = await Promise.all([
-          instance.get<MentorListResponse>('/api/mentoring/mentor/all', {
-            params: {
-              page: 0,
-              size: 100,
-            },
-          }),
-          instance.get<MemberInfo>('/api/member'),
-        ]);
+        const [mentorsResponse, memberResponse, sentAppliesResponse] =
+          await Promise.all([
+            instance.get<MentorListResponse>('/api/mentoring/mentor/all', {
+              params: {
+                page: 0,
+                size: 100,
+              },
+            }),
+            instance.get<MemberInfo>('/api/member'),
+            instance
+              .get<SentApply[]>(API_PATHS.MENTORING_APPLY_SENT)
+              .catch(() => ({ data: [] })),
+          ]);
 
         setAllMentors(mentorsResponse.data.content);
         setCurrentMemberId(memberResponse.data.memberId);
+        if (Array.isArray(sentAppliesResponse.data)) {
+          setSentApplies(sentAppliesResponse.data);
+        }
       } catch (err) {
         console.error('데이터 조회 실패:', err);
-        toast.error('데이터를 불러오는데 실패했습니다.');
+        if (axios.isAxiosError(err)) {
+          if (err.response?.status === 401) {
+            toast.error('인증이 필요합니다.');
+          } else if (err.code === 'ECONNABORTED' || err.code === 'ETIMEDOUT') {
+            toast.error(
+              '요청 시간이 초과되었습니다. 잠시 후 다시 시도해주세요.'
+            );
+          } else if (err.response?.status === 500) {
+            toast.error('서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+          } else {
+            toast.error('데이터를 불러오는데 실패했습니다.');
+          }
+        } else {
+          toast.error('데이터를 불러오는데 실패했습니다.');
+        }
       } finally {
         setIsLoading(false);
       }
@@ -67,6 +105,32 @@ export default function MentoringPage() {
 
     fetchData();
   }, []);
+
+  const fetchSentApplies = async () => {
+    try {
+      const response = await instance.get<SentApply[]>(
+        API_PATHS.MENTORING_APPLY_SENT
+      );
+      if (Array.isArray(response.data)) {
+        setSentApplies(response.data);
+      }
+    } catch (error) {
+      console.error('보낸 신청 목록 조회 실패:', error);
+      if (axios.isAxiosError(error)) {
+        if (error.response?.status === 401) {
+          toast.error('인증이 필요합니다.');
+        }
+      }
+    }
+  };
+
+  const appliedMentorIds = useMemo(() => {
+    return new Set(
+      sentApplies
+        .filter((apply) => apply.applyStatus === 'PENDING')
+        .map((apply) => apply.mentorId)
+    );
+  }, [sentApplies]);
 
   const mentors = useMemo(() => {
     let filteredMentors = allMentors;
@@ -89,7 +153,56 @@ export default function MentoringPage() {
   }, [searchQuery, allMentors, currentMemberId]);
 
   const handleMentorApply = async (mentor: MentorData) => {
-    await applyMentor(mentor);
+    if (appliedMentorIds.has(mentor.memberId)) {
+      toast.error('이미 신청한 멘토입니다.');
+      return;
+    }
+
+    try {
+      const response = await instance.post<MentoringApplyResponse>(
+        API_PATHS.MENTORING_APPLY(mentor.memberId)
+      );
+
+      const applyData = response.data;
+
+      const newApply: SentApply = {
+        applyId: applyData.applyId,
+        mentorId: applyData.mentorId,
+        name: mentor.name,
+        applyStatus: applyData.applyStatus,
+        createdAt: applyData.createdAt,
+      };
+
+      setSentApplies((prev) => [...prev, newApply]);
+      toast.success('신청을 했어요');
+    } catch (err) {
+      if (axios.isAxiosError(err)) {
+        const status = err.response?.status;
+
+        if (status === 401) {
+          toast.error('인증이 필요합니다.');
+        } else if (status === 404) {
+          toast.error('멘토를 찾을 수 없습니다.');
+        } else if (status === 409) {
+          toast.error('이미 신청한 멘토링입니다.');
+          try {
+            await fetchSentApplies();
+          } catch (fetchError) {
+            console.error('신청 목록 갱신 실패:', fetchError);
+          }
+        } else if (err.code === 'ECONNABORTED' || err.code === 'ETIMEDOUT') {
+          toast.error('요청 시간이 초과되었습니다. 잠시 후 다시 시도해주세요.');
+        } else if (status === 500) {
+          toast.error('서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+        } else {
+          console.error('멘토링 신청 실패:', err);
+          toast.error('신청에 실패했습니다.');
+        }
+      } else {
+        console.error('멘토링 신청 실패:', err);
+        toast.error('신청에 실패했습니다.');
+      }
+    }
   };
 
   return (
@@ -130,9 +243,9 @@ export default function MentoringPage() {
           <div className="h-16 bg-[linear-gradient(180deg,#FFF_0%,rgba(255,255,255,0)_100%)]"></div>
         </div>
 
-        <div className="px-7 2xl:px-12 pt-[120px] 2xl:pt-[220px] pb-12">
+        <div className="px-6 2xl:px-12 pt-[120px] 2xl:pt-[220px] pb-12">
           {isLoading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-12 justify-items-center">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 2xl:gap-12 justify-items-center">
               {Array.from({ length: 9 }).map((_, index) => (
                 <Mentor
                   key={`loading-${index}`}
@@ -144,14 +257,19 @@ export default function MentoringPage() {
               ))}
             </div>
           ) : mentors.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-12 justify-items-center">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 2xl:gap-12 justify-items-center">
               {mentors.map((mentor) => (
                 <Mentor
                   key={mentor.memberId}
                   name={mentor.name}
                   generation={mentor.generation}
                   major={mentor.major}
-                  onApply={() => handleMentorApply(mentor)}
+                  onApply={
+                    appliedMentorIds.has(mentor.memberId)
+                      ? undefined
+                      : () => handleMentorApply(mentor)
+                  }
+                  isApplied={appliedMentorIds.has(mentor.memberId)}
                 />
               ))}
             </div>
