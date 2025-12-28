@@ -140,10 +140,13 @@ export default function AdminReport({
     setIsModalOpen(true);
   };
 
-  const handleReportAction = (action: 'BLOCK' | 'REJECT' | 'HOLD') => {
-    console.log(action);
-    setIsModalOpen(false);
-    setSelectedReport(null);
+  const handleReportAction = (
+    action: 'BLOCK' | 'REJECT' | 'HOLD',
+    reportId: number
+  ) => {
+    if (action === 'BLOCK' || action === 'REJECT') {
+      setAllReports((prev) => prev.filter((r) => r.id !== reportId));
+    }
   };
 
   if (loading) {
@@ -217,11 +220,14 @@ export default function AdminReport({
       </div>
       {isModalOpen && selectedReport && (
         <CheckReportModal
+          reportId={selectedReport.id}
           onClose={() => {
             setIsModalOpen(false);
             setSelectedReport(null);
           }}
-          onAction={handleReportAction}
+          onAction={(action) => {
+            handleReportAction(action, selectedReport.id);
+          }}
         />
       )}
     </div>
