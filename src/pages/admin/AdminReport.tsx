@@ -29,22 +29,37 @@ interface Report {
   reportedPostId: number;
 }
 
-export default function AdminReport() {
+interface AdminReportProps {
+  currentPage: number;
+  onTotalPagesChange: (totalPages: number) => void;
+}
+
+export default function AdminReport({
+  currentPage,
+  onTotalPagesChange,
+}: AdminReportProps) {
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [reports, setReports] = useState<Report[]>([]);
+  const [allReports, setAllReports] = useState<Report[]>([]);
   const [selectedReport, setSelectedReport] = useState<Report | null>(null);
   const [loading, setLoading] = useState(true);
+
+  const itemsPerPage = 5;
 
   useEffect(() => {
     fetchReports();
   }, []);
 
+  useEffect(() => {
+    const totalPages = Math.ceil(allReports.length / itemsPerPage);
+    onTotalPagesChange(totalPages);
+  }, [allReports, onTotalPagesChange]);
+
   const fetchReports = async () => {
     try {
       setLoading(true);
       const response = await instance.get<Report[]>('/api/admin/report');
-      setReports(response.data);
+      setAllReports(response.data);
     } catch (err) {
       if (err instanceof AxiosError) {
         if (
@@ -70,6 +85,10 @@ export default function AdminReport() {
       setLoading(false);
     }
   };
+
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentReports = allReports.slice(startIndex, endIndex);
 
   const getStatusText = (status: string) => {
     switch (status) {
@@ -138,14 +157,14 @@ export default function AdminReport() {
   return (
     <div className="flex flex-col items-center px-4">
       <div className="w-full max-w-[1300px]">
-        {reports.length === 0 ? (
+        {allReports.length === 0 ? (
           <div className="flex justify-center items-center py-20">
             <div className="text-2xl font-semibold text-gray-3">
               신고 내역이 없습니다.
             </div>
           </div>
         ) : (
-          reports.map((report) => (
+          currentReports.map((report) => (
             <div
               key={report.id}
               className="bg-[#F9F9F9] mb-8 h-20 rounded-lg px-12 flex items-center gap-4"
