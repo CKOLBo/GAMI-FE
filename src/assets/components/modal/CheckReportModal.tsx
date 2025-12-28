@@ -70,8 +70,6 @@ export default function CheckReportModal({
 
     try {
       setProcessing(true);
-
-      // 🔥 삭제 로직 제거 (중요)
       await instance.post(`/api/admin/report/${reportId}`, {
         reportResult: reportResultMap[action],
         reportAction: 'NONE',

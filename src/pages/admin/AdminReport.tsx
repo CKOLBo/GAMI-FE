@@ -59,7 +59,10 @@ export default function AdminReport({
     try {
       setLoading(true);
       const response = await instance.get<Report[]>('/api/admin/report');
-      setAllReports(response.data);
+
+      const sortedReports = [...response.data].sort((a, b) => b.id - a.id);
+
+      setAllReports(sortedReports);
     } catch (err) {
       if (err instanceof AxiosError) {
         if (
@@ -177,13 +180,13 @@ export default function AdminReport({
             </div>
           </div>
         ) : (
-          currentReports.map((report) => (
+          currentReports.map((report, index) => (
             <div
               key={report.id}
               className="bg-[#F9F9F9] mb-8 h-20 rounded-lg px-12 flex items-center gap-4"
             >
               <span className="text-2xl font-bold shrink-0 w-[60px] text-center">
-                {report.id}
+                {index + 1}
               </span>
 
               <div className="shrink-0 w-[140px] pl-22 flex justify-center">
