@@ -4,6 +4,7 @@ import Button from '@/assets/components/Button/Button';
 import Arrow from '@/assets/svg/Arrow';
 import { instance } from '@/assets/shared/lib/axios';
 import { toast } from 'react-toastify';
+import { AxiosError } from 'axios';
 
 interface ReportModalProps {
   postId: number;
@@ -53,23 +54,27 @@ export default function ReportModal({
       await instance.post('/api/report', {
         postId,
         reportType: reportTypeMap[selectedReason],
-        reason: selectedReason,
-        reasonDetail: additionalText,
+        reason: additionalText || '',
+        reasonDetail: additionalText || '',
       });
 
       toast.success('신고가 접수되었습니다.');
       onReport();
-    } catch (error: unknown) {
-      if (
-        typeof error === 'object' &&
-        error !== null &&
-        'response' in error &&
-        (error as { response?: { status?: number } }).response?.status === 401
-      ) {
-        toast.error('로그인이 필요합니다.');
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        if (error.response?.status === 401) {
+          toast.error('로그인이 필요합니다.');
+        } else if (error.response?.status === 409) {
+          toast.error('이미 신고한 게시글입니다.');
+        } else if (error.response?.status === 400) {
+          toast.error('잘못된 신고 요청입니다.');
+        } else {
+          toast.error('신고 처리 중 오류가 발생했습니다.');
+        }
       } else {
         toast.error('신고 처리 중 오류가 발생했습니다.');
       }
+      console.error('Report error:', error);
     }
   };
 
