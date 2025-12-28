@@ -88,6 +88,11 @@ interface NotificationMessage {
   applyId?: number;
 }
 
+interface Subscription {
+  id: string;
+  unsubscribe: () => void;
+}
+
 export default function ChatPage() {
   const { user } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -127,8 +132,8 @@ export default function ChatPage() {
   }, [currentUserId]);
 
   const stompClientRef = useRef<Client | null>(null);
-  const roomSubscriptionRef = useRef<any>(null);
-  const notificationSubscriptionRef = useRef<any>(null);
+  const roomSubscriptionRef = useRef<Subscription | null>(null);
+  const notificationSubscriptionRef = useRef<Subscription | null>(null);
   const isSubscribedRef = useRef<boolean>(false);
   const isConnectingRef = useRef<boolean>(false);
 
@@ -140,6 +145,7 @@ export default function ChatPage() {
     return () => {
       disconnectWebSocket();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -155,6 +161,7 @@ export default function ChatPage() {
         }
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chatList.length, searchParams]);
 
   useEffect(() => {
@@ -255,11 +262,15 @@ export default function ChatPage() {
         if (roomSubscriptionRef.current) {
           try {
             roomSubscriptionRef.current.unsubscribe();
-          } catch (e) {}
+          } catch {
+            // 구독 해제 실패 무시
+          }
           roomSubscriptionRef.current = null;
         }
         stompClientRef.current.deactivate();
-      } catch (e) {}
+      } catch {
+        // 연결 해제 실패 무시
+      }
       stompClientRef.current = null;
     }
 
@@ -292,7 +303,7 @@ export default function ChatPage() {
     };
 
     const client = new Client({
-      webSocketFactory: () => socket as any,
+      webSocketFactory: () => socket as WebSocket,
       connectHeaders: {
         Authorization: `Bearer ${token}`,
       },
@@ -305,7 +316,9 @@ export default function ChatPage() {
         if (!isConnectingRef.current || stompClientRef.current !== client) {
           try {
             client.deactivate();
-          } catch (e) {}
+          } catch {
+            // 연결 해제 실패 무시
+          }
           return;
         }
       },
@@ -371,7 +384,9 @@ export default function ChatPage() {
         isConnectingRef.current = false;
         try {
           client.deactivate();
-        } catch (e) {}
+        } catch {
+          // 연결 해제 실패 무시
+        }
       }
     }, 10000);
 
@@ -383,14 +398,18 @@ export default function ChatPage() {
     if (roomSubscriptionRef.current) {
       try {
         roomSubscriptionRef.current.unsubscribe();
-      } catch (e) {}
+      } catch {
+        // 구독 해제 실패 무시
+      }
       roomSubscriptionRef.current = null;
     }
 
     if (notificationSubscriptionRef.current) {
       try {
         notificationSubscriptionRef.current.unsubscribe();
-      } catch (e) {}
+      } catch {
+        // 구독 해제 실패 무시
+      }
       notificationSubscriptionRef.current = null;
     }
 
@@ -402,7 +421,9 @@ export default function ChatPage() {
         if (stompClientRef.current.connected || stompClientRef.current.active) {
           stompClientRef.current.deactivate();
         }
-      } catch (e) {}
+      } catch {
+        // 연결 해제 실패 무시
+      }
       stompClientRef.current = null;
     }
   };
@@ -415,7 +436,9 @@ export default function ChatPage() {
     if (notificationSubscriptionRef.current) {
       try {
         notificationSubscriptionRef.current.unsubscribe();
-      } catch (e) {}
+      } catch {
+        // 구독 해제 실패 무시
+      }
       notificationSubscriptionRef.current = null;
     }
 
@@ -541,7 +564,9 @@ export default function ChatPage() {
               const payload = JSON.parse(atob(token.split('.')[1]));
               const exp = payload.exp * 1000;
               tokenExpired = Date.now() >= exp;
-            } catch (e) {}
+            } catch {
+              // 토큰 파싱 실패 무시
+            }
           }
 
           const toastMessage = tokenExpired
@@ -717,7 +742,9 @@ export default function ChatPage() {
     if (roomSubscriptionRef.current) {
       try {
         roomSubscriptionRef.current.unsubscribe();
-      } catch (e) {}
+      } catch {
+        // 구독 해제 실패 무시
+      }
       roomSubscriptionRef.current = null;
     }
 

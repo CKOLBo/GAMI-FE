@@ -10,8 +10,13 @@ import { API_PATHS } from '@/constants/api';
 import { Link } from 'react-router-dom';
 import { getCookie } from '@/assets/shared/lib/cookie';
 import SockJS from 'sockjs-client';
-import { Client, type IMessage } from '@stomp/stompjs';
+import { Client, type IMessage, type IFrame } from '@stomp/stompjs';
 import { toast } from 'react-toastify';
+
+interface Subscription {
+  id: string;
+  unsubscribe: () => void;
+}
 
 interface ApplyRequest {
   applyId: number;
@@ -41,7 +46,7 @@ export default function ChatApplyPage() {
     useState(false);
   const [removingIds, setRemovingIds] = useState<Set<number>>(new Set());
   const stompClientRef = useRef<Client | null>(null);
-  const notificationSubscriptionRef = useRef<any>(null);
+  const notificationSubscriptionRef = useRef<Subscription | null>(null);
   const isConnectingRef = useRef<boolean>(false);
 
   const connectWebSocket = () => {
@@ -68,11 +73,15 @@ export default function ChatApplyPage() {
         if (notificationSubscriptionRef.current) {
           try {
             notificationSubscriptionRef.current.unsubscribe();
-          } catch (e) {}
+          } catch {
+            // 구독 해제 실패 무시
+          }
           notificationSubscriptionRef.current = null;
         }
         stompClientRef.current.deactivate();
-      } catch (e) {}
+      } catch {
+        // 연결 해제 실패 무시
+      }
       stompClientRef.current = null;
     }
 
@@ -97,7 +106,7 @@ export default function ChatApplyPage() {
     };
 
     const client = new Client({
-      webSocketFactory: () => socket as any,
+      webSocketFactory: () => socket as WebSocket,
       connectHeaders: {
         Authorization: `Bearer ${token}`,
       },
@@ -114,7 +123,7 @@ export default function ChatApplyPage() {
         console.error('WebSocket 오류:', event);
         isConnectingRef.current = false;
       },
-      onStompError: (frame: any) => {
+      onStompError: (frame: IFrame) => {
         console.error('STOMP 오류:', frame);
         isConnectingRef.current = false;
       },
@@ -135,7 +144,9 @@ export default function ChatApplyPage() {
     if (notificationSubscriptionRef.current) {
       try {
         notificationSubscriptionRef.current.unsubscribe();
-      } catch (e) {}
+      } catch {
+        // 구독 해제 실패 무시
+      }
       notificationSubscriptionRef.current = null;
     }
 
@@ -171,7 +182,9 @@ export default function ChatApplyPage() {
     if (notificationSubscriptionRef.current) {
       try {
         notificationSubscriptionRef.current.unsubscribe();
-      } catch (e) {}
+      } catch {
+        // 구독 해제 실패 무시
+      }
       notificationSubscriptionRef.current = null;
     }
 
@@ -182,7 +195,9 @@ export default function ChatApplyPage() {
         if (stompClientRef.current.connected || stompClientRef.current.active) {
           stompClientRef.current.deactivate();
         }
-      } catch (e) {}
+      } catch {
+        // 연결 해제 실패 무시
+      }
       stompClientRef.current = null;
     }
   };
@@ -211,6 +226,7 @@ export default function ChatApplyPage() {
     return () => {
       disconnectWebSocket();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchReceivedRequests = async () => {
