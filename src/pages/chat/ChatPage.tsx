@@ -1135,9 +1135,9 @@ export default function ChatPage() {
                                   ? 'bg-main-1 text-white'
                                   : 'bg-white-1 text-gray-1'
                               }`}
-                              style={{ wordBreak: 'break-word', overflowWrap: 'break-word' }}
+                              style={{ wordBreak: 'break-all', overflowWrap: 'anywhere' }}
                             >
-                              <p className="text-base whitespace-normal break-words" style={{ wordBreak: 'break-word', overflowWrap: 'break-word' }}>{message.message}</p>
+                              <p className="text-base whitespace-normal break-words" style={{ wordBreak: 'break-all', overflowWrap: 'anywhere' }}>{message.message}</p>
                             </div>
                             {!isMyMessage && showTime && (
                               <span className="text-xs text-gray-3 whitespace-nowrap">
