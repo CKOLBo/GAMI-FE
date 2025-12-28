@@ -32,15 +32,6 @@ instance.interceptors.request.use(
       const token = getCookie('accessToken');
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
-        if (import.meta.env.DEV && config.url?.includes('/chat/rooms')) {
-          console.log('📤 요청 헤더 확인:', {
-            url: config.url,
-            hasAuthHeader: !!config.headers.Authorization,
-            authHeaderPreview: config.headers.Authorization
-              ? `${config.headers.Authorization.substring(0, 30)}...`
-              : '없음',
-          });
-        }
       }
     }
     return config;
