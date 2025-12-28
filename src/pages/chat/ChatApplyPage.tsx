@@ -4,10 +4,14 @@ import BellIcon from '@/assets/svg/common/BellIcon';
 import Divider from '@/assets/svg/Divider';
 import RequestItem from '@/assets/components/chat/RequestItem';
 import MentorRequestModal from '@/assets/components/modal/MentorRequestModal';
-import { useState, useEffect } from 'react';
-import { instance } from '@/assets/shared/lib/axios';
+import { useState, useEffect, useRef } from 'react';
+import { instance, baseURL } from '@/assets/shared/lib/axios';
 import { API_PATHS } from '@/constants/api';
 import { Link } from 'react-router-dom';
+import { getCookie } from '@/assets/shared/lib/cookie';
+import SockJS from 'sockjs-client';
+import { Client, type IMessage } from '@stomp/stompjs';
+import { toast } from 'react-toastify';
 
 interface ApplyRequest {
   applyId: number;
@@ -18,12 +22,166 @@ interface ApplyRequest {
   createdAt: string;
 }
 
+interface NotificationMessage {
+  type: 'MENTORING_REQUEST' | 'MENTORING_ACCEPTED' | 'MENTORING_REJECTED' | 'CHAT_MESSAGE';
+  senderName?: string;
+  message?: string;
+  applyId?: number;
+}
+
 export default function ChatApplyPage() {
   const [sentRequests, setSentRequests] = useState<ApplyRequest[]>([]);
   const [receivedRequests, setReceivedRequests] = useState<ApplyRequest[]>([]);
   const [loading, setLoading] = useState(false);
   const [isMentorRequestModalOpen, setIsMentorRequestModalOpen] =
     useState(false);
+  const [removingIds, setRemovingIds] = useState<Set<number>>(new Set());
+  const stompClientRef = useRef<Client | null>(null);
+  const notificationSubscriptionRef = useRef<any>(null);
+  const isConnectingRef = useRef<boolean>(false);
+
+  const connectWebSocket = () => {
+    const token = getCookie('accessToken');
+    if (!token) {
+      return;
+    }
+
+    if (isConnectingRef.current) {
+      return;
+    }
+
+    if (stompClientRef.current) {
+      if (stompClientRef.current.connected) {
+        subscribeToNotifications();
+        return;
+      }
+      
+      if (stompClientRef.current.active) {
+        return;
+      }
+
+      try {
+        if (notificationSubscriptionRef.current) {
+          try {
+            notificationSubscriptionRef.current.unsubscribe();
+          } catch (e) {
+          }
+          notificationSubscriptionRef.current = null;
+        }
+        stompClientRef.current.deactivate();
+      } catch (e) {
+      }
+      stompClientRef.current = null;
+    }
+
+    isConnectingRef.current = true;
+
+    const backendUrl = import.meta.env.DEV
+      ? 'https://port-0-gami-server-mj0rdvda8d11523e.sel3.cloudtype.app'
+      : baseURL;
+    const wsUrl = `${backendUrl}/ws`;
+    
+    const socket = new SockJS(wsUrl, null, {
+      transports: ['websocket', 'xhr-streaming', 'xhr-polling'],
+    });
+    
+    socket.onerror = (error: Event) => {
+      console.error('SockJS 오류:', error);
+      isConnectingRef.current = false;
+    };
+    
+    socket.onclose = () => {
+      isConnectingRef.current = false;
+    };
+    
+    const client = new Client({
+      webSocketFactory: () => socket as any,
+      connectHeaders: {
+        Authorization: `Bearer ${token}`,
+      },
+      reconnectDelay: 0,
+      heartbeatIncoming: 4000,
+      heartbeatOutgoing: 4000,
+      connectionTimeout: 10000,
+      logRawCommunication: false,
+      onConnect: () => {
+        isConnectingRef.current = false;
+        subscribeToNotifications();
+      },
+      onWebSocketError: (event: Event) => {
+        console.error('WebSocket 오류:', event);
+        isConnectingRef.current = false;
+      },
+      onStompError: (frame: any) => {
+        console.error('STOMP 오류:', frame);
+        isConnectingRef.current = false;
+      },
+      onWebSocketClose: () => {
+        isConnectingRef.current = false;
+      },
+    });
+
+    stompClientRef.current = client;
+    client.activate();
+  };
+
+  const subscribeToNotifications = () => {
+    if (!stompClientRef.current || !stompClientRef.current.connected) {
+      return;
+    }
+
+    if (notificationSubscriptionRef.current) {
+      try {
+        notificationSubscriptionRef.current.unsubscribe();
+      } catch (e) {
+      }
+      notificationSubscriptionRef.current = null;
+    }
+
+    const notificationTopic = '/user/queue/notifications';
+
+    try {
+      notificationSubscriptionRef.current = stompClientRef.current.subscribe(
+        notificationTopic,
+        (message: IMessage) => {
+          try {
+            const notification = JSON.parse(message.body) as NotificationMessage;
+            
+            if (notification.type === 'MENTORING_REQUEST' && notification.senderName) {
+              toast.info(`${notification.senderName}님한테 요청이 왔어요`);
+              fetchReceivedRequests();
+            }
+          } catch (e) {
+            console.error('알림 파싱 오류:', e);
+          }
+        }
+      );
+    } catch (e) {
+      console.error('알림 구독 실패:', e);
+    }
+  };
+
+  const disconnectWebSocket = () => {
+    if (notificationSubscriptionRef.current) {
+      try {
+        notificationSubscriptionRef.current.unsubscribe();
+      } catch (e) {
+      }
+      notificationSubscriptionRef.current = null;
+    }
+
+    isConnectingRef.current = false;
+
+    if (stompClientRef.current) {
+      try {
+        if (stompClientRef.current.connected || stompClientRef.current.active) {
+          stompClientRef.current.deactivate();
+        }
+      } catch (e) {
+      }
+      stompClientRef.current = null;
+    }
+  };
 
   useEffect(() => {
     const fetchSentRequests = async () => {
@@ -43,6 +201,12 @@ export default function ChatApplyPage() {
     };
 
     fetchSentRequests();
+    fetchReceivedRequests();
+    connectWebSocket();
+
+    return () => {
+      disconnectWebSocket();
+    };
   }, []);
 
   const fetchReceivedRequests = async () => {
@@ -66,13 +230,28 @@ export default function ChatApplyPage() {
 
   const handleCancelRequest = async (applyId: number) => {
     try {
+      setRemovingIds((prev) => new Set(prev).add(applyId));
+      
       await instance.patch(API_PATHS.MENTORING_APPLY_UPDATE(applyId), {
         applyStatus: 'REJECTED',
       });
-      setSentRequests((prev) => prev.filter((req) => req.applyId !== applyId));
+      
+      setTimeout(() => {
+        setSentRequests((prev) => prev.filter((req) => req.applyId !== applyId));
+        setRemovingIds((prev) => {
+          const newSet = new Set(prev);
+          newSet.delete(applyId);
+          return newSet;
+        });
+      }, 300);
     } catch (error) {
       console.error('요청 취소 실패:', error);
-      alert('요청 취소에 실패했습니다. 다시 시도해주세요.');
+      setRemovingIds((prev) => {
+        const newSet = new Set(prev);
+        newSet.delete(applyId);
+        return newSet;
+      });
+      toast.error('요청 취소에 실패했습니다. 다시 시도해주세요.');
     }
   };
 
@@ -86,10 +265,10 @@ export default function ChatApplyPage() {
         applyStatus: 'ACCEPTED',
       });
       await fetchReceivedRequests();
-      alert('멘토링 신청을 수락했습니다.');
+      toast.success('멘토링 신청을 수락했습니다.');
     } catch (error) {
       console.error('멘토 신청 수락 실패:', error);
-      alert('멘토 신청 수락에 실패했습니다. 다시 시도해주세요.');
+      toast.error('멘토 신청 수락에 실패했습니다. 다시 시도해주세요.');
     }
   };
 
@@ -99,10 +278,10 @@ export default function ChatApplyPage() {
         applyStatus: 'REJECTED',
       });
       await fetchReceivedRequests();
-      alert('멘토링 신청을 거절했습니다.');
+      toast.success('멘토링 신청을 거절했습니다.');
     } catch (error) {
       console.error('멘토 신청 거절 실패:', error);
-      alert('멘토 신청 거절에 실패했습니다. 다시 시도해주세요.');
+      toast.error('멘토 신청 거절에 실패했습니다. 다시 시도해주세요.');
     }
   };
 
@@ -129,6 +308,9 @@ export default function ChatApplyPage() {
                 type="button"
               >
                 <BellIcon className="text-gray-3 pointer-events-none" />
+                {receivedRequests.filter(req => req.applyStatus === 'PENDING').length > 0 && (
+                  <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>
+                )}
               </button>
             </div>
           </div>
@@ -144,6 +326,7 @@ export default function ChatApplyPage() {
                   key={request.applyId}
                   name={request.name}
                   onCancel={() => handleCancelRequest(request.applyId)}
+                  isRemoving={removingIds.has(request.applyId)}
                 />
               ))
             ) : (
