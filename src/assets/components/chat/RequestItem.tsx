@@ -6,7 +6,11 @@ interface RequestItemProps {
   isRemoving?: boolean;
 }
 
-export default function RequestItem({ name, onCancel, isRemoving = false }: RequestItemProps) {
+export default function RequestItem({
+  name,
+  onCancel,
+  isRemoving = false,
+}: RequestItemProps) {
   return (
     <div
       className={`mb-3 mx-4 2xl:mx-6 px-2 2xl:px-3 py-2 2xl:py-3 rounded-lg bg-white-1 flex items-center gap-1 2xl:gap-2 transition-all duration-300 ease-in-out ${

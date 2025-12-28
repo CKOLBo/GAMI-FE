@@ -23,7 +23,11 @@ interface ApplyRequest {
 }
 
 interface NotificationMessage {
-  type: 'MENTORING_REQUEST' | 'MENTORING_ACCEPTED' | 'MENTORING_REJECTED' | 'CHAT_MESSAGE';
+  type:
+    | 'MENTORING_REQUEST'
+    | 'MENTORING_ACCEPTED'
+    | 'MENTORING_REJECTED'
+    | 'CHAT_MESSAGE';
   senderName?: string;
   message?: string;
   applyId?: number;
@@ -55,7 +59,7 @@ export default function ChatApplyPage() {
         subscribeToNotifications();
         return;
       }
-      
+
       if (stompClientRef.current.active) {
         return;
       }
@@ -64,13 +68,11 @@ export default function ChatApplyPage() {
         if (notificationSubscriptionRef.current) {
           try {
             notificationSubscriptionRef.current.unsubscribe();
-          } catch (e) {
-          }
+          } catch (e) {}
           notificationSubscriptionRef.current = null;
         }
         stompClientRef.current.deactivate();
-      } catch (e) {
-      }
+      } catch (e) {}
       stompClientRef.current = null;
     }
 
@@ -80,20 +82,20 @@ export default function ChatApplyPage() {
       ? 'https://port-0-gami-server-mj0rdvda8d11523e.sel3.cloudtype.app'
       : baseURL;
     const wsUrl = `${backendUrl}/ws`;
-    
+
     const socket = new SockJS(wsUrl, null, {
       transports: ['websocket', 'xhr-streaming', 'xhr-polling'],
     });
-    
+
     socket.onerror = (error: Event) => {
       console.error('SockJS 오류:', error);
       isConnectingRef.current = false;
     };
-    
+
     socket.onclose = () => {
       isConnectingRef.current = false;
     };
-    
+
     const client = new Client({
       webSocketFactory: () => socket as any,
       connectHeaders: {
@@ -133,8 +135,7 @@ export default function ChatApplyPage() {
     if (notificationSubscriptionRef.current) {
       try {
         notificationSubscriptionRef.current.unsubscribe();
-      } catch (e) {
-      }
+      } catch (e) {}
       notificationSubscriptionRef.current = null;
     }
 
@@ -145,9 +146,14 @@ export default function ChatApplyPage() {
         notificationTopic,
         (message: IMessage) => {
           try {
-            const notification = JSON.parse(message.body) as NotificationMessage;
-            
-            if (notification.type === 'MENTORING_REQUEST' && notification.senderName) {
+            const notification = JSON.parse(
+              message.body
+            ) as NotificationMessage;
+
+            if (
+              notification.type === 'MENTORING_REQUEST' &&
+              notification.senderName
+            ) {
               toast.info(`${notification.senderName}님한테 요청이 왔어요`);
               fetchReceivedRequests();
             }
@@ -165,8 +171,7 @@ export default function ChatApplyPage() {
     if (notificationSubscriptionRef.current) {
       try {
         notificationSubscriptionRef.current.unsubscribe();
-      } catch (e) {
-      }
+      } catch (e) {}
       notificationSubscriptionRef.current = null;
     }
 
@@ -177,8 +182,7 @@ export default function ChatApplyPage() {
         if (stompClientRef.current.connected || stompClientRef.current.active) {
           stompClientRef.current.deactivate();
         }
-      } catch (e) {
-      }
+      } catch (e) {}
       stompClientRef.current = null;
     }
   };
@@ -231,13 +235,15 @@ export default function ChatApplyPage() {
   const handleCancelRequest = async (applyId: number) => {
     try {
       setRemovingIds((prev) => new Set(prev).add(applyId));
-      
+
       await instance.patch(API_PATHS.MENTORING_APPLY_UPDATE(applyId), {
         applyStatus: 'REJECTED',
       });
-      
+
       setTimeout(() => {
-        setSentRequests((prev) => prev.filter((req) => req.applyId !== applyId));
+        setSentRequests((prev) =>
+          prev.filter((req) => req.applyId !== applyId)
+        );
         setRemovingIds((prev) => {
           const newSet = new Set(prev);
           newSet.delete(applyId);
@@ -300,7 +306,9 @@ export default function ChatApplyPage() {
                   채팅
                 </Link>
                 <Divider className="flex-shrink-0" />
-                <span className="text-3xl 2xl:text-[40px] text-gray-1 font-bold">요청</span>
+                <span className="text-3xl 2xl:text-[40px] text-gray-1 font-bold">
+                  요청
+                </span>
               </h1>
               <button
                 onClick={handleBellClick}
@@ -308,7 +316,8 @@ export default function ChatApplyPage() {
                 type="button"
               >
                 <BellIcon className="text-gray-3 pointer-events-none" />
-                {receivedRequests.filter(req => req.applyStatus === 'PENDING').length > 0 && (
+                {receivedRequests.filter((req) => req.applyStatus === 'PENDING')
+                  .length > 0 && (
                   <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>
                 )}
               </button>

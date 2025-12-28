@@ -31,7 +31,9 @@ export default function RandomMentoring() {
   const isCancelledRef = useRef(false);
   const retryTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const retryCountRef = useRef(0);
-  const matchingDotsIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const matchingDotsIntervalRef = useRef<ReturnType<typeof setInterval> | null>(
+    null
+  );
   const { apply: applyMentor } = useMentorApply();
 
   useEffect(() => {
@@ -78,8 +80,10 @@ export default function RandomMentoring() {
       .catch((err: unknown) => {
         apiError = err;
       });
-    
-    const timerPromise = new Promise<void>((resolve) => setTimeout(resolve, minWaitTime));
+
+    const timerPromise = new Promise<void>((resolve) =>
+      setTimeout(resolve, minWaitTime)
+    );
 
     await Promise.all([apiPromise, timerPromise]);
 
@@ -89,13 +93,16 @@ export default function RandomMentoring() {
 
     if (apiError) {
       setIsMatchingModalOpen(false);
-      
+
       if (axios.isAxiosError(apiError)) {
         if (apiError.response?.status === 401) {
           toast.error('인증이 필요합니다.');
         } else if (apiError.response?.status === 404) {
           toast.error('멘토를 찾을 수 없습니다.');
-        } else if (apiError.code === 'ECONNABORTED' || apiError.code === 'ETIMEDOUT') {
+        } else if (
+          apiError.code === 'ECONNABORTED' ||
+          apiError.code === 'ETIMEDOUT'
+        ) {
           toast.error('요청 시간이 초과되었습니다. 잠시 후 다시 시도해주세요.');
         } else if (apiError.response?.status === 500) {
           toast.error('서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
@@ -116,7 +123,8 @@ export default function RandomMentoring() {
       return;
     }
 
-    const mentorData = (apiResponse as AxiosResponse<RandomMentorResponse>).data;
+    const mentorData = (apiResponse as AxiosResponse<RandomMentorResponse>)
+      .data;
     const mentorId = mentorData.memberId;
 
     if (recommendedMentorIdsRef.current.includes(mentorId)) {

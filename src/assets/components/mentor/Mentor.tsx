@@ -23,10 +23,18 @@ export default function Mentor({
         <div className="flex-shrink-0 mt-2 2xl:mt-4 ml-2 2xl:ml-4">
           {isEmpty ? (
             <div className="opacity-30">
-              <Profile width={100} height={100} className="2xl:w-[100px] 2xl:h-[100px] w-[70px] h-[70px]" />
+              <Profile
+                width={100}
+                height={100}
+                className="2xl:w-[100px] 2xl:h-[100px] w-[70px] h-[70px]"
+              />
             </div>
           ) : (
-            <Profile width={100} height={100} className="2xl:w-[100px] 2xl:h-[100px] w-[70px] h-[70px]" />
+            <Profile
+              width={100}
+              height={100}
+              className="2xl:w-[100px] 2xl:h-[100px] w-[70px] h-[70px]"
+            />
           )}
         </div>
 
@@ -34,7 +42,9 @@ export default function Mentor({
           {isEmpty ? (
             <div className="h-[24px] 2xl:h-[28px] w-32 bg-gray-4 rounded mb-1 2xl:mb-3 animate-pulse"></div>
           ) : (
-            <p className="font-bold text-gray-1 2xl:text-[24px] text-[18px] mb-1 2xl:mb-3">{name}</p>
+            <p className="font-bold text-gray-1 2xl:text-[24px] text-[18px] mb-1 2xl:mb-3">
+              {name}
+            </p>
           )}
 
           <div className="flex gap-2">

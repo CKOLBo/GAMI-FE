@@ -78,12 +78,15 @@ interface MentorRequest {
 }
 
 interface NotificationMessage {
-  type: 'MENTORING_REQUEST' | 'MENTORING_ACCEPTED' | 'MENTORING_REJECTED' | 'CHAT_MESSAGE';
+  type:
+    | 'MENTORING_REQUEST'
+    | 'MENTORING_ACCEPTED'
+    | 'MENTORING_REJECTED'
+    | 'CHAT_MESSAGE';
   senderName?: string;
   message?: string;
   applyId?: number;
 }
-
 
 export default function ChatPage() {
   const { user } = useAuth();
@@ -108,7 +111,7 @@ export default function ChatPage() {
   const isLoadingMoreRef = useRef<boolean>(false);
   const [mentorRequests, setMentorRequests] = useState<MentorRequest[]>([]);
   const currentUserId = user?.id ?? null;
-  
+
   const actualUserId = useMemo(() => {
     if (currentUserId) return currentUserId;
     const token = getCookie('accessToken');
@@ -122,7 +125,7 @@ export default function ChatPage() {
     }
     return null;
   }, [currentUserId]);
-  
+
   const stompClientRef = useRef<Client | null>(null);
   const roomSubscriptionRef = useRef<any>(null);
   const notificationSubscriptionRef = useRef<any>(null);
@@ -144,7 +147,10 @@ export default function ChatPage() {
     if (roomIdParam && chatList.length > 0) {
       const roomId = Number(roomIdParam);
       if (!isNaN(roomId)) {
-        if (roomId !== selectedRoomId || (roomId === selectedRoomId && !roomDetail)) {
+        if (
+          roomId !== selectedRoomId ||
+          (roomId === selectedRoomId && !roomDetail)
+        ) {
           handleChatClick(roomId);
         }
       }
@@ -152,7 +158,12 @@ export default function ChatPage() {
   }, [chatList.length, searchParams]);
 
   useEffect(() => {
-    if (!loading && messages.length > 0 && messagesContainerRef.current && !isLoadingMoreRef.current) {
+    if (
+      !loading &&
+      messages.length > 0 &&
+      messagesContainerRef.current &&
+      !isLoadingMoreRef.current
+    ) {
       setTimeout(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'auto' });
       }, 100);
@@ -235,7 +246,7 @@ export default function ChatPage() {
       if (stompClientRef.current.connected) {
         return;
       }
-      
+
       if (stompClientRef.current.active) {
         return;
       }
@@ -244,13 +255,11 @@ export default function ChatPage() {
         if (roomSubscriptionRef.current) {
           try {
             roomSubscriptionRef.current.unsubscribe();
-          } catch (e) {
-          }
+          } catch (e) {}
           roomSubscriptionRef.current = null;
         }
         stompClientRef.current.deactivate();
-      } catch (e) {
-      }
+      } catch (e) {}
       stompClientRef.current = null;
     }
 
@@ -260,13 +269,13 @@ export default function ChatPage() {
       ? 'https://port-0-gami-server-mj0rdvda8d11523e.sel3.cloudtype.app'
       : baseURL;
     const wsUrl = `${backendUrl}/ws`;
-    
+
     let connectionTimeoutId: ReturnType<typeof setTimeout> | null = null;
-    
+
     const socket = new SockJS(wsUrl, null, {
       transports: ['websocket', 'xhr-streaming', 'xhr-polling'],
     });
-    
+
     socket.onerror = (error: Event) => {
       console.error('SockJS 오류:', error);
       isConnectingRef.current = false;
@@ -274,14 +283,14 @@ export default function ChatPage() {
         clearTimeout(connectionTimeoutId);
       }
     };
-    
+
     socket.onclose = () => {
       isConnectingRef.current = false;
       if (connectionTimeoutId) {
         clearTimeout(connectionTimeoutId);
       }
     };
-    
+
     const client = new Client({
       webSocketFactory: () => socket as any,
       connectHeaders: {
@@ -296,8 +305,7 @@ export default function ChatPage() {
         if (!isConnectingRef.current || stompClientRef.current !== client) {
           try {
             client.deactivate();
-          } catch (e) {
-          }
+          } catch (e) {}
           return;
         }
       },
@@ -313,9 +321,9 @@ export default function ChatPage() {
         if (connectionTimeoutId) {
           clearTimeout(connectionTimeoutId);
         }
-        
+
         subscribeToNotifications();
-        
+
         if (selectedRoomId) {
           setTimeout(() => {
             subscribeToRoom(selectedRoomId);
@@ -329,11 +337,14 @@ export default function ChatPage() {
       onStompError: (frame: IFrame) => {
         console.error('STOMP 오류:', frame);
         isConnectingRef.current = false;
-        const errorMessage = frame.headers['message'] || frame.headers['error'] || '알 수 없는 오류';
-        
+        const errorMessage =
+          frame.headers['message'] ||
+          frame.headers['error'] ||
+          '알 수 없는 오류';
+
         if (errorMessage.includes('Failed to send message')) {
           isSubscribedRef.current = false;
-          
+
           if (selectedRoomId && stompClientRef.current) {
             setTimeout(() => {
               if (stompClientRef.current?.connected) {
@@ -346,7 +357,7 @@ export default function ChatPage() {
       onWebSocketClose: () => {
         isSubscribedRef.current = false;
         isConnectingRef.current = false;
-        
+
         if (selectedRoomId && !stompClientRef.current?.active) {
           setTimeout(() => {
             connectWebSocket();
@@ -360,8 +371,7 @@ export default function ChatPage() {
         isConnectingRef.current = false;
         try {
           client.deactivate();
-        } catch (e) {
-        }
+        } catch (e) {}
       }
     }, 10000);
 
@@ -373,16 +383,14 @@ export default function ChatPage() {
     if (roomSubscriptionRef.current) {
       try {
         roomSubscriptionRef.current.unsubscribe();
-      } catch (e) {
-      }
+      } catch (e) {}
       roomSubscriptionRef.current = null;
     }
 
     if (notificationSubscriptionRef.current) {
       try {
         notificationSubscriptionRef.current.unsubscribe();
-      } catch (e) {
-      }
+      } catch (e) {}
       notificationSubscriptionRef.current = null;
     }
 
@@ -394,8 +402,7 @@ export default function ChatPage() {
         if (stompClientRef.current.connected || stompClientRef.current.active) {
           stompClientRef.current.deactivate();
         }
-      } catch (e) {
-      }
+      } catch (e) {}
       stompClientRef.current = null;
     }
   };
@@ -408,8 +415,7 @@ export default function ChatPage() {
     if (notificationSubscriptionRef.current) {
       try {
         notificationSubscriptionRef.current.unsubscribe();
-      } catch (e) {
-      }
+      } catch (e) {}
       notificationSubscriptionRef.current = null;
     }
 
@@ -420,9 +426,14 @@ export default function ChatPage() {
         notificationTopic,
         (message: IMessage) => {
           try {
-            const notification = JSON.parse(message.body) as NotificationMessage;
-            
-            if (notification.type === 'MENTORING_REQUEST' && notification.senderName) {
+            const notification = JSON.parse(
+              message.body
+            ) as NotificationMessage;
+
+            if (
+              notification.type === 'MENTORING_REQUEST' &&
+              notification.senderName
+            ) {
               toast.info(`${notification.senderName}님한테 요청이 왔어요`);
               fetchMentorRequests();
             }
@@ -454,8 +465,7 @@ export default function ChatPage() {
     if (roomSubscriptionRef.current) {
       try {
         roomSubscriptionRef.current.unsubscribe();
-      } catch (e) {
-      }
+      } catch (e) {}
       roomSubscriptionRef.current = null;
     }
 
@@ -520,7 +530,7 @@ export default function ChatPage() {
       console.error('채팅방 정보 로드 실패:', error);
       if (axios.isAxiosError(error)) {
         const status = error.response?.status;
-        
+
         if (status === 401) {
           toast.error('인증이 필요합니다. 다시 로그인해주세요.');
         } else if (status === 403) {
@@ -531,16 +541,15 @@ export default function ChatPage() {
               const payload = JSON.parse(atob(token.split('.')[1]));
               const exp = payload.exp * 1000;
               tokenExpired = Date.now() >= exp;
-            } catch (e) {
-            }
+            } catch (e) {}
           }
-          
-          const toastMessage = tokenExpired 
+
+          const toastMessage = tokenExpired
             ? '토큰이 만료되었습니다. 다시 로그인해주세요.'
             : '이 채팅방의 멤버가 아닙니다. 채팅방에 참여한 후 다시 시도해주세요.';
-          
+
           toast.error(toastMessage);
-          
+
           setSelectedRoomId(null);
           setRoomDetail(null);
           setMessages([]);
@@ -548,7 +557,9 @@ export default function ChatPage() {
         } else if (status === 404) {
           toast.error('채팅방을 찾을 수 없습니다.');
         } else {
-          toast.error(`채팅방 정보를 불러오는데 실패했습니다. (${status || '알 수 없는 오류'})`);
+          toast.error(
+            `채팅방 정보를 불러오는데 실패했습니다. (${status || '알 수 없는 오류'})`
+          );
         }
       }
       setMessages([]);
@@ -649,7 +660,9 @@ export default function ChatPage() {
     }
 
     if (!stompClientRef.current.connected) {
-      toast.error('WebSocket이 연결되지 않았습니다. 잠시 후 다시 시도해주세요.');
+      toast.error(
+        'WebSocket이 연결되지 않았습니다. 잠시 후 다시 시도해주세요.'
+      );
       return;
     }
 
@@ -657,8 +670,10 @@ export default function ChatPage() {
       if (selectedRoomId) {
         subscribeToRoom(selectedRoomId);
       }
-      
-      toast.error('채팅방 구독이 완료되지 않았습니다. 잠시 후 다시 시도해주세요.');
+
+      toast.error(
+        '채팅방 구독이 완료되지 않았습니다. 잠시 후 다시 시도해주세요.'
+      );
       return;
     }
 
@@ -674,7 +689,9 @@ export default function ChatPage() {
 
     try {
       if (!stompClientRef.current.connected) {
-        toast.error('WebSocket 연결이 끊어졌습니다. 잠시 후 다시 시도해주세요.');
+        toast.error(
+          'WebSocket 연결이 끊어졌습니다. 잠시 후 다시 시도해주세요.'
+        );
         return;
       }
 
@@ -700,8 +717,7 @@ export default function ChatPage() {
     if (roomSubscriptionRef.current) {
       try {
         roomSubscriptionRef.current.unsubscribe();
-      } catch (e) {
-      }
+      } catch (e) {}
       roomSubscriptionRef.current = null;
     }
 
@@ -716,16 +732,21 @@ export default function ChatPage() {
       setSearchParams({});
       setNextCursor(null);
       setHasMore(false);
-      setChatList((prevList) => prevList.filter((chat) => chat.id !== exitedRoomId));
+      setChatList((prevList) =>
+        prevList.filter((chat) => chat.id !== exitedRoomId)
+      );
       fetchChatRooms();
       toast.success('채팅방을 나갔습니다.');
     } catch (error) {
       console.error('채팅방 나가기 실패:', error);
       if (axios.isAxiosError(error)) {
         const status = error.response?.status;
-        const errorMessage = error.response?.data?.message || error.response?.data?.error || error.message;
+        const errorMessage =
+          error.response?.data?.message ||
+          error.response?.data?.error ||
+          error.message;
         const errorData = error.response?.data;
-        
+
         console.error('상세 에러 정보:', {
           status,
           statusText: error.response?.statusText,
@@ -734,7 +755,7 @@ export default function ChatPage() {
           url: error.config?.url,
           method: error.config?.method,
         });
-        
+
         if (status === 401) {
           toast.error(`인증이 필요합니다. 다시 로그인해주세요. (${status})`);
         } else if (status === 404) {
@@ -755,11 +776,15 @@ export default function ChatPage() {
           fetchChatRooms();
         } else if (status) {
           const detailMessage = errorMessage ? `: ${errorMessage}` : '';
-          toast.error(`채팅방 나가기에 실패했습니다. (${status})${detailMessage}`);
+          toast.error(
+            `채팅방 나가기에 실패했습니다. (${status})${detailMessage}`
+          );
         } else if (error.request) {
           toast.error('서버에 연결할 수 없습니다. 네트워크를 확인해주세요.');
         } else {
-          toast.error(`채팅방 나가기에 실패했습니다. ${errorMessage || error.message}`);
+          toast.error(
+            `채팅방 나가기에 실패했습니다. ${errorMessage || error.message}`
+          );
         }
       } else {
         const errorMsg = error instanceof Error ? error.message : String(error);
@@ -770,13 +795,13 @@ export default function ChatPage() {
 
   const handleAcceptMentor = async (applyId: number) => {
     try {
-      const request = mentorRequests.find(req => req.applyId === applyId);
+      const request = mentorRequests.find((req) => req.applyId === applyId);
       const requesterName = request?.name || '상대방';
-      
+
       await instance.patch(API_PATHS.MENTORING_APPLY_UPDATE(applyId), {
         applyStatus: 'ACCEPTED',
       });
-      
+
       toast.success(`${requesterName}님의 멘토링을 수락했어요`);
       await fetchMentorRequests();
     } catch (error) {
@@ -801,21 +826,29 @@ export default function ChatPage() {
     }
 
     return messages.map((message, index) => {
-      const senderId = message.senderId != null ? Number(message.senderId) : null;
+      const senderId =
+        message.senderId != null ? Number(message.senderId) : null;
       const myUserId = actualUserId != null ? Number(actualUserId) : null;
-      const isMyMessage = senderId !== null && myUserId !== null && senderId === myUserId;
-      
+      const isMyMessage =
+        senderId !== null && myUserId !== null && senderId === myUserId;
+
       const prevMessage = index > 0 ? messages[index - 1] : null;
-      const nextMessage = index < messages.length - 1 ? messages[index + 1] : null;
+      const nextMessage =
+        index < messages.length - 1 ? messages[index + 1] : null;
       const currentDate = formatMessageDate(message.createdAt);
       const prevDate = prevMessage
         ? formatMessageDate(prevMessage.createdAt)
         : null;
       const showDate = currentDate !== prevDate;
 
-      const prevSenderId = prevMessage ? (prevMessage.senderId != null ? Number(prevMessage.senderId) : null) : null;
-      const prevIsMyMessage = prevSenderId !== null && myUserId !== null && prevSenderId === myUserId;
-      
+      const prevSenderId = prevMessage
+        ? prevMessage.senderId != null
+          ? Number(prevMessage.senderId)
+          : null
+        : null;
+      const prevIsMyMessage =
+        prevSenderId !== null && myUserId !== null && prevSenderId === myUserId;
+
       const showSenderName = !isMyMessage && (!prevMessage || prevIsMyMessage);
 
       const getTimeKey = (dateString: string) => {
@@ -825,19 +858,25 @@ export default function ChatPage() {
 
       const currentTime = getTimeKey(message.createdAt);
       const nextTime = nextMessage ? getTimeKey(nextMessage.createdAt) : null;
-      const nextSenderId = nextMessage ? (nextMessage.senderId != null ? Number(nextMessage.senderId) : null) : null;
-      const isNextSameSender = nextMessage && senderId !== null && nextSenderId !== null && senderId === nextSenderId;
+      const nextSenderId = nextMessage
+        ? nextMessage.senderId != null
+          ? Number(nextMessage.senderId)
+          : null
+        : null;
+      const isNextSameSender =
+        nextMessage &&
+        senderId !== null &&
+        nextSenderId !== null &&
+        senderId === nextSenderId;
       const isNextSameTime = nextTime === currentTime;
-      
+
       const showTime = !(isNextSameSender && isNextSameTime);
 
       return (
         <div key={message.messageId} className="mb-1">
           {showDate && (
             <div className="flex justify-center my-4">
-              <span className="text-sm text-gray-3">
-                {currentDate}
-              </span>
+              <span className="text-sm text-gray-3">{currentDate}</span>
             </div>
           )}
           <div
@@ -848,32 +887,34 @@ export default function ChatPage() {
                 isMyMessage ? 'items-end' : 'items-start'
               }`}
             >
-            {showSenderName && (
-              <span className="text-sm font-semibold text-gray-1 mb-1">
-                {message.senderName}
-              </span>
-            )}
-            <div className="flex items-end gap-2">
-              {isMyMessage && showTime && (
-                <span className="text-xs text-gray-3 whitespace-nowrap flex-shrink-0">
-                  {formatMessageTime(message.createdAt)}
+              {showSenderName && (
+                <span className="text-sm font-semibold text-gray-1 mb-1">
+                  {message.senderName}
                 </span>
               )}
-              <div
-                className={`px-4 py-2 rounded-[20px] break-words break-all max-w-[480px] ${
-                  isMyMessage
-                    ? 'bg-main-1 text-white'
-                    : 'bg-white-1 text-gray-1'
-                }`}
-              >
-                <p className="text-base whitespace-pre-wrap break-words break-all m-0">{message.message}</p>
+              <div className="flex items-end gap-2">
+                {isMyMessage && showTime && (
+                  <span className="text-xs text-gray-3 whitespace-nowrap flex-shrink-0">
+                    {formatMessageTime(message.createdAt)}
+                  </span>
+                )}
+                <div
+                  className={`px-4 py-2 rounded-[20px] break-words break-all max-w-[480px] ${
+                    isMyMessage
+                      ? 'bg-main-1 text-white'
+                      : 'bg-white-1 text-gray-1'
+                  }`}
+                >
+                  <p className="text-base whitespace-pre-wrap break-words break-all m-0">
+                    {message.message}
+                  </p>
+                </div>
+                {!isMyMessage && showTime && (
+                  <span className="text-xs text-gray-3 whitespace-nowrap flex-shrink-0">
+                    {formatMessageTime(message.createdAt)}
+                  </span>
+                )}
               </div>
-              {!isMyMessage && showTime && (
-                <span className="text-xs text-gray-3 whitespace-nowrap flex-shrink-0">
-                  {formatMessageTime(message.createdAt)}
-                </span>
-              )}
-            </div>
             </div>
           </div>
         </div>
@@ -889,7 +930,9 @@ export default function ChatPage() {
           <div className="px-7 2xl:px-15 pt-7 2xl:pt-15 pb-4 2xl:pb-5">
             <div className="flex items-center justify-between mb-4 2xl:mb-5">
               <h1 className="flex items-center gap-4 text-[40px] font-bold">
-                <span className="text-3xl 2xl:text-[40px] text-gray-1 font-bold">채팅</span>
+                <span className="text-3xl 2xl:text-[40px] text-gray-1 font-bold">
+                  채팅
+                </span>
                 <Divider className="flex-shrink-0" />
                 <Link
                   to="/chat-apply"
@@ -904,7 +947,8 @@ export default function ChatPage() {
                 type="button"
               >
                 <BellIcon className="text-gray-3 pointer-events-none" />
-                {mentorRequests.filter(req => req.applyStatus === 'PENDING').length > 0 && (
+                {mentorRequests.filter((req) => req.applyStatus === 'PENDING')
+                  .length > 0 && (
                   <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>
                 )}
               </button>
@@ -914,12 +958,12 @@ export default function ChatPage() {
                 <SearchIcon />
               </div>
               <input
-                  type="text"
-                  placeholder="검색"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full h-11 2xl:h-14 rounded-full bg-white-1 border border-gray-4 pl-14 2xl:pl-14 pr-4 py-1 text-base 2xl:text-[24px] text-gray-1 placeholder:text-gray-3 focus:outline-main-1 font-bold"
-                />
+                type="text"
+                placeholder="검색"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full h-11 2xl:h-14 rounded-full bg-white-1 border border-gray-4 pl-14 2xl:pl-14 pr-4 py-1 text-base 2xl:text-[24px] text-gray-1 placeholder:text-gray-3 focus:outline-main-1 font-bold"
+              />
             </div>
           </div>
 
@@ -1014,35 +1058,35 @@ export default function ChatPage() {
               </div>
 
               <div className="px-6 2xl:px-8 py-4 2xl:py-6">
-              {loading && messages.length === 0 ? (
-                <div className="flex items-center justify-center h-full">
-                  <p className="text-base 2xl:text-lg text-gray-3">
-                    로딩 중...
-                  </p>
-                </div>
-              ) : renderedMessages ? (
-                <div className="space-y-1">
-                  {hasMore && (
-                    <div className="flex justify-center">
-                      <button
-                        onClick={loadMoreMessages}
-                        disabled={loading}
-                        className="text-sm text-gray-3 hover:text-gray-1 disabled:opacity-50"
-                      >
-                        {loading ? '로딩 중...' : '이전 메시지 더보기'}
-                      </button>
-                    </div>
-                  )}
-                  {renderedMessages}
-                  <div ref={messagesEndRef} />
-                </div>
-              ) : (
-                <div className="flex items-center justify-center h-full">
-                  <p className="text-base 2xl:text-lg text-gray-3">
-                    메시지가 없습니다
-                  </p>
-                </div>
-              )}
+                {loading && messages.length === 0 ? (
+                  <div className="flex items-center justify-center h-full">
+                    <p className="text-base 2xl:text-lg text-gray-3">
+                      로딩 중...
+                    </p>
+                  </div>
+                ) : renderedMessages ? (
+                  <div className="space-y-1">
+                    {hasMore && (
+                      <div className="flex justify-center">
+                        <button
+                          onClick={loadMoreMessages}
+                          disabled={loading}
+                          className="text-sm text-gray-3 hover:text-gray-1 disabled:opacity-50"
+                        >
+                          {loading ? '로딩 중...' : '이전 메시지 더보기'}
+                        </button>
+                      </div>
+                    )}
+                    {renderedMessages}
+                    <div ref={messagesEndRef} />
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-center h-full">
+                    <p className="text-base 2xl:text-lg text-gray-3">
+                      메시지가 없습니다
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
 

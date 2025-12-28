@@ -71,7 +71,7 @@ export function useMentorApply(): UseMentorApplyReturn {
     } catch (err) {
       if (axios.isAxiosError(err)) {
         const status = err.response?.status;
-        
+
         if (status === 401) {
           toast.error('인증이 필요합니다.');
         } else if (status === 404) {

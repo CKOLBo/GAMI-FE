@@ -62,16 +62,19 @@ export default function MentoringPage() {
     const fetchData = async () => {
       try {
         setIsLoading(true);
-        const [mentorsResponse, memberResponse, sentAppliesResponse] = await Promise.all([
-          instance.get<MentorListResponse>('/api/mentoring/mentor/all', {
-            params: {
-              page: 0,
-              size: 100,
-            },
-          }),
-          instance.get<MemberInfo>('/api/member'),
-          instance.get<SentApply[]>(API_PATHS.MENTORING_APPLY_SENT).catch(() => ({ data: [] })),
-        ]);
+        const [mentorsResponse, memberResponse, sentAppliesResponse] =
+          await Promise.all([
+            instance.get<MentorListResponse>('/api/mentoring/mentor/all', {
+              params: {
+                page: 0,
+                size: 100,
+              },
+            }),
+            instance.get<MemberInfo>('/api/member'),
+            instance
+              .get<SentApply[]>(API_PATHS.MENTORING_APPLY_SENT)
+              .catch(() => ({ data: [] })),
+          ]);
 
         setAllMentors(mentorsResponse.data.content);
         setCurrentMemberId(memberResponse.data.memberId);
@@ -84,7 +87,9 @@ export default function MentoringPage() {
           if (err.response?.status === 401) {
             toast.error('인증이 필요합니다.');
           } else if (err.code === 'ECONNABORTED' || err.code === 'ETIMEDOUT') {
-            toast.error('요청 시간이 초과되었습니다. 잠시 후 다시 시도해주세요.');
+            toast.error(
+              '요청 시간이 초과되었습니다. 잠시 후 다시 시도해주세요.'
+            );
           } else if (err.response?.status === 500) {
             toast.error('서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
           } else {
@@ -103,7 +108,9 @@ export default function MentoringPage() {
 
   const fetchSentApplies = async () => {
     try {
-      const response = await instance.get<SentApply[]>(API_PATHS.MENTORING_APPLY_SENT);
+      const response = await instance.get<SentApply[]>(
+        API_PATHS.MENTORING_APPLY_SENT
+      );
       if (Array.isArray(response.data)) {
         setSentApplies(response.data);
       }
@@ -150,14 +157,14 @@ export default function MentoringPage() {
       toast.error('이미 신청한 멘토입니다.');
       return;
     }
-    
+
     try {
       const response = await instance.post<MentoringApplyResponse>(
         API_PATHS.MENTORING_APPLY(mentor.memberId)
       );
-      
+
       const applyData = response.data;
-      
+
       const newApply: SentApply = {
         applyId: applyData.applyId,
         mentorId: applyData.mentorId,
@@ -165,13 +172,13 @@ export default function MentoringPage() {
         applyStatus: applyData.applyStatus,
         createdAt: applyData.createdAt,
       };
-      
+
       setSentApplies((prev) => [...prev, newApply]);
       toast.success('신청을 했어요');
     } catch (err) {
       if (axios.isAxiosError(err)) {
         const status = err.response?.status;
-        
+
         if (status === 401) {
           toast.error('인증이 필요합니다.');
         } else if (status === 404) {
@@ -257,7 +264,11 @@ export default function MentoringPage() {
                   name={mentor.name}
                   generation={mentor.generation}
                   major={mentor.major}
-                  onApply={appliedMentorIds.has(mentor.memberId) ? undefined : () => handleMentorApply(mentor)}
+                  onApply={
+                    appliedMentorIds.has(mentor.memberId)
+                      ? undefined
+                      : () => handleMentorApply(mentor)
+                  }
                   isApplied={appliedMentorIds.has(mentor.memberId)}
                 />
               ))}
