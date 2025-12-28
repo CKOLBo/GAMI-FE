@@ -336,14 +336,14 @@ export function useStomp<TRoomMessage = unknown>(
       });
 
       connectionTimeoutIdRef.current = setTimeout(() => {
-          if (!client.connected && isConnectingRef.current) {
-        isConnectingRef.current = false;
-        try {
-          client.deactivate();
-        } catch (e) {
-          console.error('connection timeout - client.deactivate 실패:', e);
+        if (!client.connected && isConnectingRef.current) {
+          isConnectingRef.current = false;
+          try {
+            client.deactivate();
+          } catch (e) {
+            console.error('connection timeout - client.deactivate 실패:', e);
+          }
         }
-      }
       }, 10000);
 
       stompClientRef.current = client;
