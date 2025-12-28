@@ -7,14 +7,13 @@ import BellIcon from '@/assets/svg/common/BellIcon';
 import MentorRequestModal from '@/assets/components/modal/MentorRequestModal';
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { instance, baseURL } from '@/assets/shared/lib/axios';
+import { instance } from '@/assets/shared/lib/axios';
 import { getCookie } from '@/assets/shared/lib/cookie';
 import axios from 'axios';
 import { Link, useSearchParams } from 'react-router-dom';
 import { API_PATHS } from '@/constants/api';
-import SockJS from 'sockjs-client';
-import { Client, type IMessage, type IFrame } from '@stomp/stompjs';
 import { toast } from 'react-toastify';
+import { useStomp } from '@/hooks/useStomp';
 
 type MajorType =
   | 'FRONTEND'
@@ -77,21 +76,6 @@ interface MentorRequest {
   applyStatus: string;
 }
 
-interface NotificationMessage {
-  type:
-    | 'MENTORING_REQUEST'
-    | 'MENTORING_ACCEPTED'
-    | 'MENTORING_REJECTED'
-    | 'CHAT_MESSAGE';
-  senderName?: string;
-  message?: string;
-  applyId?: number;
-}
-
-interface Subscription {
-  id: string;
-  unsubscribe: () => void;
-}
 
 export default function ChatPage() {
   const { user } = useAuth();
@@ -131,11 +115,29 @@ export default function ChatPage() {
     return null;
   }, [currentUserId]);
 
-  const stompClientRef = useRef<Client | null>(null);
-  const roomSubscriptionRef = useRef<Subscription | null>(null);
-  const notificationSubscriptionRef = useRef<Subscription | null>(null);
-  const isSubscribedRef = useRef<boolean>(false);
-  const isConnectingRef = useRef<boolean>(false);
+
+  const { connectWebSocket, disconnectWebSocket, subscribeToRoom, unsubscribeFromRoom, sendMessage, isConnected, isSubscribed } = useStomp({
+    enableRoomSubscription: true,
+    onNotification: (notification) => {
+      if (
+        notification.type === 'MENTORING_REQUEST' &&
+        notification.senderName
+      ) {
+        toast.info(`${notification.senderName}님한테 요청이 왔어요`);
+        fetchMentorRequests();
+      }
+    },
+    onRoomMessage: (msg: ChatMessage) => {
+      setMessages((prev) => [...prev, msg]);
+      if (selectedRoomId) {
+        moveChatToTop(selectedRoomId);
+        setTimeout(() => {
+          messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+        }, 100);
+      }
+    },
+    autoReconnect: true,
+  });
 
   useEffect(() => {
     fetchChatRooms();
@@ -239,286 +241,6 @@ export default function ChatPage() {
     );
   }, [searchQuery, chatList]);
 
-  const connectWebSocket = () => {
-    const token = getCookie('accessToken');
-    if (!token) {
-      return;
-    }
-
-    if (isConnectingRef.current) {
-      return;
-    }
-
-    if (stompClientRef.current) {
-      if (stompClientRef.current.connected) {
-        return;
-      }
-
-      if (stompClientRef.current.active) {
-        return;
-      }
-
-      try {
-        if (roomSubscriptionRef.current) {
-          try {
-            roomSubscriptionRef.current.unsubscribe();
-          } catch {
-            // 구독 해제 실패 무시
-          }
-          roomSubscriptionRef.current = null;
-        }
-        stompClientRef.current.deactivate();
-      } catch {
-        // 연결 해제 실패 무시
-      }
-      stompClientRef.current = null;
-    }
-
-    isConnectingRef.current = true;
-
-    const backendUrl = baseURL;
-    const wsUrl = `${backendUrl}/ws`;
-
-    let connectionTimeoutId: ReturnType<typeof setTimeout> | null = null;
-
-    const socket = new SockJS(wsUrl, null, {
-      transports: ['websocket', 'xhr-streaming', 'xhr-polling'],
-    });
-
-    socket.onerror = (error: Event) => {
-      console.error('SockJS 오류:', error);
-      isConnectingRef.current = false;
-      if (connectionTimeoutId) {
-        clearTimeout(connectionTimeoutId);
-      }
-    };
-
-    socket.onclose = () => {
-      isConnectingRef.current = false;
-      if (connectionTimeoutId) {
-        clearTimeout(connectionTimeoutId);
-      }
-    };
-
-    const client = new Client({
-      webSocketFactory: () => socket as WebSocket,
-      connectHeaders: {
-        Authorization: `Bearer ${token}`,
-      },
-      reconnectDelay: 0,
-      heartbeatIncoming: 4000,
-      heartbeatOutgoing: 4000,
-      connectionTimeout: 10000,
-      logRawCommunication: false,
-      beforeConnect: () => {
-        if (!isConnectingRef.current || stompClientRef.current !== client) {
-          try {
-            client.deactivate();
-          } catch {
-            // 연결 해제 실패 무시
-          }
-          return;
-        }
-      },
-      onDisconnect: () => {
-        isSubscribedRef.current = false;
-        isConnectingRef.current = false;
-        if (connectionTimeoutId) {
-          clearTimeout(connectionTimeoutId);
-        }
-      },
-      onConnect: () => {
-        isConnectingRef.current = false;
-        if (connectionTimeoutId) {
-          clearTimeout(connectionTimeoutId);
-        }
-
-        subscribeToNotifications();
-
-        if (selectedRoomId) {
-          setTimeout(() => {
-            subscribeToRoom(selectedRoomId);
-          }, 100);
-        }
-      },
-      onWebSocketError: (event: Event) => {
-        console.error('WebSocket 오류:', event);
-        isConnectingRef.current = false;
-      },
-      onStompError: (frame: IFrame) => {
-        console.error('STOMP 오류:', frame);
-        isConnectingRef.current = false;
-        const errorMessage =
-          frame.headers['message'] ||
-          frame.headers['error'] ||
-          '알 수 없는 오류';
-
-        if (errorMessage.includes('Failed to send message')) {
-          isSubscribedRef.current = false;
-
-          if (selectedRoomId && stompClientRef.current) {
-            setTimeout(() => {
-              if (stompClientRef.current?.connected) {
-                subscribeToRoom(selectedRoomId);
-              }
-            }, 1000);
-          }
-        }
-      },
-      onWebSocketClose: () => {
-        isSubscribedRef.current = false;
-        isConnectingRef.current = false;
-
-        if (selectedRoomId && !stompClientRef.current?.active) {
-          setTimeout(() => {
-            connectWebSocket();
-          }, 2000);
-        }
-      },
-    });
-
-    connectionTimeoutId = setTimeout(() => {
-      if (!client.connected && isConnectingRef.current) {
-        isConnectingRef.current = false;
-        try {
-          client.deactivate();
-        } catch {
-          // 연결 해제 실패 무시
-        }
-      }
-    }, 10000);
-
-    stompClientRef.current = client;
-    client.activate();
-  };
-
-  const disconnectWebSocket = () => {
-    if (roomSubscriptionRef.current) {
-      try {
-        roomSubscriptionRef.current.unsubscribe();
-      } catch {
-        // 구독 해제 실패 무시
-      }
-      roomSubscriptionRef.current = null;
-    }
-
-    if (notificationSubscriptionRef.current) {
-      try {
-        notificationSubscriptionRef.current.unsubscribe();
-      } catch {
-        // 구독 해제 실패 무시
-      }
-      notificationSubscriptionRef.current = null;
-    }
-
-    isSubscribedRef.current = false;
-    isConnectingRef.current = false;
-
-    if (stompClientRef.current) {
-      try {
-        if (stompClientRef.current.connected || stompClientRef.current.active) {
-          stompClientRef.current.deactivate();
-        }
-      } catch {
-        // 연결 해제 실패 무시
-      }
-      stompClientRef.current = null;
-    }
-  };
-
-  const subscribeToNotifications = () => {
-    if (!stompClientRef.current || !stompClientRef.current.connected) {
-      return;
-    }
-
-    if (notificationSubscriptionRef.current) {
-      try {
-        notificationSubscriptionRef.current.unsubscribe();
-      } catch {
-        // 구독 해제 실패 무시
-      }
-      notificationSubscriptionRef.current = null;
-    }
-
-    const notificationTopic = '/user/queue/notifications';
-
-    try {
-      notificationSubscriptionRef.current = stompClientRef.current.subscribe(
-        notificationTopic,
-        (message: IMessage) => {
-          try {
-            const notification = JSON.parse(
-              message.body
-            ) as NotificationMessage;
-
-            if (
-              notification.type === 'MENTORING_REQUEST' &&
-              notification.senderName
-            ) {
-              toast.info(`${notification.senderName}님한테 요청이 왔어요`);
-              fetchMentorRequests();
-            }
-          } catch (e) {
-            console.error('알림 파싱 오류:', e);
-          }
-        }
-      );
-    } catch (e) {
-      console.error('알림 구독 실패:', e);
-    }
-  };
-
-  const subscribeToRoom = (roomId: number, retryCount = 0) => {
-    if (!stompClientRef.current) {
-      if (retryCount < 5) {
-        setTimeout(() => subscribeToRoom(roomId, retryCount + 1), 500);
-      }
-      return;
-    }
-
-    if (!stompClientRef.current.connected) {
-      if (retryCount < 5) {
-        setTimeout(() => subscribeToRoom(roomId, retryCount + 1), 500);
-      }
-      return;
-    }
-
-    if (roomSubscriptionRef.current) {
-      try {
-        roomSubscriptionRef.current.unsubscribe();
-      } catch {
-        // 구독 해제 실패 무시
-      }
-      roomSubscriptionRef.current = null;
-    }
-
-    isSubscribedRef.current = false;
-
-    const topic = `/topic/room/${roomId}`;
-
-    try {
-      roomSubscriptionRef.current = stompClientRef.current.subscribe(
-        topic,
-        (message: IMessage) => {
-          try {
-            const msg = JSON.parse(message.body) as ChatMessage;
-            setMessages((prev) => [...prev, msg]);
-            moveChatToTop(roomId);
-            setTimeout(() => {
-              messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-            }, 100);
-          } catch (e) {
-            console.error('메시지 파싱 오류:', e);
-          }
-        }
-      );
-
-      isSubscribedRef.current = true;
-    } catch (e) {
-      console.error('구독 실패:', e);
-      isSubscribedRef.current = false;
-    }
-  };
 
   const handleChatClick = async (roomId: number) => {
     setSelectedRoomId(roomId);
@@ -679,19 +401,14 @@ export default function ChatPage() {
       return;
     }
 
-    if (!stompClientRef.current) {
-      toast.error('WebSocket이 연결되지 않았습니다.');
-      return;
-    }
-
-    if (!stompClientRef.current.connected) {
+    if (!isConnected()) {
       toast.error(
         'WebSocket이 연결되지 않았습니다. 잠시 후 다시 시도해주세요.'
       );
       return;
     }
 
-    if (!isSubscribedRef.current || !roomSubscriptionRef.current) {
+    if (!isSubscribed()) {
       if (selectedRoomId) {
         subscribeToRoom(selectedRoomId);
       }
@@ -702,30 +419,12 @@ export default function ChatPage() {
       return;
     }
 
-    const token = getCookie('accessToken');
-    if (!token) {
-      toast.error('인증 토큰이 없습니다. 다시 로그인해주세요.');
-      return;
-    }
-
     const payload = JSON.stringify({
       message: message,
     });
 
     try {
-      if (!stompClientRef.current.connected) {
-        toast.error(
-          'WebSocket 연결이 끊어졌습니다. 잠시 후 다시 시도해주세요.'
-        );
-        return;
-      }
-
-      stompClientRef.current.publish({
-        destination: `/app/rooms/${selectedRoomId}/send`,
-        headers: {},
-        body: payload,
-      });
-
+      sendMessage(`/app/rooms/${selectedRoomId}/send`, payload);
       setMessageInput('');
       if (selectedRoomId) {
         moveChatToTop(selectedRoomId);
@@ -739,16 +438,7 @@ export default function ChatPage() {
   const handleExit = async () => {
     if (!selectedRoomId) return;
 
-    if (roomSubscriptionRef.current) {
-      try {
-        roomSubscriptionRef.current.unsubscribe();
-      } catch {
-        // 구독 해제 실패 무시
-      }
-      roomSubscriptionRef.current = null;
-    }
-
-    isSubscribedRef.current = false;
+    unsubscribeFromRoom();
 
     try {
       await instance.delete(`/api/chat/rooms/${selectedRoomId}/leave`);

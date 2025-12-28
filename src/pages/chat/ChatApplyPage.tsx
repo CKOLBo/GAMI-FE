@@ -4,19 +4,12 @@ import BellIcon from '@/assets/svg/common/BellIcon';
 import Divider from '@/assets/svg/Divider';
 import RequestItem from '@/assets/components/chat/RequestItem';
 import MentorRequestModal from '@/assets/components/modal/MentorRequestModal';
-import { useState, useEffect, useRef } from 'react';
-import { instance, baseURL } from '@/assets/shared/lib/axios';
+import { useState, useEffect } from 'react';
+import { instance } from '@/assets/shared/lib/axios';
 import { API_PATHS } from '@/constants/api';
 import { Link } from 'react-router-dom';
-import { getCookie } from '@/assets/shared/lib/cookie';
-import SockJS from 'sockjs-client';
-import { Client, type IMessage, type IFrame } from '@stomp/stompjs';
 import { toast } from 'react-toastify';
-
-interface Subscription {
-  id: string;
-  unsubscribe: () => void;
-}
+import { useStomp } from '@/hooks/useStomp';
 
 interface ApplyRequest {
   applyId: number;
@@ -27,17 +20,6 @@ interface ApplyRequest {
   createdAt: string;
 }
 
-interface NotificationMessage {
-  type:
-    | 'MENTORING_REQUEST'
-    | 'MENTORING_ACCEPTED'
-    | 'MENTORING_REJECTED'
-    | 'CHAT_MESSAGE';
-  senderName?: string;
-  message?: string;
-  applyId?: number;
-}
-
 export default function ChatApplyPage() {
   const [sentRequests, setSentRequests] = useState<ApplyRequest[]>([]);
   const [receivedRequests, setReceivedRequests] = useState<ApplyRequest[]>([]);
@@ -45,160 +27,32 @@ export default function ChatApplyPage() {
   const [isMentorRequestModalOpen, setIsMentorRequestModalOpen] =
     useState(false);
   const [removingIds, setRemovingIds] = useState<Set<number>>(new Set());
-  const stompClientRef = useRef<Client | null>(null);
-  const notificationSubscriptionRef = useRef<Subscription | null>(null);
-  const isConnectingRef = useRef<boolean>(false);
 
-  const connectWebSocket = () => {
-    const token = getCookie('accessToken');
-    if (!token) {
-      return;
-    }
-
-    if (isConnectingRef.current) {
-      return;
-    }
-
-    if (stompClientRef.current) {
-      if (stompClientRef.current.connected) {
-        subscribeToNotifications();
-        return;
-      }
-
-      if (stompClientRef.current.active) {
-        return;
-      }
-
-      try {
-        if (notificationSubscriptionRef.current) {
-          try {
-            notificationSubscriptionRef.current.unsubscribe();
-          } catch {
-            // 구독 해제 실패 무시
-          }
-          notificationSubscriptionRef.current = null;
-        }
-        stompClientRef.current.deactivate();
-      } catch {
-        // 연결 해제 실패 무시
-      }
-      stompClientRef.current = null;
-    }
-
-    isConnectingRef.current = true;
-
-    const backendUrl = baseURL;
-    const wsUrl = `${backendUrl}/ws`;
-
-    const socket = new SockJS(wsUrl, null, {
-      transports: ['websocket', 'xhr-streaming', 'xhr-polling'],
-    });
-
-    socket.onerror = (error: Event) => {
-      console.error('SockJS 오류:', error);
-      isConnectingRef.current = false;
-    };
-
-    socket.onclose = () => {
-      isConnectingRef.current = false;
-    };
-
-    const client = new Client({
-      webSocketFactory: () => socket as WebSocket,
-      connectHeaders: {
-        Authorization: `Bearer ${token}`,
-      },
-      reconnectDelay: 0,
-      heartbeatIncoming: 4000,
-      heartbeatOutgoing: 4000,
-      connectionTimeout: 10000,
-      logRawCommunication: false,
-      onConnect: () => {
-        isConnectingRef.current = false;
-        subscribeToNotifications();
-      },
-      onWebSocketError: (event: Event) => {
-        console.error('WebSocket 오류:', event);
-        isConnectingRef.current = false;
-      },
-      onStompError: (frame: IFrame) => {
-        console.error('STOMP 오류:', frame);
-        isConnectingRef.current = false;
-      },
-      onWebSocketClose: () => {
-        isConnectingRef.current = false;
-      },
-    });
-
-    stompClientRef.current = client;
-    client.activate();
-  };
-
-  const subscribeToNotifications = () => {
-    if (!stompClientRef.current || !stompClientRef.current.connected) {
-      return;
-    }
-
-    if (notificationSubscriptionRef.current) {
-      try {
-        notificationSubscriptionRef.current.unsubscribe();
-      } catch {
-        // 구독 해제 실패 무시
-      }
-      notificationSubscriptionRef.current = null;
-    }
-
-    const notificationTopic = '/user/queue/notifications';
-
+  const fetchReceivedRequests = async () => {
     try {
-      notificationSubscriptionRef.current = stompClientRef.current.subscribe(
-        notificationTopic,
-        (message: IMessage) => {
-          try {
-            const notification = JSON.parse(
-              message.body
-            ) as NotificationMessage;
-
-            if (
-              notification.type === 'MENTORING_REQUEST' &&
-              notification.senderName
-            ) {
-              toast.info(`${notification.senderName}님한테 요청이 왔어요`);
-              fetchReceivedRequests();
-            }
-          } catch (e) {
-            console.error('알림 파싱 오류:', e);
-          }
-        }
+      const response = await instance.get<ApplyRequest[]>(
+        API_PATHS.MENTORING_APPLY_RECEIVED
       );
-    } catch (e) {
-      console.error('알림 구독 실패:', e);
+      if (Array.isArray(response.data)) {
+        setReceivedRequests(response.data);
+      }
+    } catch (error) {
+      console.error('받은 요청 목록 로드 실패:', error);
     }
   };
 
-  const disconnectWebSocket = () => {
-    if (notificationSubscriptionRef.current) {
-      try {
-        notificationSubscriptionRef.current.unsubscribe();
-      } catch {
-        // 구독 해제 실패 무시
+  const { connectWebSocket, disconnectWebSocket } = useStomp({
+    onNotification: (notification) => {
+      if (
+        notification.type === 'MENTORING_REQUEST' &&
+        notification.senderName
+      ) {
+        toast.info(`${notification.senderName}님한테 요청이 왔어요`);
+        fetchReceivedRequests();
       }
-      notificationSubscriptionRef.current = null;
-    }
-
-    isConnectingRef.current = false;
-
-    if (stompClientRef.current) {
-      try {
-        if (stompClientRef.current.connected || stompClientRef.current.active) {
-          stompClientRef.current.deactivate();
-        }
-      } catch {
-        // 연결 해제 실패 무시
-      }
-      stompClientRef.current = null;
-    }
-  };
+    },
+    autoReconnect: false,
+  });
 
   useEffect(() => {
     const fetchSentRequests = async () => {
@@ -225,20 +79,7 @@ export default function ChatApplyPage() {
       disconnectWebSocket();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const fetchReceivedRequests = async () => {
-    try {
-      const response = await instance.get<ApplyRequest[]>(
-        API_PATHS.MENTORING_APPLY_RECEIVED
-      );
-      if (Array.isArray(response.data)) {
-        setReceivedRequests(response.data);
-      }
-    } catch (error) {
-      console.error('받은 요청 목록 로드 실패:', error);
-    }
-  };
+  }, [connectWebSocket, disconnectWebSocket]);
 
   useEffect(() => {
     if (isMentorRequestModalOpen) {
