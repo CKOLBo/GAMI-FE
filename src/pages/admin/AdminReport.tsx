@@ -103,11 +103,11 @@ export default function AdminReport() {
         return '광고·홍보·스팸';
       case 'AVERSION':
         return '욕설·비하·혐오 표현';
-      case 'PRIVACY':
+      case 'EXPOSURE':
         return '개인정보 노출';
-      case 'ILLEGAL':
+      case 'LEWD':
         return '음란·불쾌한 내용';
-      case 'HARMFUL':
+      case 'INAPPROPRIATE':
         return '게시판 목적과 맞지 않는 내용';
       case 'ETC':
         return '기타';
