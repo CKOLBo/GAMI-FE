@@ -309,7 +309,16 @@ export function useStomp<TRoomMessage = unknown>(
             }
           }
         },
-        onWebSocketClose: () => {
+        onWebSocketClose: (event?: CloseEvent) => {
+          if (event) {
+            console.error(
+              'WebSocket 닫힘:',
+              JSON.stringify({ code: event.code, reason: event.reason })
+            );
+          } else {
+            console.error('WebSocket 닫힘: 이벤트 정보 없음');
+          }
+
           isSubscribedRef.current = false;
           isConnectingRef.current = false;
 

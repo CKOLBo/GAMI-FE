@@ -4,12 +4,11 @@ import BellIcon from '@/assets/svg/common/BellIcon';
 import Divider from '@/assets/svg/Divider';
 import RequestItem from '@/assets/components/chat/RequestItem';
 import MentorRequestModal from '@/assets/components/modal/MentorRequestModal';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { instance } from '@/assets/shared/lib/axios';
 import { API_PATHS } from '@/constants/api';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { useStomp } from '@/hooks/useStomp';
 
 interface ApplyRequest {
   applyId: number;
@@ -27,64 +26,74 @@ export default function ChatApplyPage() {
   const [isMentorRequestModalOpen, setIsMentorRequestModalOpen] =
     useState(false);
   const [removingIds, setRemovingIds] = useState<Set<number>>(new Set());
+  const previousReceivedCountRef = useRef<number>(0);
 
-  const fetchReceivedRequests = async () => {
+  const fetchReceivedRequests = useCallback(async () => {
     try {
       const response = await instance.get<ApplyRequest[]>(
         API_PATHS.MENTORING_APPLY_RECEIVED
       );
       if (Array.isArray(response.data)) {
+        const newCount = response.data.filter(
+          (req) => req.applyStatus === 'PENDING'
+        ).length;
+        
+        // 새로운 요청이 들어온 경우 알림
+        if (newCount > previousReceivedCountRef.current) {
+          const newRequests = response.data.filter(
+            (req) => req.applyStatus === 'PENDING'
+          );
+          const addedCount = newCount - previousReceivedCountRef.current;
+          if (addedCount === 1 && newRequests.length > 0) {
+            toast.info(`${newRequests[0].name}님한테 요청이 왔어요`);
+          } else if (addedCount > 1) {
+            toast.info(`${addedCount}개의 새로운 요청이 왔어요`);
+          }
+        }
+        
+        previousReceivedCountRef.current = newCount;
         setReceivedRequests(response.data);
       }
     } catch (error) {
       console.error('받은 요청 목록 로드 실패:', error);
     }
-  };
+  }, []);
 
-  const { connectWebSocket, disconnectWebSocket } = useStomp({
-    onNotification: (notification) => {
-      if (
-        notification.type === 'MENTORING_REQUEST' &&
-        notification.senderName
-      ) {
-        toast.info(`${notification.senderName}님한테 요청이 왔어요`);
-        fetchReceivedRequests();
+  const fetchSentRequests = useCallback(async () => {
+    setLoading(true);
+    try {
+      const response = await instance.get<ApplyRequest[]>(
+        API_PATHS.MENTORING_APPLY_SENT
+      );
+      if (Array.isArray(response.data)) {
+        setSentRequests(response.data);
       }
-    },
-    autoReconnect: false,
-  });
+    } catch (error) {
+      console.error('보낸 요청 목록 로드 실패:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    const fetchSentRequests = async () => {
-      setLoading(true);
-      try {
-        const response = await instance.get<ApplyRequest[]>(
-          API_PATHS.MENTORING_APPLY_SENT
-        );
-        if (Array.isArray(response.data)) {
-          setSentRequests(response.data);
-        }
-      } catch (error) {
-        console.error('보낸 요청 목록 로드 실패:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchSentRequests();
     fetchReceivedRequests();
-    connectWebSocket();
+
+    // 10초마다 받은 요청 확인
+    const pollInterval = setInterval(() => {
+      fetchReceivedRequests();
+    }, 10000);
 
     return () => {
-      disconnectWebSocket();
+      clearInterval(pollInterval);
     };
-  }, [connectWebSocket, disconnectWebSocket]);
+  }, [fetchReceivedRequests, fetchSentRequests]);
 
   useEffect(() => {
     if (isMentorRequestModalOpen) {
       fetchReceivedRequests();
     }
-  }, [isMentorRequestModalOpen]);
+  }, [fetchReceivedRequests, isMentorRequestModalOpen]);
 
   const handleCancelRequest = async (applyId: number) => {
     try {
