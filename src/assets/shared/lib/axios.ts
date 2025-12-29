@@ -9,9 +9,13 @@ export class TokenRefreshError extends Error {
   }
 }
 
-export const baseURL: string = import.meta.env.DEV
-  ? ''
-  : 'https://port-0-gami-server-mj0rdvda8d11523e.sel3.cloudtype.app';
+const DEFAULT_BACKEND =
+  'https://port-0-gami-server-mj0rdvda8d11523e.sel3.cloudtype.app';
+
+// Allow override via Vite env var VITE_API_BASE for local testing.
+// Fallback to DEFAULT_BACKEND to avoid dev-time proxying to vite origin.
+export const baseURL: string = (import.meta.env.VITE_API_BASE as string) ||
+  DEFAULT_BACKEND;
 
 export const instance = axios.create({
   baseURL,
