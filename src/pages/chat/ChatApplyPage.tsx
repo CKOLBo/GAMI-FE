@@ -78,7 +78,6 @@ export default function ChatApplyPage() {
     return () => {
       disconnectWebSocket();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [connectWebSocket, disconnectWebSocket]);
 
   useEffect(() => {

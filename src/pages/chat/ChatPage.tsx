@@ -406,6 +406,13 @@ export default function ChatPage() {
       return;
     }
 
+    if (message.length > 250) {
+      toast.error(
+        `메시지는 250자 이하로 작성해주세요. (현재 ${message.length}자)`
+      );
+      return;
+    }
+
     if (!isConnected()) {
       toast.error(
         'WebSocket이 연결되지 않았습니다. 잠시 후 다시 시도해주세요.'
