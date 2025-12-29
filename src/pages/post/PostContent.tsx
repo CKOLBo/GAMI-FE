@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import Delete from '@/assets/svg/post/Delete';
+import { useNavigate } from 'react-router-dom';
 
 import Heart from '@/assets/svg/Heart';
 import Comment from '@/assets/svg/post/Comment';
@@ -179,6 +181,31 @@ export default function PostContent() {
     }
   };
 
+  const navigate = useNavigate();
+
+  const handleAdminDelete = async () => {
+    if (!postId) return;
+
+    const confirmDelete = window.confirm('게시글을 삭제하시겠습니까?');
+    if (!confirmDelete) return;
+
+    try {
+      await instance.delete(`/api/admin/post/${postId}`);
+      toast.success('게시글이 삭제되었습니다.');
+      navigate(-1);
+    } catch (error: unknown) {
+      if (typeof error === 'object' && error !== null && 'response' in error) {
+        const status = (error as { response?: { status?: number } }).response
+          ?.status;
+
+        if (status === 401) toast.error('로그인이 필요합니다.');
+        else if (status === 403) toast.error('관리자 권한이 없습니다.');
+        else if (status === 404) toast.error('게시글을 찾을 수 없습니다.');
+        else toast.error('게시글 삭제에 실패했습니다.');
+      }
+    }
+  };
+
   const fetchComments = async () => {
     if (!postId) return;
 
@@ -201,6 +228,18 @@ export default function PostContent() {
       }
     } finally {
       setIsCommentLoading(false);
+    }
+  };
+
+  const isAdmin = () => {
+    try {
+      const token = localStorage.getItem('accessToken');
+      if (!token) return false;
+
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return payload.role === 'ADMIN' || payload.role === 'ROLE_ADMIN';
+    } catch {
+      return false;
     }
   };
 
@@ -299,6 +338,16 @@ export default function PostContent() {
               <button onClick={() => setIsModalOpen(true)}>
                 <Report />
               </button>
+
+              {isAdmin() && (
+                <button
+                  onClick={handleAdminDelete}
+                  className="hover:opacity-70"
+                  title="게시글 삭제"
+                >
+                  <Delete />
+                </button>
+              )}
             </div>
           </div>
 
