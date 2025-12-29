@@ -219,7 +219,7 @@ export function useStomp<TRoomMessage = unknown>(
       } else if (backendOrigin.startsWith('wss:')) {
         backendOrigin = backendOrigin.replace(/^wss:/, 'https:');
       }
-      
+
       const sockjsUrl = backendOrigin.endsWith('/')
         ? backendOrigin + 'ws'
         : backendOrigin + '/ws';
