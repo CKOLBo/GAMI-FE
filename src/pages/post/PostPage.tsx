@@ -117,7 +117,7 @@ export default function PostPage() {
                 likeCount={post.likeCount}
                 commentCount={post.commentCount}
                 timeAgo={new Date(post.createdAt).toLocaleDateString()}
-                onPostClick={() => navigate(`/post-content/${post.id}`)}
+                onPostClick={() => navigate(`/post/${post.id}`)}
                 actions={[
                   {
                     icon: <Report />,
