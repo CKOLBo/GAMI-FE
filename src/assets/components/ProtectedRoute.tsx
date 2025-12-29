@@ -23,10 +23,12 @@ export default function ProtectedRoute({
     const userRoles: string[] = Array.isArray(user?.role)
       ? (user?.role as string[])
       : user?.role
-      ? [user.role as string]
-      : [];
+        ? [user.role as string]
+        : [];
 
-    const required = Array.isArray(requiredRole) ? requiredRole : [requiredRole];
+    const required = Array.isArray(requiredRole)
+      ? requiredRole
+      : [requiredRole];
 
     const normalize = (r: string) => r.replace(/^ROLE_/i, '').toUpperCase();
 
