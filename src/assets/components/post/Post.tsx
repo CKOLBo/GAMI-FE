@@ -34,7 +34,7 @@ export default function Post({
     if (onPostClick) {
       onPostClick();
     } else {
-      navigate(`/post-content/${postId}`);
+      navigate(`/post/${postId}`);
     }
   };
 
@@ -50,7 +50,7 @@ export default function Post({
     try {
       const { data } = await instance.get(`/api/post/${postId}`);
 
-      navigate(`/post-content/${postId}`, {
+      navigate(`/post/${postId}`, {
         state: { post: data },
       });
     } catch {
