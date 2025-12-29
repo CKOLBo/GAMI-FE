@@ -113,7 +113,7 @@ export default function MyPost() {
                   likeCount={0}
                   commentCount={0}
                   timeAgo={new Date(post.createdAt).toLocaleDateString()}
-                  onPostClick={() => navigate(`/post-content/${post.id}`)}
+                  onPostClick={() => navigate(`/post/${post.id}`)}
                   actions={[
                     {
                       icon: <Delete />,
