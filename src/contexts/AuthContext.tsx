@@ -11,6 +11,7 @@ interface User {
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
+  initialized: boolean;
   login: (user: User, token?: string) => void;
   logout: () => void;
 }
@@ -34,6 +35,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
     return null;
   });
+  const [initialized] = useState(true);
 
   const login = (userData: User, token?: string) => {
     setUser(userData);
@@ -49,11 +51,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem('token');
   };
 
+  // Mark context as initialized after mount so consumers don't redirect during startup
+  // (localStorage read above is synchronous, but this ensures any async checks
+  //  or token refresh logic can set state before ProtectedRoute redirects)
+
   return (
     <AuthContext.Provider
       value={{
         user,
         isAuthenticated: !!user,
+        initialized,
         login,
         logout,
       }}

@@ -12,7 +12,9 @@ export default function ProtectedRoute({
   children,
   requiredRole,
 }: ProtectedRouteProps) {
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated, user, initialized } = useAuth();
+  // while auth state is initializing, don't redirect — avoid false negatives
+  if (!initialized) return null;
   if (!isAuthenticated) {
     return <Navigate to="/" replace />;
   }
