@@ -210,22 +210,16 @@ export function useStomp<TRoomMessage = unknown>(
       }
 
       isConnectingRef.current = true;
-
-      // 안전한 WS URL 생성: 개발환경에서는 baseURL이 빈 문자열이므로
-      // origin을 사용해 백엔드 endpoint로 연결하도록 합니다.
-      // baseURL may be '' in dev. Ensure we have a usable origin string.
       const backendOriginRaw =
         baseURL && baseURL !== '' ? baseURL : window.location.origin;
       let backendOrigin = String(backendOriginRaw);
 
-      // If someone provided a ws/wss URL, convert to http/https for SockJS.
       if (backendOrigin.startsWith('ws:')) {
         backendOrigin = backendOrigin.replace(/^ws:/, 'http:');
       } else if (backendOrigin.startsWith('wss:')) {
         backendOrigin = backendOrigin.replace(/^wss:/, 'https:');
       }
-
-      // Ensure trailing slash handling
+      
       const sockjsUrl = backendOrigin.endsWith('/')
         ? backendOrigin + 'ws'
         : backendOrigin + '/ws';

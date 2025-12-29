@@ -14,8 +14,8 @@ const DEFAULT_BACKEND =
 
 // Allow override via Vite env var VITE_API_BASE for local testing.
 // Fallback to DEFAULT_BACKEND to avoid dev-time proxying to vite origin.
-export const baseURL: string = (import.meta.env.VITE_API_BASE as string) ||
-  DEFAULT_BACKEND;
+export const baseURL: string =
+  (import.meta.env.VITE_API_BASE as string) || DEFAULT_BACKEND;
 
 export const instance = axios.create({
   baseURL,
