@@ -35,7 +35,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
     return null;
   });
-  const [initialized, setInitialized] = useState(false);
+    const [initialized] = useState(true);
 
   const login = (userData: User, token?: string) => {
     setUser(userData);
@@ -54,9 +54,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Mark context as initialized after mount so consumers don't redirect during startup
   // (localStorage read above is synchronous, but this ensures any async checks
   //  or token refresh logic can set state before ProtectedRoute redirects)
-  useEffect(() => {
-    setInitialized(true);
-  }, []);
 
   return (
     <AuthContext.Provider

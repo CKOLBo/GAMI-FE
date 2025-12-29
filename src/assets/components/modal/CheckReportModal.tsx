@@ -31,33 +31,38 @@ export default function CheckReportModal({
   const [processing, setProcessing] = useState(false);
 
   useEffect(() => {
-    fetchReportDetail();
-  }, [reportId]);
-
-  const fetchReportDetail = async () => {
-    try {
-      setLoading(true);
-      const response = await instance.get<ReportDetail>(
-        `/api/admin/report/${reportId}`
-      );
-      setReportDetail(response.data);
-    } catch (err) {
-      if (err instanceof AxiosError) {
-        if (err.response?.status === 403) {
-          toast.error('관리자 권한이 없습니다.');
-        } else if (err.response?.status === 404) {
-          toast.error('신고를 찾을 수 없습니다.');
+    let mounted = true;
+    const fetchReportDetail = async () => {
+      try {
+        setLoading(true);
+        const response = await instance.get<ReportDetail>(
+          `/api/admin/report/${reportId}`
+        );
+        if (!mounted) return;
+        setReportDetail(response.data);
+      } catch (err) {
+        if (err instanceof AxiosError) {
+          if (err.response?.status === 403) {
+            toast.error('관리자 권한이 없습니다.');
+          } else if (err.response?.status === 404) {
+            toast.error('신고를 찾을 수 없습니다.');
+          } else {
+            toast.error('신고 상세 정보를 불러오는데 실패했습니다.');
+          }
         } else {
-          toast.error('신고 상세 정보를 불러오는데 실패했습니다.');
+          toast.error('오류가 발생했습니다.');
         }
-      } else {
-        toast.error('오류가 발생했습니다.');
+        onClose();
+      } finally {
+        if (mounted) setLoading(false);
       }
-      onClose();
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
+
+    fetchReportDetail();
+    return () => {
+      mounted = false;
+    };
+  }, [reportId, onClose]);
 
   const handleReportAction = async (action: 'BLOCK' | 'REJECT' | 'HOLD') => {
     if (!reportDetail || processing) return;
