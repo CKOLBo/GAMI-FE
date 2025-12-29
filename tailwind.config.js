@@ -6,6 +6,9 @@ export default {
       fontFamily: {
         sans: ['Pretendard', 'sans-serif'],
       },
+      boxShadow: {
+        GAMI: '4px 4px 20px -5px rgba(0, 0, 0, 0.25)',
+      },
     },
   },
   plugins: [],

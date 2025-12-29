@@ -1,0 +1,151 @@
+import { useState } from 'react';
+import axios from 'axios';
+import { jwtDecode } from 'jwt-decode';
+import { useAuth } from '@/contexts/AuthContext';
+import { instance } from '@/assets/shared/lib/axios';
+import { setCookie } from '@/assets/shared/lib/cookie';
+
+interface LoginResponse {
+  accessToken: string;
+  refreshToken: string;
+  accessTokenExpiresIn: string;
+  refreshTokenExpiresIn: string;
+}
+
+interface UserInfo {
+  id?: number;
+  memberId?: number;
+  email: string;
+  name?: string;
+  role?: string | string[];
+  roles?: string | string[];
+  authorities?: string | string[];
+  Role?: string | string[];
+  ROLE?: string | string[];
+  userRole?: string | string[];
+  memberRole?: string | string[];
+}
+
+interface JWTPayload {
+  auth?: string | string[];
+  role?: string | string[];
+  roles?: string | string[];
+  authorities?: string | string[];
+  authority?: string | string[];
+  Role?: string | string[];
+  ROLE?: string | string[];
+  userRole?: string | string[];
+  memberRole?: string | string[];
+  [key: string]: unknown;
+}
+
+interface LoginCredentials {
+  email: string;
+  password: string;
+}
+
+interface UseLoginReturn {
+  login: (credentials: LoginCredentials) => Promise<void>;
+  isLoading: boolean;
+}
+
+export function useLogin(): UseLoginReturn {
+  const { login: setAuthUser } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
+
+  const login = async (credentials: LoginCredentials): Promise<void> => {
+    setIsLoading(true);
+
+    try {
+      const response = await instance.post<LoginResponse>('/api/auth/signin', {
+        email: credentials.email,
+        password: credentials.password,
+      });
+
+      const { accessToken, refreshToken } = response.data;
+
+      const decodedToken = jwtDecode<JWTPayload>(accessToken);
+
+      setCookie('accessToken', accessToken);
+      setCookie('refreshToken', refreshToken);
+
+      const userResponse = await instance.get<UserInfo>('/api/member', {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      const userData = userResponse.data;
+
+      const tokenRoleKeys = [
+        'auth',
+        'role',
+        'roles',
+        'authorities',
+        'authority',
+        'Role',
+        'ROLE',
+        'userRole',
+        'memberRole',
+      ];
+      const roleFromToken = tokenRoleKeys
+        .map((key) => decodedToken?.[key])
+        .find((r) => r) as string | string[] | undefined;
+
+      const apiRoleKeys = [
+        'role',
+        'roles',
+        'authorities',
+        'Role',
+        'ROLE',
+        'userRole',
+        'memberRole',
+      ];
+      const roleFromAPI = apiRoleKeys
+        .map((key) => (userData as unknown as Record<string, unknown>)[key])
+        .find((r) => r) as string | string[] | undefined;
+
+      const role: string | string[] | undefined = roleFromToken || roleFromAPI;
+
+      const finalUserData = {
+        ...userData,
+        id: userData.id || userData.memberId || 0,
+        role: role,
+      };
+
+      setAuthUser(finalUserData, accessToken);
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        const status = error.response?.status;
+        const url = error.config?.url || '';
+
+        if (
+          url.includes('/api/auth/signin') &&
+          (status === 401 || status === 403)
+        ) {
+          throw new Error('이메일 또는 비밀번호가 일치하지 않습니다.');
+        }
+
+        if (url.includes('/api/member') && status === 401) {
+          throw new Error('사용자 정보를 가져오는데 실패했습니다.');
+        }
+
+        if (status === 404) {
+          throw new Error('사용자 정보를 가져오는데 실패했습니다.');
+        }
+
+        throw new Error(
+          error.response?.data?.message || '로그인 중 오류가 발생했습니다.'
+        );
+      }
+      if (error instanceof Error) {
+        throw error;
+      }
+      throw new Error('로그인 중 오류가 발생했습니다. 다시 시도해주세요.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return { login, isLoading };
+}

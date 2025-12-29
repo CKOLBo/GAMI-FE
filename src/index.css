@@ -1,16 +1,29 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+@theme {
+  --font-family-sans: 'Pretendard', sans-serif;
+
+  --color-main-3: #ff6b6b;
+  --color-main-2: #bfa9ff;
+  --color-main-1: #73a9ff;
+
+  --color-main-1-hover: #4d91ff;
+  --color-main-2-hover: #aa8eff;
+
+  --color-gray-4: #d6d6d7;
+  --color-gray-3: #6d6f79;
+  --color-gray-2: #b7bcc8;
+  --color-gray-1: #333d48;
+
+  --color-white-1: #f9f9f9;
+
+  --shadow-GAMI: 4px 4px 20px -5px rgba(0, 0, 0, 0.25);
 }
 
 html,
 body {
   overflow-x: hidden;
+  font-family: 'Pretendard', sans-serif;
 }
 
 #root {
@@ -100,4 +113,45 @@ input[type='email']:user-invalid {
 
 input::-webkit-validation-bubble-message {
   color: #ff6b6b;
+}
+
+.Toastify__toast {
+  font-size: 13px;
+  width: 380px;
+  min-height: 56px;
+}
+
+.Toastify__toast-body {
+  font-size: 13px;
+}
+
+/* 커스텀 스크롤바 스타일 - 기본 숨김, hover 시 표시 */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: white;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 4px;
+}
+
+.custom-scrollbar:hover::-webkit-scrollbar-thumb {
+  background: #d6d6d7;
+}
+
+.custom-scrollbar:hover::-webkit-scrollbar-thumb:hover {
+  background: #b7bcc8;
+}
+
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: transparent white;
+}
+
+.custom-scrollbar:hover {
+  scrollbar-color: #d6d6d7 white;
 }
