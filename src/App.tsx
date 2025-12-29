@@ -37,7 +37,7 @@ function App() {
           <Route element={<ProtectedLayout />}>
             <Route path="/main" element={<Main />} />
             <Route path="/post" element={<Post />} />
-            <Route path="/post-content/:postId" element={<PostContent />} />
+            <Route path="/post/:postId" element={<PostContent />} />
             <Route path="/post-write" element={<PostWrite />} />
             <Route path="/my-post" element={<MyPost />} />
             <Route path="/mentoring" element={<Mentoring />} />
