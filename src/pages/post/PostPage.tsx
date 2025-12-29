@@ -71,17 +71,23 @@ export default function PostPage() {
 
   return (
     <div className="flex">
-      <Sidebar />
+      <div className="hidden lg:block">
+        <Sidebar />
+      </div>
 
       <div className="w-full flex-1">
-        <div className="max-w-[1500px] px-4 ml-80 lg:px-6">
-          <div className="flex items-center justify-between">
-            <h1 className="flex items-center gap-4 text-[40px] font-bold text-gray-1">
-              <span className="text-3xl 2xl:text-[40px]">익명 게시판</span>
-              <Divider className="shrink-0" />
+        <div className="max-w-[1500px] px-4 lg:px-6 lg:ml-80">
+          <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+            <h1 className="flex flex-wrap items-center gap-4 font-bold text-gray-1">
+              <span className="text-2xl sm:text-3xl xl:text-[40px]">
+                익명 게시판
+              </span>
+
+              <Divider className="shrink-0 hidden sm:block" />
+
               <Link
                 to="/my-post"
-                className="text-3xl 2xl:text-[40px] text-gray-2 hover:text-gray-1 transition-colors"
+                className="text-2xl sm:text-3xl xl:text-[40px] text-gray-2 hover:text-gray-1 transition-colors"
               >
                 내가 쓴 글
               </Link>
@@ -96,7 +102,7 @@ export default function PostPage() {
 
           <div className="border-t-2 border-gray-2">
             {postData.length === 0 && (
-              <div className="py-20 text-center text-2xl text-gray-2">
+              <div className="py-20 text-center text-xl sm:text-2xl text-gray-2">
                 검색 결과가 없습니다.
               </div>
             )}
@@ -111,7 +117,7 @@ export default function PostPage() {
                 likeCount={post.likeCount}
                 commentCount={post.commentCount}
                 timeAgo={new Date(post.createdAt).toLocaleDateString()}
-                onPostClick={() => navigate(`/post-content/${post.id}`)}
+                onPostClick={() => navigate(`/post/${post.id}`)}
                 actions={[
                   {
                     icon: <Report />,
@@ -125,11 +131,11 @@ export default function PostPage() {
             ))}
           </div>
 
-          <div className="flex justify-center gap-6 py-10 text-2xl font-bold">
+          <div className="flex justify-center gap-6 py-10 font-bold text-lg sm:text-xl md:text-2xl">
             <button
               disabled={page === 0}
               onClick={() => setPage((p) => p - 1)}
-              className="cursor-pointer"
+              className="cursor-pointer disabled:opacity-30"
             >
               이전
             </button>
@@ -141,7 +147,7 @@ export default function PostPage() {
             <button
               disabled={page + 1 >= totalPages}
               onClick={() => setPage((p) => p + 1)}
-              className="cursor-pointer"
+              className="cursor-pointer disabled:opacity-30"
             >
               다음
             </button>
