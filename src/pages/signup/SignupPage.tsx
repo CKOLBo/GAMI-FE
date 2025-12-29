@@ -75,7 +75,7 @@ export default function SignupPage() {
     { id: 'IT_NETWORK', label: 'IT Network' },
     { id: 'FLUTTER', label: 'Flutter' },
     { id: 'CYBER_SECURITY', label: 'Cyber Security' },
-    { id: 'GAME_DEVELOPMENT', label: 'Game Development' },
+    { id: 'GAME_DEVELOP', label: 'Game Development' },
     { id: 'CLOUD_COMPUTING', label: 'Cloud Computing' },
   ];
 
