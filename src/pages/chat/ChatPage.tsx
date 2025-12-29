@@ -407,7 +407,9 @@ export default function ChatPage() {
     }
 
     if (message.length > 250) {
-      toast.error(`메시지는 250자 이하로 작성해주세요. (현재 ${message.length}자)`);
+      toast.error(
+        `메시지는 250자 이하로 작성해주세요. (현재 ${message.length}자)`
+      );
       return;
     }
 
