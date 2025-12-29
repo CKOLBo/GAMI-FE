@@ -62,22 +62,33 @@ export default function MentoringPage() {
     const fetchData = async () => {
       try {
         setIsLoading(true);
-        const [mentorsResponse, memberResponse, sentAppliesResponse] =
-          await Promise.all([
-            instance.get<MentorListResponse>('/api/mentoring/mentor/all', {
-              params: {
-                page: 0,
-                size: 100,
-              },
-            }),
-            instance.get<MemberInfo>('/api/member'),
-            instance
-              .get<SentApply[]>(API_PATHS.MENTORING_APPLY_SENT)
-              .catch(() => ({ data: [] })),
-          ]);
+
+        // 먼저 현재 멤버 정보를 가져와 generation을 확보합니다.
+        let memberResponse: { data: MemberInfo } | null = null;
+        try {
+          memberResponse = await instance.get<MemberInfo>('/api/member');
+          setCurrentMemberId(memberResponse.data.memberId);
+        } catch (memberErr) {
+          // 멤버 조회 실패(예: 비인증) 시에도 멘토 목록은 generation 없이 가져옵니다.
+          memberResponse = null;
+          setCurrentMemberId(null);
+        }
+
+        const mentorParams: any = { page: 0, size: 100 };
+        if (memberResponse && memberResponse.data.generation != null) {
+          mentorParams.generation = memberResponse.data.generation;
+        }
+
+        const [mentorsResponse, sentAppliesResponse] = await Promise.all([
+          instance.get<MentorListResponse>('/api/mentoring/mentor/all', {
+            params: mentorParams,
+          }),
+          instance
+            .get<SentApply[]>(API_PATHS.MENTORING_APPLY_SENT)
+            .catch(() => ({ data: [] })),
+        ]);
 
         setAllMentors(mentorsResponse.data.content);
-        setCurrentMemberId(memberResponse.data.memberId);
         if (Array.isArray(sentAppliesResponse.data)) {
           setSentApplies(sentAppliesResponse.data);
         }

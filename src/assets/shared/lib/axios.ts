@@ -9,7 +9,7 @@ export class TokenRefreshError extends Error {
   }
 }
 
-export const baseURL = import.meta.env.DEV
+export const baseURL: string = import.meta.env.DEV
   ? ''
   : 'https://port-0-gami-server-mj0rdvda8d11523e.sel3.cloudtype.app';
 

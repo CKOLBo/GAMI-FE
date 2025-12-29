@@ -211,40 +211,37 @@ export function useStomp<TRoomMessage = unknown>(
 
       isConnectingRef.current = true;
 
-      const wsUrl = `${baseURL}/ws`;
+      // 안전한 WS URL 생성: 개발환경에서는 baseURL이 빈 문자열이므로
+      // origin을 사용해 백엔드 endpoint로 연결하도록 합니다.
+      // baseURL may be '' in dev. Ensure we have a usable origin string.
+      const backendOriginRaw = baseURL && baseURL !== '' ? baseURL : window.location.origin;
+      let backendOrigin = String(backendOriginRaw);
+
+      // If someone provided a ws/wss URL, convert to http/https for SockJS.
+      if (backendOrigin.startsWith('ws:')) {
+        backendOrigin = backendOrigin.replace(/^ws:/, 'http:');
+      } else if (backendOrigin.startsWith('wss:')) {
+        backendOrigin = backendOrigin.replace(/^wss:/, 'https:');
+      }
+
+      // Ensure trailing slash handling
+      const sockjsUrl = backendOrigin.endsWith('/')
+        ? backendOrigin + 'ws'
+        : backendOrigin + '/ws';
 
       if (connectionTimeoutIdRef.current) {
         clearTimeout(connectionTimeoutIdRef.current);
         connectionTimeoutIdRef.current = null;
       }
 
-      const socket = new SockJS(wsUrl, null, {
-        transports: ['websocket', 'xhr-streaming', 'xhr-polling'],
-      });
-
-      socket.onerror = (error: Event) => {
-        console.error('SockJS 오류:', error);
-        isConnectingRef.current = false;
-        if (connectionTimeoutIdRef.current) {
-          clearTimeout(connectionTimeoutIdRef.current);
-          connectionTimeoutIdRef.current = null;
-        }
-      };
-
-      socket.onclose = () => {
-        isConnectingRef.current = false;
-        if (connectionTimeoutIdRef.current) {
-          clearTimeout(connectionTimeoutIdRef.current);
-          connectionTimeoutIdRef.current = null;
-        }
-      };
-
       const client = new Client({
-        webSocketFactory: () => socket as WebSocket,
+        // SockJS 인스턴스를 webSocketFactory에서 직접 생성해서 반환합니다.
+        webSocketFactory: () => new SockJS(sockjsUrl),
         connectHeaders: {
           Authorization: `Bearer ${token}`,
         },
-        reconnectDelay: 0,
+        // 재접속 지연을 두어 반복 연결 시도를 완화합니다.
+        reconnectDelay: 2000,
         heartbeatIncoming: 4000,
         heartbeatOutgoing: 4000,
         connectionTimeout: 10000,
