@@ -50,6 +50,12 @@ interface SentApply {
   createdAt: string;
 }
 
+type MentorParams = {
+  page: number;
+  size: number;
+  generation?: number;
+};
+
 export default function MentoringPage() {
   const [allMentors, setAllMentors] = useState<MentorData[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -68,13 +74,13 @@ export default function MentoringPage() {
         try {
           memberResponse = await instance.get<MemberInfo>('/api/member');
           setCurrentMemberId(memberResponse.data.memberId);
-        } catch (memberErr) {
+        } catch {
           // 멤버 조회 실패(예: 비인증) 시에도 멘토 목록은 generation 없이 가져옵니다.
           memberResponse = null;
           setCurrentMemberId(null);
         }
 
-        const mentorParams: any = { page: 0, size: 100 };
+        const mentorParams: MentorParams = { page: 0, size: 100 };
         if (memberResponse && memberResponse.data.generation != null) {
           mentorParams.generation = memberResponse.data.generation;
         }
