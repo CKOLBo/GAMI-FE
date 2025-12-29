@@ -237,8 +237,19 @@ export default function PostContent() {
       if (!token) return false;
 
       const payload = JSON.parse(atob(token.split('.')[1]));
-      return payload.role === 'ADMIN' || payload.role === 'ROLE_ADMIN';
-    } catch {
+
+      console.log('JWT payload:', payload);
+
+      return (
+        payload.role === 'ADMIN' ||
+        payload.role === 'ROLE_ADMIN' ||
+        payload.auth === 'ROLE_ADMIN' ||
+        payload.authority === 'ADMIN' ||
+        payload.roles?.includes('ADMIN') ||
+        payload.roles?.includes('ROLE_ADMIN')
+      );
+    } catch (e) {
+      console.error('isAdmin error', e);
       return false;
     }
   };
@@ -273,6 +284,19 @@ export default function PostContent() {
               {postData.content}
             </ReactMarkdown>
           </div>
+
+          {postData.images && postData.images.length > 0 && (
+            <div className="flex flex-wrap gap-4 mb-20">
+              {postData.images.map((imageUrl, idx) => (
+                <img
+                  key={idx}
+                  src={imageUrl}
+                  alt={`post-image-${idx}`}
+                  className="max-w-[400px] rounded-lg border"
+                />
+              ))}
+            </div>
+          )}
 
           <div className="flex gap-12 mb-34">
             <div className="border rounded-full p-4 w-18 h-18 border-gray-2">
@@ -340,11 +364,7 @@ export default function PostContent() {
               </button>
 
               {isAdmin() && (
-                <button
-                  onClick={handleAdminDelete}
-                  className="hover:opacity-70"
-                  title="게시글 삭제"
-                >
+                <button onClick={handleAdminDelete} className="cursor-pointer">
                   <Delete />
                 </button>
               )}
