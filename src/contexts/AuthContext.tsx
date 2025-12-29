@@ -35,7 +35,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
     return null;
   });
-    const [initialized] = useState(true);
+  const [initialized] = useState(true);
 
   const login = (userData: User, token?: string) => {
     setUser(userData);
