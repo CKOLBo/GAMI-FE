@@ -37,7 +37,7 @@ export default function ChatApplyPage() {
         const newCount = response.data.filter(
           (req) => req.applyStatus === 'PENDING'
         ).length;
-        
+
         // 새로운 요청이 들어온 경우 알림
         if (newCount > previousReceivedCountRef.current) {
           const newRequests = response.data.filter(
@@ -50,7 +50,7 @@ export default function ChatApplyPage() {
             toast.info(`${addedCount}개의 새로운 요청이 왔어요`);
           }
         }
-        
+
         previousReceivedCountRef.current = newCount;
         setReceivedRequests(response.data);
       }
