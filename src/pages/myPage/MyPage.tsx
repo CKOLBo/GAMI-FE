@@ -14,15 +14,36 @@ interface MemberProfile {
   name: string;
   gender: 'MALE' | 'FEMALE';
   generation: number;
-  major: 'FRONTEND' | 'BACKEND' | 'ANDROID' | 'IOS' | 'DESIGN';
+  major:
+    | 'FRONTEND'
+    | 'BACKEND'
+    | 'ANDROID'
+    | 'IOS'
+    | 'MOBILE_ROBOTICS'
+    | 'DESIGN'
+    | 'DEVOPS'
+    | 'AI'
+    | 'IT_NETWORK'
+    | 'FLUTTER'
+    | 'CYBER_SECURITY'
+    | 'GAME_DEVELOP'
+    | 'CLOUD_COMPUTING';
 }
 
 const majorToInterestMap: Record<string, string> = {
   FRONTEND: 'FE',
   BACKEND: 'BE',
-  ANDROID: 'AOS',
+  ANDROID: 'Android',
   IOS: 'iOS',
+  MOBILE_ROBOTICS: 'Mobile Robotics',
   DESIGN: 'Design',
+  DEVOPS: 'DevOps',
+  AI: 'AI',
+  IT_NETWORK: 'IT Network',
+  FLUTTER: 'Flutter',
+  CYBER_SECURITY: 'Cyber Security',
+  GAME_DEVELOP: 'Game Development',
+  CLOUD_COMPUTING: 'Cloud Computing',
 };
 
 export default function MyPage() {
