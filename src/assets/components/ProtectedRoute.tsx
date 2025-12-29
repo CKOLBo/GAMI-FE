@@ -30,7 +30,15 @@ export default function ProtectedRoute({
       ? requiredRole
       : [requiredRole];
 
-    const hasRole = required.some((r) => userRoles.includes(r));
+    const normalize = (r: string) => r.replace(/^ROLE_/i, '').toUpperCase();
+
+    const normalizedUserRoles = userRoles.map((r) => normalize(r));
+    const normalizedRequired = required.map((r) => normalize(r));
+
+    const hasRole = normalizedRequired.some((req) =>
+      normalizedUserRoles.includes(req)
+    );
+
     if (!hasRole) {
       return <NotFound />;
     }
