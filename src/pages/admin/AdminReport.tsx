@@ -219,9 +219,7 @@ export default function AdminReport({
 
               <div className="shrink-0 w-[120px] flex justify-center">
                 <button
-                  onClick={() =>
-                    navigate(`/post-content/${report.reportedPostId}`)
-                  }
+                  onClick={() => navigate(`/post/${report.reportedPostId}`)}
                   className="text-main-1 font-semibold cursor-pointer text-2xl whitespace-nowrap"
                 >
                   바로가기
