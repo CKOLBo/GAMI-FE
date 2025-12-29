@@ -45,16 +45,8 @@ function App() {
             <Route path="/my-page" element={<MyPage />} />
             <Route path="/chat" element={<ChatPage />} />
             <Route path="/chat-apply" element={<ChatApplyPage />} />
+            <Route path="/admin" element={<Admin />} />
           </Route>
-
-          <Route
-            path="/admin"
-            element={
-              <ProtectedRoute requiredRole={'ADMIN'}>
-                <Admin />
-              </ProtectedRoute>
-            }
-          />
           <Route path="*" element={<NotFound />} />
         </Routes>
 
