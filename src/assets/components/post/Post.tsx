@@ -34,7 +34,7 @@ export default function Post({
     if (onPostClick) {
       onPostClick();
     } else {
-      navigate(`/post-content/${postId}`);
+      navigate(`/post/${postId}`);
     }
   };
 
