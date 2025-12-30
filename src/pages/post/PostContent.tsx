@@ -17,6 +17,7 @@ import { instance } from '@/assets/shared/lib/axios';
 
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import DeleteModal from '@/assets/components/modal/DeleteModal';
 
 interface PostDetailType {
   id: number;
@@ -60,6 +61,8 @@ export default function PostContent() {
 
   const [comments, setComments] = useState<CommentType[]>([]);
   const [isCommentLoading, setIsCommentLoading] = useState(false);
+
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const calculateTimeAgo = (createdAt: string) => {
     const now = new Date();
@@ -186,11 +189,9 @@ export default function PostContent() {
   const handleAdminDelete = async () => {
     if (!postId) return;
 
-    const confirmDelete = window.confirm('게시글을 삭제하시겠습니까?');
-    if (!confirmDelete) return;
-
     try {
       await instance.delete(`/api/admin/post/${postId}`);
+
       toast.success('게시글이 삭제되었습니다.');
       navigate(-1);
     } catch (error: unknown) {
@@ -198,11 +199,20 @@ export default function PostContent() {
         const status = (error as { response?: { status?: number } }).response
           ?.status;
 
-        if (status === 401) toast.error('로그인이 필요합니다.');
-        else if (status === 403) toast.error('관리자 권한이 없습니다.');
-        else if (status === 404) toast.error('게시글을 찾을 수 없습니다.');
-        else toast.error('게시글 삭제에 실패했습니다.');
+        if (status === 401) {
+          toast.error('로그인이 필요합니다.');
+        } else if (status === 403) {
+          toast.error('관리자 권한이 없습니다.');
+        } else if (status === 404) {
+          toast.error('게시글을 찾을 수 없습니다.');
+        } else {
+          toast.error('게시글 삭제에 실패했습니다.');
+        }
+      } else {
+        toast.error('서버와 통신할 수 없습니다.');
       }
+    } finally {
+      setIsDeleteModalOpen(false);
     }
   };
 
@@ -228,29 +238,6 @@ export default function PostContent() {
       }
     } finally {
       setIsCommentLoading(false);
-    }
-  };
-
-  const isAdmin = () => {
-    try {
-      const token = localStorage.getItem('accessToken');
-      if (!token) return false;
-
-      const payload = JSON.parse(atob(token.split('.')[1]));
-
-      console.log('JWT payload:', payload);
-
-      return (
-        payload.role === 'ADMIN' ||
-        payload.role === 'ROLE_ADMIN' ||
-        payload.auth === 'ROLE_ADMIN' ||
-        payload.authority === 'ADMIN' ||
-        payload.roles?.includes('ADMIN') ||
-        payload.roles?.includes('ROLE_ADMIN')
-      );
-    } catch (e) {
-      console.error('isAdmin error', e);
-      return false;
     }
   };
 
@@ -363,11 +350,12 @@ export default function PostContent() {
                 <Report />
               </button>
 
-              {isAdmin() && (
-                <button onClick={handleAdminDelete} className="cursor-pointer">
-                  <Delete />
-                </button>
-              )}
+              <button
+                onClick={() => setIsDeleteModalOpen(true)}
+                className="cursor-pointer"
+              >
+                <Delete />
+              </button>
             </div>
           </div>
 
@@ -411,6 +399,13 @@ export default function PostContent() {
           postId={Number(postId)}
           onClose={() => setIsModalOpen(false)}
           onReport={() => setIsModalOpen(false)}
+        />
+      )}
+
+      {isDeleteModalOpen && (
+        <DeleteModal
+          onClose={() => setIsDeleteModalOpen(false)}
+          onDelete={handleAdminDelete}
         />
       )}
     </>
